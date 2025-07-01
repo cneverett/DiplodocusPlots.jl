@@ -1,4 +1,4 @@
-function ObserverFlux(PhaseSpace::DT.PhaseSpaceStruct,sol::DT.OutputStruct,ObserverAngles::Vector{Float64},ObserverDistance::Float64)
+function ObserverFlux(PhaseSpace::PhaseSpaceStruct,sol::OutputStruct,ObserverAngles::Vector{Float64},ObserverDistance::Float64)
 
     Space = PhaseSpace.Space
     Time = PhaseSpace.Time
@@ -6,7 +6,7 @@ function ObserverFlux(PhaseSpace::DT.PhaseSpaceStruct,sol::DT.OutputStruct,Obser
     Grids = PhaseSpace.Grids
     name_list = PhaseSpace.name_list
 
-    if typeof(Space.space_coordinates) != DT.Cylindrical
+    if typeof(Space.space_coordinates) != Cylindrical
         error("ObserverFlux is only implemented for cylindrical coordinates.")
     end
 
@@ -117,7 +117,7 @@ function ObserverFlux(PhaseSpace::DT.PhaseSpaceStruct,sol::DT.OutputStruct,Obser
 end
 
 
-function ObserverFluxPlot(PhaseSpace::DT.PhaseSpaceStruct,sol::DT.OutputStruct,ObserverAngles::Vector{Float64},ObserverDistance::Float64;plot_limits=(nothing,nothing))
+function ObserverFluxPlot(PhaseSpace::PhaseSpaceStruct,sol::OutputStruct,ObserverAngles::Vector{Float64},ObserverDistance::Float64;plot_limits=(nothing,nothing))
 
     GLMakie.activate!(inline=false)
 

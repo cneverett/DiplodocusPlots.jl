@@ -6,8 +6,8 @@ module DiplodocusPlots
     using CairoMakie
     using GLMakie
 
-    import DiplodocusCollisions as DC
-    import DiplodocusTransport as DT
+    using DiplodocusCollisions
+    using DiplodocusTransport
 
     include("Themes.jl")
     include("CollisionPlots/Interactive/AnalyticalSpectra.jl/InverseCompton.jl")
