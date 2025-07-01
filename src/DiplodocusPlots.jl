@@ -1,7 +1,5 @@
 module DiplodocusPlots
 
-    export InteractiveGainLossPlot
-
     #using CairoMakie
     using GLMakie
 
@@ -10,5 +8,7 @@ module DiplodocusPlots
 
     include("..\\..\\BoltzmannCollisionIntegral\\CompTests.jl") # remove later
     include("CollisionPlots/Interactive/GainLossAnalysis.jl")
+
+    include("TransportPlots/ObserverFlux.jl")
 
 end
