@@ -6,7 +6,7 @@ module DiplodocusPlots
     import DiplodocusCollisions as DC
     import DiplodocusTransport as DT
 
-    include("..\\..\\BoltzmannCollisionIntegral\\CompTests.jl") # remove later
+    include("CollisionPlots/Interactive/AnalyticalSpectra.jl/InverseCompton.jl")
     include("CollisionPlots/Interactive/GainLossAnalysis.jl")
 
     include("TransportPlots/ObserverFlux.jl")
