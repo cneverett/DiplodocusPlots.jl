@@ -1,6 +1,8 @@
-function InteractiveBinaryGainLossPlot(Output::Tuple)
+function InteractiveBinaryGainLossPlot(Output::Tuple;theme=DiplodocusDark())
 
     GLMakie.activate!(inline=false)
+
+    with_theme(theme) do
 
     (name1,name2,name3,name4,mu1,mu2,mu3,mu4,p1_low,p1_up,p1_grid,p1_num,u1_grid,u1_num,h1_grid,h1_num,p2_low,p2_up,p2_grid,p2_num,u2_grid,u2_num,h2_grid,h2_num,p3_low,p3_up,p3_grid,p3_num,u3_grid,u3_num,h3_grid,h3_num,p4_low,p4_up,p4_grid,p4_num,u4_grid,u4_num,h4_grid,h4_num) = Output[1]
     
@@ -124,8 +126,11 @@ function InteractiveBinaryGainLossPlot(Output::Tuple)
     # Loss Matrix   
     p1_loss = @lift($(cbAngAvg.checked) ? log10.(LossMatrix1Avg[$p1_idx,$p2_idx]) : log10.(LossMatrix1[$p1_idx,$u1_idx,$h1_idx,$p2_idx,$u2_idx,$h2_idx]))
     p2_loss = @lift($(cbAngAvg.checked) ? log10.(LossMatrix2Avg[$p2_idx,$p1_idx]) : log10.(LossMatrix2[$p2_idx,$u2_idx,$h2_idx,$p1_idx,$u1_idx,$h1_idx]))
+    # Gain Matrix
+    p3_gain = @lift($(cbAngAvg.checked) ? log10.(GainMatrix3Avg[1:end,$p1_idx,$p2_idx]) : log10.(GainMatrix3[1:end,$u3_idx,$h3_idx,$p1_idx,$u1_idx,$h1_idx,$p2_idx,$u2_idx,$h2_idx]))
+    p4_gain = @lift($(cbAngAvg.checked) ? log10.(GainMatrix4Avg[1:end,$p1_idx,$p2_idx]) : log10.(GainMatrix4[1:end,$u4_idx,$h4_idx,$p1_idx,$u1_idx,$h1_idx,$p2_idx,$u2_idx,$h2_idx]))
 
-    #limits = @lift((min($p1_val,$p2_val)-2.0,max($p1_val,$p2_val)+2.0), (max($p1_loss,$p2_loss)-12.0,max($p1_loss,$p2_loss)+2.0))
+    # limits
     y_max = @lift(max($p1_loss,$p2_loss)+2.0)
     y_min = @lift(min($p1_loss,$p2_loss)-12.0)
     x_min = @lift(min($p1_val,$p2_val)-2.0)
@@ -139,14 +144,9 @@ function InteractiveBinaryGainLossPlot(Output::Tuple)
     ax1.aspect = DataAspect()
 
     scatterlines!(ax1,p1_val,p1_loss, label = "$name1 Loss Spectrum")
-    scatterlines!(ax1,p2_val,p2_loss, label = "$name2 Loss Spectrum")
-
-    # Gain Matrix
-    p3_gain = @lift($(cbAngAvg.checked) ? log10.(GainMatrix3Avg[1:end,$p1_idx,$p2_idx]) : log10.(GainMatrix3[1:end,$u3_idx,$h3_idx,$p1_idx,$u1_idx,$h1_idx,$p2_idx,$u2_idx,$h2_idx]))
-    p4_gain = @lift($(cbAngAvg.checked) ? log10.(GainMatrix4Avg[1:end,$p1_idx,$p2_idx]) : log10.(GainMatrix4[1:end,$u4_idx,$h4_idx,$p1_idx,$u1_idx,$h1_idx,$p2_idx,$u2_idx,$h2_idx]))
+    scatterlines!(ax1,p2_val,p2_loss, label = "$name2 Loss Spectrum")   
     scatterlines!(ax1,log10.(p3_m),p3_gain, label = "$name3 Gain Spectrum")
     scatterlines!(ax1,log10.(p4_m),p4_gain, label = "$name4 Gain Spectrum")
-
 
     # lines for what the incoming state momenta are
     vlines!(ax1,p1_val,color=:black,linestyle=:dash)
@@ -162,12 +162,11 @@ function InteractiveBinaryGainLossPlot(Output::Tuple)
         end
     end
 
-    
-    
-
     Legend(subgl2[1,1:2],ax1)
 
     return fig
+
+    end # theme
 
 end
 
