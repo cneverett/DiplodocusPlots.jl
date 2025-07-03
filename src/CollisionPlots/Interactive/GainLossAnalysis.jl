@@ -1,4 +1,4 @@
-function InteractiveGainLossBinaryPlot(Output::Tuple)
+function InteractiveBinaryGainLossPlot(Output::Tuple)
 
     GLMakie.activate!(inline=false)
 

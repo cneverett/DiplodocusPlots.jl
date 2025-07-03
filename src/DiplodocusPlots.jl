@@ -2,11 +2,12 @@ module DiplodocusPlots
 
     export DiplodocusDark, DiplodocusLight
     export MomentumDistributionPlot
+    export InteractiveBinaryGainLossPlot
 
     using CairoMakie
     using GLMakie
 
-    using DiplodocusCollisions
+    import DiplodocusCollisions as DC
     using DiplodocusTransport
 
     include("Themes.jl")
