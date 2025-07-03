@@ -38,10 +38,12 @@ function InteractiveBinaryGainLossPlot(Output::Tuple)
     vlines!(ax1,p2_val,color=:black,linestyle=:dot)
 
     # analytic kernels
-    p3_val_true = @lift(log10.(replace(IC_kernel.(p2_m[$p2_idx],p1_m[$p1_idx],p2_m[$p2_idx]+sqrt(p1_m[$p1_idx]^2+1e0^2).- sqrt.(p1_m.^2 .+1e0^2)),0.0 => NaN) .* (p1_m ./ sqrt.(p1_m.^2 .+ 1e0^2)).* p1_d))
-    p4_val_true = @lift(log10.(replace(IC_kernel.(p2_m[$p2_idx],p1_m[$p1_idx],p2_m),0.0 => NaN) .* p2_d))
-    scatterlines!(ax1,log10.(p1_m),p3_val_true,color=:green,strokewidth=1.0,markersize=0.0)
-    scatterlines!(ax1,log10.(p2_m),p4_val_true,markersize=0.0,color=:red, strokewidth=1.0);
+    if name1 == "Ele" && name2 == "Pho" && name3 == "Ele" && name4 == "Pho" # Inverse Compton
+        p3_val_true = @lift(log10.(replace(IC_kernel.(p2_m[$p2_idx],p1_m[$p1_idx],p2_m[$p2_idx]+sqrt(p1_m[$p1_idx]^2+1e0^2).- sqrt.(p1_m.^2 .+1e0^2)),0.0 => NaN) .* (p1_m ./ sqrt.(p1_m.^2 .+ 1e0^2)).* p1_d))
+        p4_val_true = @lift(log10.(replace(IC_kernel.(p2_m[$p2_idx],p1_m[$p1_idx],p2_m),0.0 => NaN) .* p2_d))
+        scatterlines!(ax1,log10.(p1_m),p3_val_true,color=:green,strokewidth=1.0,markersize=0.0)
+        scatterlines!(ax1,log10.(p2_m),p4_val_true,markersize=0.0,color=:red, strokewidth=1.0)
+    end
 
     # Loss Matrix   
     p1_loss = @lift(log10.(LossMatrix1[$p1_idx,$p2_idx]))
@@ -50,8 +52,8 @@ function InteractiveBinaryGainLossPlot(Output::Tuple)
     hlines!(ax1,p2_loss)
 
     # Gain Matrix
-    p3_gain = @lift(log10.(GainMatrix3[1:end,$p1_idx,$p2_idx])) # ignore overflow
-    p4_gain = @lift(log10.(GainMatrix4[1:end,$p1_idx,$p2_idx])) # ignore overflow
+    p3_gain = @lift(log10.(GainMatrix3[1:end,$p1_idx,$p2_idx]))
+    p4_gain = @lift(log10.(GainMatrix4[1:end,$p1_idx,$p2_idx]))
     scatter!(ax1,log10.(p1_m),p3_gain)
     scatter!(ax1,log10.(p2_m),p4_gain)
 
