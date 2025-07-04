@@ -25,7 +25,7 @@ function MomentumDistributionPlot(sol,species::String,PhaseSpace::PhaseSpaceStru
     dp = Grids.dpx_list[species_index]
     du = Grids.dpy_list[species_index]
     meanp = Grids.mpx_list[species_index]
-    p_r = Grids.p_r_list[species_index]
+    p_r = Grids.pxr_list[species_index]
 
     d = zeros(Float32,p_num,u_num)
     dj = zeros(Float32,p_num,2)
