@@ -78,7 +78,7 @@ function MomentumDistributionPlot(sol,species::String,PhaseSpace::PhaseSpaceStru
 
     Colorbar(fig[1,2],colormap = my_colors,limits=(log10(sol.t[2]),log10(sol.t[end])),label=L"$\log_{10}(t)$ $[\text{s} * \sigma_{T}c]$")
 
-    if plot_limts == (nothing,nothing)
+    if plot_limits == (nothing,nothing)
         xlims!(ax,(p_r[1],p_r[end]))
         ylims!(ax,(max_total-11.0,max_total+1.0)) 
     end
