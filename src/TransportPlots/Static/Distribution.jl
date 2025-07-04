@@ -1,16 +1,26 @@
 """
-    MomentumDistributionPlot(sol,species,PhaseSpace;step=1,uDis=false,logt=false,plot_limits=(nothing,nothing),theme=DiplodocusDark())
+    MomentumDistributionPlot(sol,species,PhaseSpace;step=1,order=1,uDis=false,logt=false,plot_limits=(nothing,nothing),theme=DiplodocusDark())
 
 Plots the angle averaged distribution function of of a given particle `species` as a function of time given by the `sol` based on the conditions held in `PhaseSpace`. 
+
+Optional arguments:
+- `step`: the step size in time to plot, default is 1.
+- `order`: the order of p in p^order * dN/dp dV, default is 1, i.e. number density spectrum. 2 is "energy" density spectrum.
 """
-function MomentumDistributionPlot(sol,species::String,PhaseSpace::PhaseSpaceStruct;step=1,uDis=false,logt=false,plot_limits=(nothing,nothing),theme=DiplodocusDark())
+function MomentumDistributionPlot(sol,species::String,PhaseSpace::PhaseSpaceStruct;step=1,order::Int64=1,thermal=false,uDis=false,logt=false,plot_limits=(nothing,nothing),theme=DiplodocusDark())
 
     CairoMakie.activate!(inline=true) # plot in vs code window
 
     with_theme(theme) do
 
     fig = Figure()
-    ax = Axis(fig[1,1],xlabel=L"$\log_{10}p$ $[m_\text{Ele}c]$",ylabel=L"$\log_{10}\left(p^2\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V}\right)$ $[\text{m}^{-3}]$",aspect=DataAspect())
+    xlab = L"$\log_{10}p$ $[m_\text{Ele}c]$"
+    if order == 1
+        ylab = L"$\log_{10}\left(p\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V}\right)$ $[\text{m}^{-3}]$"
+    elseif order == 2
+        ylab = L"$\log_{10}\left(p\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V}\right)$ $[\text{m}^{-3}]$"
+    end
+    ax = Axis(fig[1,1],xlabel=xlab,ylabel=ylab,aspect=DataAspect())
     ax.limits = plot_limits
 
     name_list = PhaseSpace.name_list
@@ -26,6 +36,8 @@ function MomentumDistributionPlot(sol,species::String,PhaseSpace::PhaseSpaceStru
     du = Grids.dpy_list[species_index]
     meanp = Grids.mpx_list[species_index]
     p_r = Grids.pxr_list[species_index]
+    u_r = Grids.pyr_list[species_index]
+    mass = Grids.mass_list[species_index]
 
     d = zeros(Float32,p_num,u_num)
     dj = zeros(Float32,p_num,2)
@@ -66,7 +78,13 @@ function MomentumDistributionPlot(sol,species::String,PhaseSpace::PhaseSpaceStru
                 scatterlines!(ax,log10.(meanp),dj[:,1],linewidth=2.0,color = my_colors[color_counter],markersize=1.0)
                 scatterlines!(ax,log10.(meanp),dj[:,2],linewidth=2.0,color = my_colors[color_counter],markersize=1.0,linestyle=:dash)
             else
-                dj[:,1] .= log10.(d*du .* dp)
+                # sum along u direction
+                pdNdp = dropdims(sum(d, dims=2),dims=2)
+                if order == 1
+                    dj[:,1] .= log10.(pdNdp) 
+                elseif order == 2
+                    dj[:,1] .= log10.(pdNdp .* meanp)
+                end
                 scatterlines!(ax,log10.(meanp),dj[:,1],linewidth=2.0,color = my_colors[color_counter],markersize=1.0)
             end
 
@@ -76,10 +94,36 @@ function MomentumDistributionPlot(sol,species::String,PhaseSpace::PhaseSpaceStru
 
     end
 
-    Colorbar(fig[1,2],colormap = my_colors,limits=(log10(sol.t[2]),log10(sol.t[end])),label=L"$\log_{10}(t)$ $[\text{s} * \sigma_{T}c]$")
+    if thermal
+
+        # expected thermal spectrum based on final time step
+        f = sol.f[end].x[species_index]
+        Nᵃ = DiplodocusTransport.FourFlow(f,p_num,u_num,p_r,u_r,mass)
+        Uₐ = [-1.0,0.0,0.0,0.0] # static observer
+        num = DiplodocusTransport.ScalarNumberDensity(Nᵃ,Uₐ)
+        Δab = DiplodocusTransport.ProjectionTensor(Uₐ)
+        Tᵃᵇ = DiplodocusTransport.StressEnergyTensor(f,p_num,u_num,p_r,u_r,mass)
+        Pressure = DiplodocusTransport.ScalarPressure(Tᵃᵇ,Δab)
+        Temperature = DiplodocusTransport.ScalarTemperature(Pressure,num)
+
+        MJ = DiplodocusTransport.MaxwellJuttner_Distribution(PhaseSpace,"Sph",Temperature,mass;n=num)
+
+        if order == 2
+            MJ = MJ .* meanp
+        end
+
+        scatterlines!(ax,log10.(meanp),log10.(MJ),linewidth=2.0,color = :white,markersize=0.0,linestyle=:dash,label="Maxwell-Juttner")
+
+    end
+
+    if Time.t_grid == "u"
+        Colorbar(fig[1,2],colormap = my_colors,limits=(sol.t[1],sol.t[end]),label=L"$t$ $[\text{s} * \sigma_{T}c]$")
+    elseif Time.t_grid == "l"
+        Colorbar(fig[1,2],colormap = my_colors,limits=(log10(sol.t[1]),log10(sol.t[end])),label=L"$\log_{10}(t)$ $[\text{s} * \sigma_{T}c]$")
+    end
 
     if plot_limits == (nothing,nothing)
-        xlims!(ax,(p_r[1],p_r[end]))
+        xlims!(ax,(log10.(p_r[1]),log10.(p_r[end])))
         ylims!(ax,(max_total-11.0,max_total+1.0)) 
     end
     

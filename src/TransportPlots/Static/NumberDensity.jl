@@ -44,10 +44,10 @@ function NumberDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;specie
         end
 
         if t_grid == "u"
-            scatterlines!(ax,sol.t,num,marker = :circle,markersize=1.0,label=name_list[j])
+            scatterlines!(ax,sol.t,num,marker = :circle,markersize=0.0,label=name_list[j])
             xlims!(ax,sol.t[1],sol.t[end])
         elseif t_grid == "l"
-            scatterlines!(ax,log10.(sol.t),num,marker = :circle,markersize=1.0,label=name_list[j])
+            scatterlines!(ax,log10.(sol.t),num,marker = :circle,markersize=0.0,label=name_list[j])
             xlims!(ax,log10(sol.t[1]),log10(sol.t[end]))
         end
 
@@ -70,6 +70,8 @@ Returns a plot of the fractional change in number density of all species between
 """
 function FracNumberDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::String="All",fig=nothing,theme=DiplodocusDark())
 
+    CairoMakie.activate!(inline=true) # plot in vs code window
+
     with_theme(theme) do
 
     name_list = PhaseSpace.name_list
@@ -85,9 +87,6 @@ function FracNumberDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;sp
     ur_list = Grids.pyr_list
 
     mass_list = Grids.mass_list
-
-    num_species = length(name_list)
-
 
     if isnothing(fig)
         fig = Figure(size=(600,300))
@@ -117,10 +116,10 @@ function FracNumberDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;sp
         end
 
         if t_grid == "u"
-            scatterlines!(ax,sol.t,frac_num,marker = :circle,markersize=1.0,label=name_list[j])
+            scatterlines!(ax,sol.t,frac_num,marker = :circle,markersize=0.0,label=name_list[j])
             xlims!(ax,sol.t[1],sol.t[end])
         elseif t_grid == "l"
-            scatterlines!(ax,log10.(sol.t),frac_num,marker = :circle,markersize=1.0,label=name_list[j])
+            scatterlines!(ax,log10.(sol.t),frac_num,marker = :circle,markersize=0.0,label=name_list[j])
             xlims!(ax,log10(sol.t[1]),log10(sol.t[end]))
         end
 

@@ -47,10 +47,10 @@ function EnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;specie
         end
 
         if t_grid == "u"
-            scatterlines!(ax,sol.t,eng,marker = :circle,markersize=1.0,label=name_list[j])
+            scatterlines!(ax,sol.t,eng,marker = :circle,markersize=0.0,label=name_list[j])
             xlims!(ax,sol.t[1],sol.t[end])
         elseif t_grid == "l"
-            scatterlines!(ax,log10.(sol.t),eng,marker = :circle,markersize=1.0,label=name_list[j])
+            scatterlines!(ax,log10.(sol.t),eng,marker = :circle,markersize=0.0,label=name_list[j])
             xlims!(ax,log10(sol.t[1]),log10(sol.t[end]))
         end
 
@@ -73,6 +73,8 @@ Returns a plot of the fractional change in energy density of all species between
 """
 function FracEnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::String="All",fig=nothing,theme=DiplodocusDark())
 
+    CairoMakie.activate!(inline=true) # plot in vs code window
+
     with_theme(theme) do
 
     name_list = PhaseSpace.name_list
@@ -89,14 +91,11 @@ function FracEnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;sp
 
     mass_list = Grids.mass_list
 
-    num_species = length(name_list)
-
-
     if isnothing(fig)
         fig = Figure(size=(600,300))
-        ax = Axis(fig[1,1],title="Frac. Change in Number Density",xlabel="Time",ylabel="Frac. Change")
+        ax = Axis(fig[1,1],title="Frac. Change in Energy Density",xlabel="Time",ylabel="Frac. Change")
     else
-        ax = Axis(fig,title="Frac. Change in Number Density",xlabel="Time",ylabel="Frac. Change")
+        ax = Axis(fig,title="Frac. Change in Energy Density",xlabel="Time",ylabel="Frac. Change")
     end
 
     #j = findfirst(x->x==species,name_list)
@@ -124,10 +123,10 @@ function FracEnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;sp
         end
 
         if t_grid == "u"
-            scatterlines!(ax,sol.t,frac_eng,marker = :circle,markersize=1.0,label=name_list[j])
+            scatterlines!(ax,sol.t,frac_eng,marker = :circle,markersize=0.0,label=name_list[j])
             xlims!(ax,sol.t[1],sol.t[end])
         elseif t_grid == "l"
-            scatterlines!(ax,log10.(sol.t),frac_eng,marker = :circle,markersize=1.0,label=name_list[j])
+            scatterlines!(ax,log10.(sol.t),frac_eng,marker = :circle,markersize=0.0,label=name_list[j])
             xlims!(ax,log10(sol.t[1]),log10(sol.t[end]))
         end
 
