@@ -21,6 +21,7 @@ module DiplodocusPlots
     include("TransportPlots/Static/Distribution.jl")
     include("TransportPlots/Static/NumberDensity.jl")
     include("TransportPlots/Static/EnergyDensity.jl")
+    include("TransportPlots/Static/ThermalAndIsotropic.jl")
     #Interactive Plots
     include("TransportPlots/Interactive/ObserverFlux.jl")
 
