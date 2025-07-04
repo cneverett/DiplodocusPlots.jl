@@ -56,7 +56,7 @@ function MomentumDistributionPlot(sol,species::String,PhaseSpace::PhaseSpaceStru
         d .= reshape(sol.f[i].x[species_index],(p_num,u_num))
 
         max_d = maximum(x for x in d if !isnan(x))
-        max = max(max_t,max)
+        max = max(max_d,max)
 
         @. d = d*(d!=Inf)
 
