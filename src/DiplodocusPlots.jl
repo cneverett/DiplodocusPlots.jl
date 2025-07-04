@@ -3,6 +3,8 @@ module DiplodocusPlots
     export DiplodocusDark, DiplodocusLight
     export MomentumDistributionPlot
     export InteractiveBinaryGainLossPlot
+    export FracNumberDensityPlot, NumberDensityPlot
+    export FracEnergyDensityPlot, EnergyDensityPlot
 
     using CairoMakie
     using GLMakie
@@ -17,6 +19,8 @@ module DiplodocusPlots
     # Transport Plots
     # Static Plots
     include("TransportPlots/Static/Distribution.jl")
+    include("TransportPlots/Static/NumberDensity.jl")
+    include("TransportPlots/Static/EnergyDensity.jl")
     #Interactive Plots
     include("TransportPlots/Interactive/ObserverFlux.jl")
 

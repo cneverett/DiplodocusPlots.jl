@@ -1,9 +1,9 @@
 """
-    NumberDensityPlot(sol,PhaseSpace;species="All",fig=nothing,theme=DiplodocusDark())
+    EnergyDensityPlot(sol,PhaseSpace;species="All",fig=nothing,theme=DiplodocusDark())
 
-Returns a plot of the number density of all species as a function of time.
+Returns a plot of the energy density of all species as a function of time.
 """
-function NumberDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::String="All",fig=nothing,theme=DiplodocusDark())
+function EnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::String="All",fig=nothing,theme=DiplodocusDark())
 
     CairoMakie.activate!(inline=true) # plot in vs code window
 
@@ -23,13 +23,13 @@ function NumberDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;specie
 
     mass_list = Grids.mass_list
 
-    num = zeros(Float64,length(sol.t))
+    eng = zeros(Float64,length(sol.t))
 
     if isnothing(fig)
         fig = Figure(size=(600,300))
-        ax = Axis(fig[1,1],title="Number Density",xlabel="Time",ylabel=L"$n$ $[\mathrm{m}^{-3}]$")
+        ax = Axis(fig[1,1],title="Energy Density",xlabel="Time",ylabel=L"$e/c$ $[\mathrm{J}\mathrm{m}^{-3}]$") # check units
     else
-        ax = Axis(fig,title="Number Density",xlabel="Time",ylabel=L"$n$ $[\mathrm{m}^{-3}]$")
+        ax = Axis(fig,title="Energy Density",xlabel="Time",ylabel=L"$e/c$ $[\mathrm{J}\mathrm{m}^{-3}]$") # check units
     end
 
     for j in (species != "All" ? findfirst(x->x==species,name_list) : eachindex(name_list))
@@ -37,23 +37,26 @@ function NumberDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;specie
         for i in eachindex(sol.t)
 
             Nᵃ = DiplodocusTransport.FourFlow(sol.f[i].x[j],p_num_list[j],u_num_list[j],pr_list[j],ur_list[j],mass_list[j])
-            #Ua = HydroFourVelocity(Na)
             Uₐ = [-1,0,0,0] # static observer
-            num[i] = DiplodocusTransport.ScalarNumberDensity(Nᵃ,Uₐ)
+            num = DiplodocusTransport.ScalarNumberDensity(Nᵃ,Uₐ)
+
+            Tᵃᵇ = DiplodocusTransport.StressEnergyTensor(sol.f[i].x[j],p_num_list[j],u_num_list[j],pr_list[j],ur_list[j],mass_list[j]) 
+
+            eng[i] = DiplodocusTransport.ScalarEnergyDensity(Tᵃᵇ,Uₐ,num)
         
         end
 
         if t_grid == "u"
-            scatterlines!(ax,sol.t,num,marker = :circle,markersize=1.0,label=name_list[j])
+            scatterlines!(ax,sol.t,eng,marker = :circle,markersize=1.0,label=name_list[j])
             xlims!(ax,sol.t[1],sol.t[end])
         elseif t_grid == "l"
-            scatterlines!(ax,log10.(sol.t),num,marker = :circle,markersize=1.0,label=name_list[j])
+            scatterlines!(ax,log10.(sol.t),eng,marker = :circle,markersize=1.0,label=name_list[j])
             xlims!(ax,log10(sol.t[1]),log10(sol.t[end]))
         end
 
     end
 
-    fig[1,2] = Legend(fig,ax,"Particles") 
+    fig[1,2] = Legend(fig,ax,"Particles")
 
     end # with_theme
 
@@ -64,11 +67,11 @@ end
 
 
 """
-    FracNumberDensityPlot(sol,PhaseSpace;species="All",fig=nothing,theme=DiplodocusDark())
+    FracEnergyDensityPlot(sol,PhaseSpace;species="All",fig=nothing,theme=DiplodocusDark())
 
-Returns a plot of the fractional change in number density of all species between time setups as a function of time.
+Returns a plot of the fractional change in energy density of all species between time setups as a function of time.
 """
-function FracNumberDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::String="All",fig=nothing,theme=DiplodocusDark())
+function FracEnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::String="All",fig=nothing,theme=DiplodocusDark())
 
     with_theme(theme) do
 
@@ -96,31 +99,35 @@ function FracNumberDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;sp
         ax = Axis(fig,title="Frac. Change in Number Density",xlabel="Time",ylabel="Frac. Change")
     end
 
-    frac_num = zeros(Float64,length(sol.t))
-    num = 0.0
+    #j = findfirst(x->x==species,name_list)
+
+    frac_eng = zeros(Float64,length(sol.t))
+    eng = 0.0
 
     for j in (species != "All" ? findfirst(x->x==species,name_list) : eachindex(name_list))
 
         for i in eachindex(sol.t)
 
             Nᵃ = DiplodocusTransport.FourFlow(sol.f[i].x[j],p_num_list[j],u_num_list[j],pr_list[j],ur_list[j],mass_list[j])
-            Uₐ = [-1,0,0,0]
+            Uₐ = [-1,0,0,0] # static observer
+            num = DiplodocusTransport.ScalarNumberDensity(Nᵃ,Uₐ)
+            Tᵃᵇ = DiplodocusTransport.StressEnergyTensor(sol.f[i].x[j],p_num_list[j],u_num_list[j],pr_list[j],ur_list[j],mass_list[j]) 
 
             if i == 1
-                frac_num[i] = 0.0 # initial value
+                frac_eng[i] = 0.0 # initial value
             else
-                frac_num[i] = DiplodocusTransport.ScalarNumberDensity(Nᵃ,Uₐ)/num - 1.0
+                frac_eng[i] = DiplodocusTransport.ScalarEnergyDensity(Tᵃᵇ,Uₐ,num)/eng - 1.0
             end
 
-            num = DiplodocusTransport.ScalarNumberDensity(Nᵃ,Uₐ)
+            eng = DiplodocusTransport.ScalarEnergyDensity(Tᵃᵇ,Uₐ,num)
         
         end
 
         if t_grid == "u"
-            scatterlines!(ax,sol.t,frac_num,marker = :circle,markersize=1.0,label=name_list[j])
+            scatterlines!(ax,sol.t,frac_eng,marker = :circle,markersize=1.0,label=name_list[j])
             xlims!(ax,sol.t[1],sol.t[end])
         elseif t_grid == "l"
-            scatterlines!(ax,log10.(sol.t),frac_num,marker = :circle,markersize=1.0,label=name_list[j])
+            scatterlines!(ax,log10.(sol.t),frac_eng,marker = :circle,markersize=1.0,label=name_list[j])
             xlims!(ax,log10(sol.t[1]),log10(sol.t[end]))
         end
 
@@ -132,4 +139,3 @@ function FracNumberDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;sp
 
     return fig
 end
-

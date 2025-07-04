@@ -1,86 +1,122 @@
 function DiplodocusDark()
-    return Theme(backgroundcolor=(:black,0),
-    fonts = Attributes(
+    # inspired from Makie's theme_black but with latex fonts and some modifications
+    return Theme(
+        backgroundcolor=(:black,0),
+        textcolor=:white,
+        linecolor=:white,
+        #palette = generate_default_palette(:black),
+        fonts = Attributes(
             :bold => Makie.texfont(:bold),
             :bolditalic => Makie.texfont(:bolditalic),
             :italic => Makie.texfont(:italic),
             :regular => Makie.texfont(:regular)
         ),
-    Figure = (
-        backgroundcolor=(:black,0),
-        size=(1200,1200),
-        fontsize = 20.0f0
+        Figure = (
+            backgroundcolor=(:black,0),
+            size=(1200,1200),
+            fontsize = 20.0f0
         ),
-    Axis = (
-        backgroundcolor=(:black,0),
-        titlesize = 20.0f0,
-        xlabelsize = 20.0f0,
-        ylabelsize = 20.0f0,
-        titlecolor= RGBAf(250, 250, 250, 1.0),
-        ylabelcolor=RGBAf(250, 250, 250, 1.0),
-        xlabelcolor=RGBAf(250, 250, 250, 1.0),
-        bottomspinecolor=RGBAf(200, 200, 200, 1.0),
-        leftspinecolor=RGBAf(200, 200, 200, 1.0),
-        rightspinecolor=RGBAf(200, 200, 200, 1.0),
-        topspinecolor=RGBAf(200, 200, 200, 1.0),
-        spinewidth = 2.0,
-        xgridcolor=RGBAf(100, 100, 100, 0.5),
-        ygridcolor=RGBAf(100, 100, 100, 0.5),
-        xgridwidth=1.0,
-        ygridwidth=1.0,
-        xminorgridcolor=RGBAf(100, 100, 100, 0.5),
-        yminorgridcolor=RGBAf(100, 100, 100, 0.5),
-        xminorgridwidth=1.0,
-        yminorgridwidth=1.0,
-        xtickcolor=RGBAf(200, 200, 200, 1.0),
-        ytickcolor=RGBAf(200, 200, 200, 1.0),
-        xticklabelcolor=RGBAf(200, 200, 200, 1.0),
-        yticklabelcolor=RGBAf(200, 200, 200, 1.0),
+        Axis = (
+            backgroundcolor=:transparent,
+            bottomspinecolor = :white,
+            topspinecolor = :white,
+            leftspinecolor = :white,
+            rightspinecolor = :white,
+            xgridcolor = :grey45,
+            ygridcolor = :grey45,
+            xtickcolor = :white,
+            ytickcolor = :white,
+            xtickwidth = 2.0,
+            ytickwidth = 2.0,
+            # modification from theme_black
+            titlesize = 20.0f0,
+            xlabelsize = 20.0f0,
+            ylabelsize = 20.0f0,
+            titlecolor= :white,
+            ylabelcolor= :white,
+            xlabelcolor= :white,
+            spinewidth = 2.0,
+            xgridwidth = 1.0,
+            ygridwidth = 1.0,
+            xminorgridcolor=:white,
+            yminorgridcolor=:white,
+            xminortickcolor=:white,
+            yminortickcolor=:white,
+            xminorgridwidth = 2.0,
+            yminorgridwidth = 2.0,
+            xticklabelcolor=:white,
+            yticklabelcolor=:white,
         ),
-    Colorbar = (
-        labelcolor=RGBAf(200,200,200,1.0),
-        bottomspinecolor = RGBAf(200,200,200,1.0),
-        topspinecolor = RGBAf(200,200,200,1.0),
-        leftspinecolor = RGBAf(200,200,200,1.0),
-        rightspinecolor = RGBAf(200,200,200,1.0),
-        minortickcolor=RGBAf(100,100,100,1.0),
-        tickcolor=RGBAf(200,200,200,1.0),
-        ticklabelcolor=RGBAf(200,200,200,1.0),
-        spinewidth=1.5,
-        labelsize = 20.0f0
+        Legend = (
+            framecolor = :white,
+            backgroundcolor = :transparent,
+            framewidth = 2.0,
+        ),
+        Colorbar = (
+            tickcolor = :white,
+            spinecolor = :white,
+            topspinecolor = :white,
+            bottomspinecolor = :white,
+            leftspinecolor = :white,
+            rightspinecolor = :white,
+            # modifications from theme_black
+            spinewidth= 2.0,
+            labelsize = 20.0f0
+        ),
+        ScatterLines = (
+            linewidth = 3.0f0,
         ),
     )
 end
 
 function DiplodocusLight()
-    return Theme(backgroundcolor=(:black,0),
-    Figure = (backgroundcolor=(:black,0),
-        size=(600,600),
-        fontsize = 20.0f0),
-    Axis = (backgroundcolor=(:black,0),
-        titlesize = 20.0f0,
-        xlabelsize = 20.0f0,
-        ylabelsize = 20.0f0,
-        titlecolor= RGBAf(250, 250, 250, 1.0),
-        ylabelcolor=RGBAf(250, 250, 250, 1.0),
-        xlabelcolor=RGBAf(250, 250, 250, 1.0),
-        bottomspinecolor=RGBAf(200, 200, 200, 1.0),
-        leftspinecolor=RGBAf(200, 200, 200, 1.0),
-        rightspinecolor=RGBAf(200, 200, 200, 1.0),
-        topspinecolor=RGBAf(200, 200, 200, 1.0),
-        spinewidth = 2.0,
-        xgridcolor=RGBAf(100, 100, 100, 0.5),
-        ygridcolor=RGBAf(100, 100, 100, 0.5),
-        xgridwidth=1.0,
-        ygridwidth=1.0,
-        xminorgridcolor=RGBAf(100, 100, 100, 0.5),
-        yminorgridcolor=RGBAf(100, 100, 100, 0.5),
-        xminorgridwidth=1.0,
-        yminorgridwidth=1.0,
-        xtickcolor=RGBAf(200, 200, 200, 1.0),
-        ytickcolor=RGBAf(200, 200, 200, 1.0),
-        xticklabelcolor=RGBAf(200, 200, 200, 1.0),
-        yticklabelcolor=RGBAf(200, 200, 200, 1.0),
+    # slight modifications from the default theme but with Latex fonts and some modifications
+    return Theme(
+        fonts = Attributes(
+            :bold => Makie.texfont(:bold),
+            :bolditalic => Makie.texfont(:bolditalic),
+            :italic => Makie.texfont(:italic),
+            :regular => Makie.texfont(:regular)
+        ),
+        Figure = (
+            size=(1200,1200),
+            fontsize = 20.0f0
+        ),
+        Axis = (
+            backgroundcolor=:transparent,
+            titlesize = 20.0f0,
+            xlabelsize = 20.0f0,
+            ylabelsize = 20.0f0,
+            titlecolor= :black,
+            ylabelcolor= :black,
+            xlabelcolor= :black,
+            spinewidth = 2.0,
+            xgridwidth = 1.0,
+            ygridwidth = 1.0,
+            xgridcolor = :grey45,
+            ygridcolor = :grey45,
+            xminorgridcolor=:white,
+            yminorgridcolor=:white,
+            xminorgridwidth = 2.0,
+            yminorgridwidth = 2.0,
+            xtickcolor=:black,
+            ytickcolor=:black,
+            xtickwidth = 2.0,
+            ytickwidth = 2.0,
+            xticklabelcolor=:black,
+            yticklabelcolor=:black,
+        ),
+        Colorbar = (
+            spinewidth=1.5,
+            labelsize = 20.0f0
+        ),
+        Legend = (
+            framecolor = :black,
+            backgroundcolor = :transparent,
+            framewidth = 2.0,
+        ),
+        ScatterLines = (
+            linewidth = 3.0f0,
         ),
     )
 end
