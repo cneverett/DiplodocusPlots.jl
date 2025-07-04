@@ -25,6 +25,7 @@ function MomentumDistributionPlot(sol,species::String,PhaseSpace::PhaseSpaceStru
     dp = Grids.dpx_list[species_index]
     du = Grids.dpy_list[species_index]
     meanp = Grids.mpx_list[species_index]
+    p_r = Grids.p_r_list[species_index]
 
     d = zeros(Float32,p_num,u_num)
     dj = zeros(Float32,p_num,2)
@@ -46,11 +47,16 @@ function MomentumDistributionPlot(sol,species::String,PhaseSpace::PhaseSpaceStru
 
     for i in 1:t_save
 
+        max = -Inf
+
     if i in values || i == 1
 
         t = sol.t[i]
 
         d .= reshape(sol.f[i].x[species_index],(p_num,u_num))
+
+        max_d = maximum(x for x in d if !isnan(x))
+        max = max(max_t,max)
 
         @. d = d*(d!=Inf)
 
@@ -73,7 +79,8 @@ function MomentumDistributionPlot(sol,species::String,PhaseSpace::PhaseSpaceStru
     Colorbar(fig[1,2],colormap = my_colors,limits=(log10(sol.t[2]),log10(sol.t[end])),label=L"$\log_{10}(t)$ $[\text{s} * \sigma_{T}c]$")
 
     if plot_limts == (nothing,nothing)
-        autolimits!(ax)
+        xlims!(ax,(p_r[1],p_r[end]))
+        ylims!(ax,(max-11.0,max+1.0)) 
     end
     
     return fig
