@@ -47,32 +47,32 @@ function MomentumDistributionPlot(sol,species::String,PhaseSpace::PhaseSpaceStru
 
     for i in 1:t_save
 
-        max = -Inf
+        max_total = -Inf32
 
-    if i in values || i == 1
+        if i in values || i == 1
 
-        t = sol.t[i]
+            t = sol.t[i]
 
-        d .= reshape(sol.f[i].x[species_index],(p_num,u_num))
+            d .= reshape(sol.f[i].x[species_index],(p_num,u_num))
 
-        max_d = maximum(x for x in d if !isnan(x))
-        max = max(max_d,max)
+            max_d = maximum(x for x in d if !isnan(x))
+            max_total = max(max_d,max_total)
 
-        @. d = d*(d!=Inf)
+            @. d = d*(d!=Inf)
 
-        if uDis
-            dj .= log10.(d .* dp)[:,4:3:8] # print just aligned and antialigned with field
+            if uDis
+                dj .= log10.(d .* dp)[:,4:3:8] # print just aligned and antialigned with field
 
-            scatterlines!(ax,log10.(meanp),dj[:,1],linewidth=2.0,color = my_colors[color_counter],markersize=1.0)
-            scatterlines!(ax,log10.(meanp),dj[:,2],linewidth=2.0,color = my_colors[color_counter],markersize=1.0,linestyle=:dash)
-        else
-            dj[:,1] .= log10.(d*du .* dp)
-            scatterlines!(ax,log10.(meanp),dj[:,1],linewidth=2.0,color = my_colors[color_counter],markersize=1.0)
+                scatterlines!(ax,log10.(meanp),dj[:,1],linewidth=2.0,color = my_colors[color_counter],markersize=1.0)
+                scatterlines!(ax,log10.(meanp),dj[:,2],linewidth=2.0,color = my_colors[color_counter],markersize=1.0,linestyle=:dash)
+            else
+                dj[:,1] .= log10.(d*du .* dp)
+                scatterlines!(ax,log10.(meanp),dj[:,1],linewidth=2.0,color = my_colors[color_counter],markersize=1.0)
+            end
+
+            color_counter += 1
+
         end
-
-        color_counter += 1
-
-    end
 
     end
 
@@ -80,7 +80,7 @@ function MomentumDistributionPlot(sol,species::String,PhaseSpace::PhaseSpaceStru
 
     if plot_limts == (nothing,nothing)
         xlims!(ax,(p_r[1],p_r[end]))
-        ylims!(ax,(max-11.0,max+1.0)) 
+        ylims!(ax,(max_total-11.0,max_total+1.0)) 
     end
     
     return fig
