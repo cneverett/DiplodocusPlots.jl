@@ -45,9 +45,9 @@ function MomentumDistributionPlot(sol,species::String,PhaseSpace::PhaseSpaceStru
         my_colors = [cgrad(:rainbow)[z] for z ∈ range(0.0, 1.0, length = t_plot+1)]
     end
 
-    for i in 1:t_save
+    max_total = -Inf32
 
-        max_total = -Inf32
+    for i in 1:t_save
 
         if i in values || i == 1
 
