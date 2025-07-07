@@ -1,10 +1,10 @@
 function DiplodocusDark()
     # inspired from Makie's theme_black but with latex fonts and some modifications
     return Theme(
-        backgroundcolor=(:black,0),
+        backgroundcolor=:transparent,
         textcolor=:white,
         linecolor=:white,
-        #palette = generate_default_palette(:black),
+        #palette = Makie.generate_default_palette(:black),
         fonts = Attributes(
             :bold => Makie.texfont(:bold),
             :bolditalic => Makie.texfont(:bolditalic),
@@ -12,7 +12,7 @@ function DiplodocusDark()
             :regular => Makie.texfont(:regular)
         ),
         Figure = (
-            backgroundcolor=(:black,0),
+            backgroundcolor = :transparent,
             size=(1200,1200),
             fontsize = 20.0f0
         ),
@@ -66,12 +66,32 @@ function DiplodocusDark()
         ScatterLines = (
             linewidth = 3.0f0,
         ),
+        PolarAxis = (
+            backgroundcolor = :transparent,
+            rticksvisible = true,
+            rticksmirrored = true,
+            rtickcolor = :white,
+            rtickwidth = 2.0,
+            gridcolor = :grey45,
+            gridwidth = 1.0,
+            tickcolor = :white,
+            tickwidth = 2.0,
+            labelsize = 20.0f0,
+            labelcolor = :white,
+            spinewidth = 2.0,
+            spinecolor = :white,
+            clip = false,
+        )
     )
 end
 
 function DiplodocusLight()
     # slight modifications from the default theme but with Latex fonts and some modifications
     return Theme(
+        backgroundcolor=:transparent,
+        textcolor=:black,
+        linecolor=:black,
+        #palette = Makie.generate_default_palette(:white),
         fonts = Attributes(
             :bold => Makie.texfont(:bold),
             :bolditalic => Makie.texfont(:bolditalic),
@@ -79,6 +99,7 @@ function DiplodocusLight()
             :regular => Makie.texfont(:regular)
         ),
         Figure = (
+            backgroundcolor = :transparent,
             size=(1200,1200),
             fontsize = 20.0f0
         ),
@@ -95,8 +116,8 @@ function DiplodocusLight()
             ygridwidth = 1.0,
             xgridcolor = :grey45,
             ygridcolor = :grey45,
-            xminorgridcolor=:white,
-            yminorgridcolor=:white,
+            xminorgridcolor=:black,
+            yminorgridcolor=:black,
             xminorgridwidth = 2.0,
             yminorgridwidth = 2.0,
             xtickcolor=:black,
@@ -107,16 +128,32 @@ function DiplodocusLight()
             yticklabelcolor=:black,
         ),
         Colorbar = (
+            backgroundcolor = :transparent,
             spinewidth=1.5,
             labelsize = 20.0f0
         ),
         Legend = (
-            framecolor = :black,
             backgroundcolor = :transparent,
+            framecolor = :black,
             framewidth = 2.0,
         ),
         ScatterLines = (
             linewidth = 3.0f0,
         ),
+        PolarAxis = (
+            rticksvisible = true,
+            rticksmirrored = true,
+            rtickcolor = :black,
+            rtickwidth = 2.0,
+            gridcolor = :grey45,
+            gridwidth = 1.0,
+            tickcolor = :black,
+            tickwidth = 2.0,
+            labelsize = 20.0f0,
+            labelcolor = :black,
+            spinewidth = 2.0,
+            spinecolor = :black,
+            clip = false,
+        )
     )
 end

@@ -1,12 +1,13 @@
 module DiplodocusPlots
 
     export DiplodocusDark, DiplodocusLight
-    export MomentumDistributionPlot
+    export MomentumDistributionPlot, MomentumAndPolarAngleDistributionPlot
     export InteractiveBinaryGainLossPlot
     export FracNumberDensityPlot, NumberDensityPlot
     export FracEnergyDensityPlot, EnergyDensityPlot
     export IsThermalPlot, IsIsotropicPlot, IsThermalAndIsotropicPlot
 
+    using Makie
     using CairoMakie
     using GLMakie
 

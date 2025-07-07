@@ -202,10 +202,10 @@ function IsThermalAndIsotropicPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruc
         end
 
         if t_grid == "u"
-            scatterlines!(ax,sol.t,SumSquaredResiduals,marker = :circle,markersize=0.0,label=name_list[j]*" T?")
+            scatterlines!(ax,sol.t,SumSquaredResiduals,marker = :circle,markersize=0.0,label=name_list[j]*" Thermal?")
             xlims!(ax,sol.t[1],sol.t[end])
         elseif t_grid == "l"
-            scatterlines!(ax,log10.(sol.t),SumSquaredResiduals,marker = :circle,markersize=0.0,label=name_list[j]*" T?")
+            scatterlines!(ax,log10.(sol.t),SumSquaredResiduals,marker = :circle,markersize=0.0,label=name_list[j]*" Thermal?")
             xlims!(ax,log10(sol.t[1]),log10(sol.t[end]))
         end
 
@@ -229,16 +229,18 @@ function IsThermalAndIsotropicPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruc
         end
 
         if t_grid == "u"
-            scatterlines!(ax,sol.t,SumSquaredResiduals,marker = :circle,markersize=0.0,linestyle=:dash,label=name_list[j]*" I?")
+            scatterlines!(ax,sol.t,SumSquaredResiduals,marker = :circle,markersize=0.0,linestyle=:dash,label=name_list[j]*" Isotropic?")
             xlims!(ax,sol.t[1],sol.t[end])
         elseif t_grid == "l"
-            scatterlines!(ax,log10.(sol.t),SumSquaredResiduals,marker = :circle,markersize=0.0,linestyle=:dash,label=name_list[j]*" I?")
+            scatterlines!(ax,log10.(sol.t),SumSquaredResiduals,marker = :circle,markersize=0.0,linestyle=:dash,label=name_list[j]*" Isotropic?")
             xlims!(ax,log10(sol.t[1]),log10(sol.t[end]))
         end
 
     end
 
     fig[1,2] = Legend(fig,ax,"Particles")
+
+    axislegend(ax,"Particles")
 
     end # with_theme
 

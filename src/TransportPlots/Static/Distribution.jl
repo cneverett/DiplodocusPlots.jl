@@ -17,8 +17,8 @@ function MomentumDistributionPlot(sol,species::String,PhaseSpace::PhaseSpaceStru
     xlab = L"$\log_{10}p$ $[m_\text{Ele}c]$"
     if order == 1
         ylab = L"$\log_{10}\left(p\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V}\right)$ $[\text{m}^{-3}]$"
-    elseif order == 2
-        ylab = L"$\log_{10}\left(p^2\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V}\right)$ $[\text{m}^{-3}]$"
+    elseif order != 1
+        ylab = L"$\log_{10}\left(p^{%$(order)}\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V}\right)$ $[\text{m}^{-3}]$"
     end
     ax = Axis(fig[1,1],xlabel=xlab,ylabel=ylab,aspect=DataAspect())
     ax.limits = plot_limits
@@ -80,11 +80,8 @@ function MomentumDistributionPlot(sol,species::String,PhaseSpace::PhaseSpaceStru
             else
                 # sum along u direction
                 pdNdp = dropdims(sum(d, dims=2),dims=2)
-                if order == 1
-                    dj[:,1] .= log10.(pdNdp) 
-                elseif order == 2
-                    dj[:,1] .= log10.(pdNdp .* meanp)
-                end
+                # scale by order-1
+                dj[:,1] .= log10.(pdNdp .* (meanp.^(order-1)))
                 scatterlines!(ax,log10.(meanp),dj[:,1],linewidth=2.0,color = my_colors[color_counter],markersize=1.0)
             end
 
@@ -108,9 +105,7 @@ function MomentumDistributionPlot(sol,species::String,PhaseSpace::PhaseSpaceStru
 
         MJ = DiplodocusTransport.MaxwellJuttner_Distribution(PhaseSpace,"Sph",Temperature,mass;n=num)
 
-        if order == 2
-            MJ = MJ .* meanp
-        end
+        MJ = MJ .* (meanp.^(order-1))
 
         scatterlines!(ax,log10.(meanp),log10.(MJ),linewidth=2.0,color = :white,markersize=0.0,linestyle=:dash,label="Maxwell-Juttner")
 
@@ -126,6 +121,117 @@ function MomentumDistributionPlot(sol,species::String,PhaseSpace::PhaseSpaceStru
         xlims!(ax,(log10.(p_r[1]),log10.(p_r[end])))
         ylims!(ax,(max_total-11.0,max_total+1.0)) 
     end
+    
+    return fig
+
+    end # with_theme
+
+end
+
+
+"""
+    MomentumAndPolarAngleDistributionPlot(sol,species,PhaseSpace,time;order=1,theme=DiplodocusDark())
+
+Plots the distribution function of of a given particle `species` as a function of momentum ``p`` and polar angle ``u`` at a given `time given by the `sol` based on the conditions held in `PhaseSpace`. 
+
+Optional arguments:
+- `order`: the order of p in p^order * dN/dp dV, default is 1, i.e. number density spectrum. 2 is "energy" density spectrum.
+"""
+function MomentumAndPolarAngleDistributionPlot(sol,species::String,PhaseSpace::PhaseSpaceStruct,time::T;order::Int64=1,theme=DiplodocusDark()) where T <: Union{Tuple{Float64,Float64,Float64},Tuple{Int64,Int64,Int64}}
+
+    CairoMakie.activate!(inline=true) # plot in vs code window
+
+    with_theme(theme) do
+
+    name_list = PhaseSpace.name_list
+    Momentum = PhaseSpace.Momentum
+    Grids = PhaseSpace.Grids
+    Time = PhaseSpace.Time
+
+    species_index = findfirst(x->x==species,name_list)
+
+    p_num = Momentum.px_num_list[species_index]  
+    u_num = Momentum.py_num_list[species_index]
+    dp = Grids.dpx_list[species_index]
+    du = Grids.dpy_list[species_index]
+    meanp = Grids.mpx_list[species_index]
+    meanu = Grids.mpy_list[species_index]
+    p_r = Grids.pxr_list[species_index]
+    u_r = Grids.pyr_list[species_index]
+    mass = Grids.mass_list[species_index]
+
+    t_idx = zeros(Int64,3)
+    t = zeros(Float64,3)
+
+    if typeof(time) == Tuple{Int64,Int64,Int64}
+        for i in 1:3
+        t_idx[i] = time[i]
+        t[i] = sol.t[t_idx[i]]
+        end
+    elseif typeof(time) == Tuple{Float64,Float64,Float64}
+        for i in 1:3
+        t[i] = time[i]
+        t_idx[i] = findfirst(x->x==t[i],sol.t)
+        end
+    end
+
+    fig = Figure(size=(800,300))
+
+    dis1 = reshape(sol.f[t_idx[1]].x[species_index],(p_num,u_num))
+    dis1 = dis1 .* (meanp.^(order-1))
+
+    replace!(dis1,0.0 => NaN) # replace Inf with NaN for plotting
+    dis2 = reshape(sol.f[t_idx[2]].x[species_index],(p_num,u_num))
+    dis2 = dis2 .* (meanp.^(order-1))
+    replace!(dis2,0.0 => NaN) # replace Inf with NaN for plotting
+    dis3 = reshape(sol.f[t_idx[3]].x[species_index],(p_num,u_num))
+    dis3 = dis3 .* (meanp.^(order-1))
+    replace!(dis3,0.0 => NaN) # replace Inf with NaN for plotting
+
+    max_dis = maximum(x for x in [dis1; dis2; dis3] if !isnan(x))
+    min_dis = minimum(x for x in [dis1; dis2; dis3] if !isnan(x))
+    col_range = (log10(max_dis)-20.0,log10(max_dis))
+
+    ax1 = PolarAxis(fig[1,1+1],theta_0=-pi/2,direction=-1)
+    ax1.radius_at_origin = log10(p_r[1])-1.0
+    thetalims!(ax1,0,pi)
+
+    ax2 = PolarAxis(fig[1,2+1],theta_0=-pi/2,direction=-1)
+    ax2.radius_at_origin = log10(p_r[1])-1.0
+    thetalims!(ax2,0,pi)
+
+    ax3 = PolarAxis(fig[1,3+1],theta_0=-pi/2,direction=-1)
+    ax3.radius_at_origin = log10(p_r[1])-1.0
+    thetalims!(ax3,0,pi)
+
+    hm1 = heatmap!(ax1,acos.(u_r),log10.(p_r),log10.(dis1'),colorrange=col_range)
+    hm2 = heatmap!(ax2,acos.(u_r),log10.(p_r),log10.(dis2'),colorrange=col_range)
+    hm3 = heatmap!(ax3,acos.(u_r),log10.(p_r),log10.(dis3'),colorrange=col_range)
+
+    rlims!(ax1,log10(p_r[1]),log10(p_r[end])+1.0)
+    rlims!(ax2,log10(p_r[1]),log10(p_r[end])+1.0)
+    rlims!(ax3,log10(p_r[1]),log10(p_r[end])+1.0)
+    hidethetadecorations!(ax1, grid=false)
+    hidethetadecorations!(ax2, grid=false)
+    hidethetadecorations!(ax3, grid=false)
+
+    if order == 1
+        Colorbar(fig[1,1],hm1,label=L"$\log_{10}\left(p\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V}\right)$ $[\text{m}^{-3}]$",flipaxis=false,height=220,tellheight=false)
+    elseif order != 1
+        Colorbar(fig[1,1],hm1,label=L"$\log_{10}\left(p^{%$order}\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V}\right)$ $[\text{m}^{-3}]$",flipaxis=false,height=220,tellheight=false)
+    end
+
+    text!(fig[1,2],L"$\log_{10}p$ $[m_\text{Ele}c]$",position=(-3.05,5.1),rotation=pi/2,fontsize=18.0f0)
+
+    text!(fig[1,2],L"$t=%$(time[1])$",position=(2.6,7),fontsize=20.0f0)
+
+    text!(fig[1,3],L"$t=%$(time[2])$",position=(2.6,7),fontsize=20.0f0)
+
+    text!(fig[1,4],L"$t=%$(time[3])$",position=(2.6,7),fontsize=20.0f0)
+
+    colgap!(fig.layout,1,Relative(-0.05))
+    colgap!(fig.layout,2,Relative(-0.2))
+    colgap!(fig.layout,3,Relative(-0.2))
     
     return fig
 
