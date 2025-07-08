@@ -171,9 +171,9 @@ function IsThermalAndIsotropicPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruc
 
     if isnothing(fig)
         fig = Figure(size=(600,300))
-        ax = Axis(fig[1,1],title="Is Thermal?",xlabel="Time",ylabel=L"SSR")
+        ax = Axis(fig[1,1],title="Is Thermal and Is Isotropic?",xlabel="Time",ylabel=L"SSR")
     else
-        ax = Axis(fig,title="Is Thermal?",xlabel="Time",ylabel=L"SSR")
+        ax = Axis(fig,title="Is Thermal and Is Isotropic?",xlabel="Time",ylabel=L"SSR")
     end
 
     # Is Thermal?
