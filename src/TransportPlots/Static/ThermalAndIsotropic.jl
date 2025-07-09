@@ -27,9 +27,9 @@ function IsThermalPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::S
 
     if isnothing(fig)
         fig = Figure(size=(600,300))
-        ax = Axis(fig[1,1],title="Is Thermal?",xlabel="Time",ylabel=L"SSR",gridcolor=:transparent)
+        ax = Axis(fig[1,1],title="Is Thermal?",xlabel="Time",ylabel=L"SSR",xgridvisible=false,ygridvisible=false)
     else
-        ax = Axis(fig,title="Is Thermal?",xlabel="Time",ylabel=L"SSR",gridcolor=:transparent)
+        ax = Axis(fig,title="Is Thermal?",xlabel="Time",ylabel=L"SSR",xgridvisible=false,ygridvisible=false)
     end
 
     for j in (species != "All" ? findfirst(x->x==species,name_list) : eachindex(name_list))
@@ -104,9 +104,9 @@ function IsIsotropicPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species:
 
     if isnothing(fig)
         fig = Figure(size=(600,300))
-        ax = Axis(fig[1,1],title="Is Isotropic?",xlabel="Time",ylabel=L"SSR",gridcolor=:transparent)
+        ax = Axis(fig[1,1],title="Is Isotropic?",xlabel="Time",ylabel=L"SSR",xgridvisible=false,ygridvisible=false)
     else
-        ax = Axis(fig,title="Is Isotropic?",xlabel="Time",ylabel=L"SSR",gridcolor=:transparent)
+        ax = Axis(fig,title="Is Isotropic?",xlabel="Time",ylabel=L"SSR",xgridvisible=false,ygridvisible=false)
     end
 
     for j in (species != "All" ? findfirst(x->x==species,name_list) : eachindex(name_list))
@@ -173,9 +173,9 @@ function IsThermalAndIsotropicPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruc
 
     if isnothing(fig)
         fig = Figure(size=(400,300))
-        ax = Axis(fig[1,1],title="Is Thermal and Is Isotropic?",xlabel="Time",ylabel=L"SSR",gridcolor=:transparent)
+        ax = Axis(fig[1,1],title="Is Thermal and Is Isotropic?",xlabel="Time",ylabel=L"SSR",xgridvisible=false,ygridvisible=false)
     else
-        ax = Axis(fig,title="Is Thermal and Is Isotropic?",xlabel="Time",ylabel=L"SSR",gridcolor=:transparent)
+        ax = Axis(fig,title="Is Thermal and Is Isotropic?",xlabel="Time",ylabel=L"SSR",xgridvisible=false,ygridvisible=false)
     end
 
     # Is Thermal?

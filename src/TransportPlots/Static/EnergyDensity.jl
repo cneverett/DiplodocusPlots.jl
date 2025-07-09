@@ -27,9 +27,9 @@ function EnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;specie
 
     if isnothing(fig)
         fig = Figure(size=(400,300))
-        ax = Axis(fig[1,1],title="Energy Density",xlabel="Time",ylabel=L"$e/c$ $[\mathrm{J}\mathrm{m}^{-3}]$",gridcolor=:transparent) # check units
+        ax = Axis(fig[1,1],title="Energy Density",xlabel="Time",ylabel=L"$e/c$ $[\mathrm{J}\mathrm{m}^{-3}]$",xgridvisible=false,ygridvisible=false) # check units
     else
-        ax = Axis(fig,title="Energy Density",xlabel="Time",ylabel=L"$e/c$ $[\mathrm{J}\mathrm{m}^{-3}]$",gridcolor=:transparent) # check units
+        ax = Axis(fig,title="Energy Density",xlabel="Time",ylabel=L"$e/c$ $[\mathrm{J}\mathrm{m}^{-3}]$",xgridvisible=false,ygridvisible=false) # check units
     end
 
     for j in (species != "All" ? findfirst(x->x==species,name_list) : eachindex(name_list))
@@ -94,9 +94,9 @@ function FracEnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;sp
 
     if isnothing(fig)
         fig = Figure(size=(400,300))
-        ax = Axis(fig[1,1],title="Frac. Change in Energy Density",xlabel="Time",ylabel="Frac. Change",gridcolor=:transparent) # check units
+        ax = Axis(fig[1,1],title="Frac. Change in Energy Density",xlabel="Time",ylabel="Frac. Change",xgridvisible=false,ygridvisible=false) # check units
     else
-        ax = Axis(fig,title="Frac. Change in Energy Density",xlabel="Time",ylabel="Frac. Change",gridcolor=:transparent) # check units
+        ax = Axis(fig,title="Frac. Change in Energy Density",xlabel="Time",ylabel="Frac. Change",xgridvisible=false,ygridvisible=false) # check units
     end
 
     #j = findfirst(x->x==species,name_list)
@@ -134,7 +134,7 @@ function FracEnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;sp
     end
 
     #fig[1,2] = Legend(fig,ax,"Particles")
-    axislegend(ax,"Particles",positino = :rb)
+    axislegend(ax,"Particles",position = :rb)
 
     end # with_theme
 

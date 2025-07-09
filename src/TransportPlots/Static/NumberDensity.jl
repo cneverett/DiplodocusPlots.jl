@@ -27,9 +27,9 @@ function NumberDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;specie
 
     if isnothing(fig)
         fig = Figure(size=(400,300))
-        ax = Axis(fig[1,1],title="Number Density",xlabel="Time",ylabel=L"$n$ $[\mathrm{m}^{-3}]$",gridcolor=:transparent)
+        ax = Axis(fig[1,1],title="Number Density",xlabel="Time",ylabel=L"$n$ $[\mathrm{m}^{-3}]$",xgridvisible=false,ygridvisible=false)
     else
-        ax = Axis(fig,title="Number Density",xlabel="Time",ylabel=L"$n$ $[\mathrm{m}^{-3}]$",gridcolor=:transparent)
+        ax = Axis(fig,title="Number Density",xlabel="Time",ylabel=L"$n$ $[\mathrm{m}^{-3}]$",xgridvisible=false,ygridvisible=false)
     end
 
     for j in (species != "All" ? findfirst(x->x==species,name_list) : eachindex(name_list))
@@ -92,9 +92,9 @@ function FracNumberDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;sp
 
     if isnothing(fig)
         fig = Figure(size=(400,300))
-        ax = Axis(fig[1,1],title="Frac. Change in Number Density",xlabel="Time",ylabel="Frac. Change",gridcolodr=:transparent)
+        ax = Axis(fig[1,1],title="Frac. Change in Number Density",xlabel="Time",ylabel="Frac. Change",xgridvisible=false,ygridvisible=false)
     else
-        ax = Axis(fig,title="Frac. Change in Number Density",xlabel="Time",ylabel="Frac. Change",gridcolor=:transparent)
+        ax = Axis(fig,title="Frac. Change in Number Density",xlabel="Time",ylabel="Frac. Change",xgridvisible=false,ygridvisible=false)
     end
 
     frac_num = zeros(Float64,length(sol.t))
