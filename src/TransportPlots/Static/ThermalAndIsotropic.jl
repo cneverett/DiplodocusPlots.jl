@@ -27,9 +27,9 @@ function IsThermalPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::S
 
     if isnothing(fig)
         fig = Figure(size=(600,300))
-        ax = Axis(fig[1,1],title="Is Thermal?",xlabel="Time",ylabel=L"SSR")
+        ax = Axis(fig[1,1],title="Is Thermal?",xlabel="Time",ylabel=L"SSR",gridcolor=:transparent)
     else
-        ax = Axis(fig,title="Is Thermal?",xlabel="Time",ylabel=L"SSR")
+        ax = Axis(fig,title="Is Thermal?",xlabel="Time",ylabel=L"SSR",gridcolor=:transparent)
     end
 
     for j in (species != "All" ? findfirst(x->x==species,name_list) : eachindex(name_list))
@@ -66,7 +66,8 @@ function IsThermalPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::S
 
     end
 
-    fig[1,2] = Legend(fig,ax,"Particles")
+    #fig[1,2] = Legend(fig,ax,"Particles")
+    axislegend(ax,"Particles")
 
     end # with_theme
 
@@ -103,9 +104,9 @@ function IsIsotropicPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species:
 
     if isnothing(fig)
         fig = Figure(size=(600,300))
-        ax = Axis(fig[1,1],title="Is Isotropic?",xlabel="Time",ylabel=L"SSR")
+        ax = Axis(fig[1,1],title="Is Isotropic?",xlabel="Time",ylabel=L"SSR",gridcolor=:transparent)
     else
-        ax = Axis(fig,title="Is Isotropic?",xlabel="Time",ylabel=L"SSR")
+        ax = Axis(fig,title="Is Isotropic?",xlabel="Time",ylabel=L"SSR",gridcolor=:transparent)
     end
 
     for j in (species != "All" ? findfirst(x->x==species,name_list) : eachindex(name_list))
@@ -134,7 +135,8 @@ function IsIsotropicPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species:
 
     end
 
-    fig[1,2] = Legend(fig,ax,"Particles")
+    #fig[1,2] = Legend(fig,ax,"Particles")
+    axislegend(ax,"Particles")
 
     end # with_theme
 
@@ -170,10 +172,10 @@ function IsThermalAndIsotropicPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruc
     SumSquaredResiduals = zeros(Float64,length(sol.t))
 
     if isnothing(fig)
-        fig = Figure(size=(600,300))
-        ax = Axis(fig[1,1],title="Is Thermal and Is Isotropic?",xlabel="Time",ylabel=L"SSR")
+        fig = Figure(size=(400,300))
+        ax = Axis(fig[1,1],title="Is Thermal and Is Isotropic?",xlabel="Time",ylabel=L"SSR",gridcolor=:transparent)
     else
-        ax = Axis(fig,title="Is Thermal and Is Isotropic?",xlabel="Time",ylabel=L"SSR")
+        ax = Axis(fig,title="Is Thermal and Is Isotropic?",xlabel="Time",ylabel=L"SSR",gridcolor=:transparent)
     end
 
     # Is Thermal?
@@ -238,8 +240,7 @@ function IsThermalAndIsotropicPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruc
 
     end
 
-    fig[1,2] = Legend(fig,ax,"Particles")
-
+    #fig[1,2] = Legend(fig,ax,"Particles")
     axislegend(ax,"Particles")
 
     end # with_theme

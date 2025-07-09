@@ -26,10 +26,10 @@ function EnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;specie
     eng = zeros(Float64,length(sol.t))
 
     if isnothing(fig)
-        fig = Figure(size=(600,300))
-        ax = Axis(fig[1,1],title="Energy Density",xlabel="Time",ylabel=L"$e/c$ $[\mathrm{J}\mathrm{m}^{-3}]$") # check units
+        fig = Figure(size=(400,300))
+        ax = Axis(fig[1,1],title="Energy Density",xlabel="Time",ylabel=L"$e/c$ $[\mathrm{J}\mathrm{m}^{-3}]$",gridcolor=:transparent) # check units
     else
-        ax = Axis(fig,title="Energy Density",xlabel="Time",ylabel=L"$e/c$ $[\mathrm{J}\mathrm{m}^{-3}]$") # check units
+        ax = Axis(fig,title="Energy Density",xlabel="Time",ylabel=L"$e/c$ $[\mathrm{J}\mathrm{m}^{-3}]$",gridcolor=:transparent) # check units
     end
 
     for j in (species != "All" ? findfirst(x->x==species,name_list) : eachindex(name_list))
@@ -56,7 +56,8 @@ function EnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;specie
 
     end
 
-    fig[1,2] = Legend(fig,ax,"Particles")
+    #fig[1,2] = Legend(fig,ax,"Particles")
+    axislegend(ax,"Particles",position = :rb)
 
     end # with_theme
 
@@ -92,10 +93,10 @@ function FracEnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;sp
     mass_list = Grids.mass_list
 
     if isnothing(fig)
-        fig = Figure(size=(600,300))
-        ax = Axis(fig[1,1],title="Frac. Change in Energy Density",xlabel="Time",ylabel="Frac. Change")
+        fig = Figure(size=(400,300))
+        ax = Axis(fig[1,1],title="Frac. Change in Energy Density",xlabel="Time",ylabel="Frac. Change",gridcolor=:transparent) # check units
     else
-        ax = Axis(fig,title="Frac. Change in Energy Density",xlabel="Time",ylabel="Frac. Change")
+        ax = Axis(fig,title="Frac. Change in Energy Density",xlabel="Time",ylabel="Frac. Change",gridcolor=:transparent) # check units
     end
 
     #j = findfirst(x->x==species,name_list)
@@ -132,7 +133,8 @@ function FracEnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;sp
 
     end
 
-    fig[1,2] = Legend(fig,ax,"Particles")
+    #fig[1,2] = Legend(fig,ax,"Particles")
+    axislegend(ax,"Particles",positino = :rb)
 
     end # with_theme
 

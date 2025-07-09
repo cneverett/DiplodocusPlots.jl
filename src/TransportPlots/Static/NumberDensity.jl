@@ -26,10 +26,10 @@ function NumberDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;specie
     num = zeros(Float64,length(sol.t))
 
     if isnothing(fig)
-        fig = Figure(size=(600,300))
-        ax = Axis(fig[1,1],title="Number Density",xlabel="Time",ylabel=L"$n$ $[\mathrm{m}^{-3}]$")
+        fig = Figure(size=(400,300))
+        ax = Axis(fig[1,1],title="Number Density",xlabel="Time",ylabel=L"$n$ $[\mathrm{m}^{-3}]$",gridcolor=:transparent)
     else
-        ax = Axis(fig,title="Number Density",xlabel="Time",ylabel=L"$n$ $[\mathrm{m}^{-3}]$")
+        ax = Axis(fig,title="Number Density",xlabel="Time",ylabel=L"$n$ $[\mathrm{m}^{-3}]$",gridcolor=:transparent)
     end
 
     for j in (species != "All" ? findfirst(x->x==species,name_list) : eachindex(name_list))
@@ -53,7 +53,9 @@ function NumberDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;specie
 
     end
 
-    fig[1,2] = Legend(fig,ax,"Particles") 
+    #fig[1,2] = Legend(fig,ax,"Particles")
+    
+    axislegend(ax,"Particles",position = :rb)
 
     end # with_theme
 
@@ -89,10 +91,10 @@ function FracNumberDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;sp
     mass_list = Grids.mass_list
 
     if isnothing(fig)
-        fig = Figure(size=(600,300))
-        ax = Axis(fig[1,1],title="Frac. Change in Number Density",xlabel="Time",ylabel="Frac. Change")
+        fig = Figure(size=(400,300))
+        ax = Axis(fig[1,1],title="Frac. Change in Number Density",xlabel="Time",ylabel="Frac. Change",gridcolodr=:transparent)
     else
-        ax = Axis(fig,title="Frac. Change in Number Density",xlabel="Time",ylabel="Frac. Change")
+        ax = Axis(fig,title="Frac. Change in Number Density",xlabel="Time",ylabel="Frac. Change",gridcolor=:transparent)
     end
 
     frac_num = zeros(Float64,length(sol.t))
@@ -125,7 +127,8 @@ function FracNumberDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;sp
 
     end
 
-    fig[1,2] = Legend(fig,ax,"Particles")
+    #fig[1,2] = Legend(fig,ax,"Particles")
+    axislegend(ax,"Particles",position = :rb)
 
     end # with_theme
 
