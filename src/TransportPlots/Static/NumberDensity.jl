@@ -3,7 +3,7 @@
 
 Returns a plot of the number density of all species as a function of time.
 """
-function NumberDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::String="All",fig=nothing,theme=DiplodocusDark())
+function NumberDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::String="All",fig=nothing,theme=DiplodocusDark(),title=true)
 
     CairoMakie.activate!(inline=true) # plot in vs code window
 
@@ -26,10 +26,14 @@ function NumberDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;specie
     num = zeros(Float64,length(sol.t))
 
     if isnothing(fig)
-        fig = Figure(size=(400,300))
-        ax = Axis(fig[1,1],title="Number Density",xlabel="Time",ylabel=L"$n$ $[\mathrm{m}^{-3}]$",xgridvisible=false,ygridvisible=false)
+        fig = Figure()
+        ax = Axis(fig[1,1],xlabel="Time",ylabel=L"$n$ $[\mathrm{m}^{-3}]$",xgridvisible=false,ygridvisible=false)
     else
-        ax = Axis(fig,title="Number Density",xlabel="Time",ylabel=L"$n$ $[\mathrm{m}^{-3}]$",xgridvisible=false,ygridvisible=false)
+        ax = Axis(fig,xlabel="Time",ylabel=L"$n$ $[\mathrm{m}^{-3}]$",xgridvisible=false,ygridvisible=false)
+    end
+
+    if title
+        ax.title = "Number Density"
     end
 
     for j in (species != "All" ? findfirst(x->x==species,name_list) : eachindex(name_list))
@@ -55,7 +59,7 @@ function NumberDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;specie
 
     #fig[1,2] = Legend(fig,ax,"Particles")
     
-    axislegend(ax,"Particles",position = :rb)
+    axislegend(ax,position = :rb)
 
     end # with_theme
 
@@ -70,7 +74,7 @@ end
 
 Returns a plot of the fractional change in number density of all species between time setups as a function of time.
 """
-function FracNumberDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::String="All",fig=nothing,theme=DiplodocusDark())
+function FracNumberDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::String="All",fig=nothing,theme=DiplodocusDark(),title=true)
 
     CairoMakie.activate!(inline=true) # plot in vs code window
 
@@ -91,10 +95,14 @@ function FracNumberDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;sp
     mass_list = Grids.mass_list
 
     if isnothing(fig)
-        fig = Figure(size=(400,300))
-        ax = Axis(fig[1,1],title="Frac. Change in Number Density",xlabel="Time",ylabel="Frac. Change",xgridvisible=false,ygridvisible=false)
+        fig = Figure()
+        ax = Axis(fig[1,1],xlabel="Time",ylabel="Num. Den. Frac. Change",xgridvisible=false,ygridvisible=false)
     else
-        ax = Axis(fig,title="Frac. Change in Number Density",xlabel="Time",ylabel="Frac. Change",xgridvisible=false,ygridvisible=false)
+        ax = Axis(fig,xlabel="Time",ylabel="Num. Den. Frac. Change",xgridvisible=false,ygridvisible=false)
+    end
+
+    if title 
+        ax.title = "Frac. Change in Number Density"
     end
 
     frac_num = zeros(Float64,length(sol.t))
@@ -128,7 +136,7 @@ function FracNumberDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;sp
     end
 
     #fig[1,2] = Legend(fig,ax,"Particles")
-    axislegend(ax,"Particles",position = :rb)
+    axislegend(ax,position = :rb)
 
     end # with_theme
 

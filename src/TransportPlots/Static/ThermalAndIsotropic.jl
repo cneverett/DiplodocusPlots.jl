@@ -3,7 +3,7 @@
 
 Returns a plot of the sum of squared residuals between the distribution function for each species and an expected Maxwell-Juttner distribution based on the current distribution of that species as a function of time.  
 """
-function IsThermalPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::String="All",fig=nothing,theme=DiplodocusDark())
+function IsThermalPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::String="All",fig=nothing,theme=DiplodocusDark(),title=true)
 
     CairoMakie.activate!(inline=true) # plot in vs code window
 
@@ -26,10 +26,14 @@ function IsThermalPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::S
     SumSquaredResiduals = zeros(Float64,length(sol.t))
 
     if isnothing(fig)
-        fig = Figure(size=(600,300))
-        ax = Axis(fig[1,1],title="Is Thermal?",xlabel="Time",ylabel=L"SSR",xgridvisible=false,ygridvisible=false)
+        fig = Figure()
+        ax = Axis(fig[1,1],xlabel="Time",ylabel=L"SSR",xgridvisible=false,ygridvisible=false)
     else
-        ax = Axis(fig,title="Is Thermal?",xlabel="Time",ylabel=L"SSR",xgridvisible=false,ygridvisible=false)
+        ax = Axis(fig,xlabel="Time",ylabel=L"SSR",xgridvisible=false,ygridvisible=false)
+    end
+
+    if title
+        ax.title = "Is Thermal?"
     end
 
     for j in (species != "All" ? findfirst(x->x==species,name_list) : eachindex(name_list))
@@ -80,7 +84,7 @@ end
 
 Returns a plot of the sum of squared residuals between the distribution function for each species and an expected isotropic distribution based on the current distribution of that species as a function of time.  
 """
-function IsIsotropicPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::String="All",fig=nothing,theme=DiplodocusDark())
+function IsIsotropicPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::String="All",fig=nothing,theme=DiplodocusDark(),title=true)
 
     CairoMakie.activate!(inline=true) # plot in vs code window
 
@@ -103,10 +107,14 @@ function IsIsotropicPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species:
     SumSquaredResiduals = zeros(Float64,length(sol.t))
 
     if isnothing(fig)
-        fig = Figure(size=(600,300))
-        ax = Axis(fig[1,1],title="Is Isotropic?",xlabel="Time",ylabel=L"SSR",xgridvisible=false,ygridvisible=false)
+        fig = Figure()
+        ax = Axis(fig[1,1],xlabel="Time",ylabel=L"SSR",xgridvisible=false,ygridvisible=false)
     else
-        ax = Axis(fig,title="Is Isotropic?",xlabel="Time",ylabel=L"SSR",xgridvisible=false,ygridvisible=false)
+        ax = Axis(fig,xlabel="Time",ylabel=L"SSR",xgridvisible=false,ygridvisible=false)
+    end
+
+    if title
+        ax.title = "Is Isotropic?"
     end
 
     for j in (species != "All" ? findfirst(x->x==species,name_list) : eachindex(name_list))
@@ -135,8 +143,7 @@ function IsIsotropicPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species:
 
     end
 
-    #fig[1,2] = Legend(fig,ax,"Particles")
-    axislegend(ax,"Particles")
+    axislegend(ax)
 
     end # with_theme
 
@@ -149,7 +156,7 @@ end
 
 Returns a plot of the sum of squared residuals between the distribution function for each species and an expected Maxwell-Juttner distribution and an isotropic distribution based on the current distribution of that species as a function of time.  
 """
-function IsThermalAndIsotropicPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::String="All",fig=nothing,theme=DiplodocusDark())
+function IsThermalAndIsotropicPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::String="All",fig=nothing,theme=DiplodocusDark(),title=true)
 
     CairoMakie.activate!(inline=true) # plot in vs code window
 
@@ -172,10 +179,14 @@ function IsThermalAndIsotropicPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruc
     SumSquaredResiduals = zeros(Float64,length(sol.t))
 
     if isnothing(fig)
-        fig = Figure(size=(400,300))
-        ax = Axis(fig[1,1],title="Is Thermal and Is Isotropic?",xlabel="Time",ylabel=L"SSR",xgridvisible=false,ygridvisible=false)
+        fig = Figure(size=(288,216))
+        ax = Axis(fig[1,1],xlabel="Time",ylabel=L"SSR",xgridvisible=false,ygridvisible=false)
     else
-        ax = Axis(fig,title="Is Thermal and Is Isotropic?",xlabel="Time",ylabel=L"SSR",xgridvisible=false,ygridvisible=false)
+        ax = Axis(fig,xlabel="Time",ylabel=L"SSR",xgridvisible=false,ygridvisible=false)
+    end
+
+    if title
+        ax.title = "Is Thermal and Isotropic?"
     end
 
     # Is Thermal?
@@ -240,8 +251,7 @@ function IsThermalAndIsotropicPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruc
 
     end
 
-    #fig[1,2] = Legend(fig,ax,"Particles")
-    axislegend(ax,"Particles")
+    axislegend(ax)
 
     end # with_theme
 

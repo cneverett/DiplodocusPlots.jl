@@ -7,13 +7,18 @@ Optional arguments:
 - `step`: the step size in time to plot, default is 1.
 - `order`: the order of p in p^order * dN/dp dV, default is 1, i.e. number density spectrum. 2 is "energy" density spectrum.
 """
-function MomentumDistributionPlot(sol,species::String,PhaseSpace::PhaseSpaceStruct;step=1,order::Int64=1,thermal=false,uDis=false,logt=false,plot_limits=(nothing,nothing),theme=DiplodocusDark())
+function MomentumDistributionPlot(sol,species::String,PhaseSpace::PhaseSpaceStruct;step=1,order::Int64=1,thermal=false,uDis=false,logt=false,plot_limits=(nothing,nothing),theme=DiplodocusDark(),wide=false)
 
     CairoMakie.activate!(inline=true) # plot in vs code window
 
     with_theme(theme) do
 
     fig = Figure()
+    if wide
+        fig = Figure(size=(576,216)) # double column 8:3 aspect ratio
+    else
+        fig = Figure() # default single column 4:3 aspect ratio
+    end
     xlab = L"$\log_{10}p$ $[m_\text{Ele}c]$"
     if order == 1
         ylab = L"$\log_{10}\left(p\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V}\right)$ $[\text{m}^{-3}]$"
@@ -175,7 +180,7 @@ function MomentumAndPolarAngleDistributionPlot(sol,species::String,PhaseSpace::P
         end
     end
 
-    fig = Figure(size=(800,300))
+    fig = Figure(size=(576,276)) # 8:3 aspect ratio
 
     dis1 = reshape(sol.f[t_idx[1]].x[species_index],(p_num,u_num))
     dis1 = dis1 .* (meanp.^(order-1))
@@ -192,15 +197,15 @@ function MomentumAndPolarAngleDistributionPlot(sol,species::String,PhaseSpace::P
     min_dis = minimum(x for x in [dis1; dis2; dis3] if !isnan(x))
     col_range = (log10(max_dis)-20.0,log10(max_dis))
 
-    ax1 = PolarAxis(fig[1,1+1],theta_0=-pi/2,direction=-1)
+    ax1 = PolarAxis(fig[1,1+1],theta_0=-pi/2,direction=-1,width=176)
     ax1.radius_at_origin = log10(p_r[1])-1.0
     thetalims!(ax1,0,pi)
 
-    ax2 = PolarAxis(fig[1,2+1],theta_0=-pi/2,direction=-1)
+    ax2 = PolarAxis(fig[1,2+1],theta_0=-pi/2,direction=-1,width=176)
     ax2.radius_at_origin = log10(p_r[1])-1.0
     thetalims!(ax2,0,pi)
 
-    ax3 = PolarAxis(fig[1,3+1],theta_0=-pi/2,direction=-1)
+    ax3 = PolarAxis(fig[1,3+1],theta_0=-pi/2,direction=-1,width=176)
     ax3.radius_at_origin = log10(p_r[1])-1.0
     thetalims!(ax3,0,pi)
 
@@ -216,22 +221,21 @@ function MomentumAndPolarAngleDistributionPlot(sol,species::String,PhaseSpace::P
     hidethetadecorations!(ax3, grid=false)
 
     if order == 1
-        Colorbar(fig[1,1],hm1,label=L"$\log_{10}\left(p\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V}\right)$ $[\text{m}^{-3}]$",flipaxis=false,height=220,tellheight=false)
+        Colorbar(fig[1,1],hm1,label=L"$\log_{10}\left(p\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V}\right)$ $[\text{m}^{-3}]$",flipaxis=false,height=176,tellheight=false)
     elseif order != 1
-        Colorbar(fig[1,1],hm1,label=L"$\log_{10}\left(p^{%$order}\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V}\right)$ $[\text{m}^{-3}]$",flipaxis=false,height=220,tellheight=false)
+        Colorbar(fig[1,1],hm1,label=L"$\log_{10}\left(p^{%$order}\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V}\right)$ $[\text{m}^{-3}]$",flipaxis=false,height=176,tellheight=false)
     end
 
-    text!(fig[1,2],L"$\log_{10}p$ $[m_\text{Ele}c]$",position=(-3.05,5.1),rotation=pi/2,fontsize=18.0f0)
+    pt = 4/3
+    text!(ax1,L"$\log_{10}p$ $[m_\text{Ele}c]$",position=(-3.05,log10(p_r[end])),rotation=pi/2,fontsize=9pt)
+    text!(ax1,L"$t=%$(time[1])$",position=(2.6,log10(p_r[end])+3.2),fontsize=10pt)
+    text!(ax2,L"$t=%$(time[2])$",position=(2.6,log10(p_r[end])+3.2),fontsize=10pt)
+    text!(ax3,L"$t=%$(time[3])$",position=(2.6,log10(p_r[end])+3.2),fontsize=10pt)
 
-    text!(fig[1,2],L"$t=%$(time[1])$",position=(2.6,7),fontsize=20.0f0)
-
-    text!(fig[1,3],L"$t=%$(time[2])$",position=(2.6,7),fontsize=20.0f0)
-
-    text!(fig[1,4],L"$t=%$(time[3])$",position=(2.6,7),fontsize=20.0f0)
-
-    colgap!(fig.layout,1,Relative(-0.05))
-    colgap!(fig.layout,2,Relative(-0.2))
-    colgap!(fig.layout,3,Relative(-0.2))
+    colsize!(fig.layout,1,Relative(0.1))
+    colsize!(fig.layout,2,Relative(0.3))
+    colsize!(fig.layout,3,Relative(0.3))
+    colsize!(fig.layout,4,Relative(0.3))
     
     return fig
 

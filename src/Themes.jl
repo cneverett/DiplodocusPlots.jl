@@ -1,9 +1,22 @@
+inch = 96
+pt = 4/3
+cm = inch / 2.54 
+
+#= 
+Latex double column width is 236pt which is 3.29 inches or 8.36cm
+
+Deault figure size will be designed for single column with a width of 3 inches or 7.62cm and a aspect ratio of 4:3, therefore height of 2.25 inches or 5.72cm
+
+=#
+
 function DiplodocusDark()
     # inspired from Makie's theme_black but with latex fonts and some modifications
     return Theme(
         backgroundcolor=:transparent,
         textcolor=:white,
         linecolor=:white,
+        size=(3inch,2.25inch),
+        fontsize = 9pt,
         #palette = Makie.generate_default_palette(:black),
         fonts = Attributes(
             :bold => Makie.texfont(:bold),
@@ -13,10 +26,10 @@ function DiplodocusDark()
         ),
         Figure = (
             backgroundcolor = :transparent,
-            size=(1200,1200),
-            fontsize = 20.0f0
+            fontsize = 9pt
         ),
         Axis = (
+            fontsize = 9pt,
             backgroundcolor=:transparent,
             bottomspinecolor = :white,
             topspinecolor = :white,
@@ -29,9 +42,9 @@ function DiplodocusDark()
             xtickwidth = 2.0,
             ytickwidth = 2.0,
             # modification from theme_black
-            titlesize = 20.0f0,
-            xlabelsize = 20.0f0,
-            ylabelsize = 20.0f0,
+            titlesize = 11pt,
+            #xlabelsize = 10pt, # defults if :fontsize
+            #ylabelsize = 10pt, # defults if :fontsize
             titlecolor= :white,
             ylabelcolor= :white,
             xlabelcolor= :white,
@@ -46,13 +59,20 @@ function DiplodocusDark()
             yminorgridwidth = 2.0,
             xticklabelcolor=:white,
             yticklabelcolor=:white,
+            xticklabelsize = 9pt,
+            yticklabelsize = 9pt,
         ),
         Legend = (
+            fontsize = 9pt,
+            labelsize = 9pt,
             framecolor = :white,
             backgroundcolor = :transparent,
             framewidth = 2.0,
         ),
         Colorbar = (
+            fontsize = 9pt,
+            labelsize = 9pt,
+            ticklabelsize = 9pt,
             tickcolor = :white,
             spinecolor = :white,
             topspinecolor = :white,
@@ -61,12 +81,14 @@ function DiplodocusDark()
             rightspinecolor = :white,
             # modifications from theme_black
             spinewidth= 2.0,
-            labelsize = 20.0f0
         ),
         ScatterLines = (
-            linewidth = 3.0f0,
+            linewidth = 3.0,
         ),
         PolarAxis = (
+            fontsize = 9pt,
+            labelsize = 9pt,
+            rticklabelsize = 9pt,
             backgroundcolor = :transparent,
             rticksvisible = true,
             rticksmirrored = true,
@@ -76,7 +98,6 @@ function DiplodocusDark()
             gridwidth = 1.0,
             tickcolor = :white,
             tickwidth = 2.0,
-            labelsize = 20.0f0,
             labelcolor = :white,
             spinewidth = 2.0,
             spinecolor = :white,
@@ -91,6 +112,8 @@ function DiplodocusLight()
         backgroundcolor=:transparent,
         textcolor=:black,
         linecolor=:black,
+        size=(3inch,2.25inch),
+        fontsize = 9pt,
         #palette = Makie.generate_default_palette(:white),
         fonts = Attributes(
             :bold => Makie.texfont(:bold),
@@ -100,14 +123,14 @@ function DiplodocusLight()
         ),
         Figure = (
             backgroundcolor = :transparent,
-            size=(1200,1200),
-            fontsize = 20.0f0
+            fontsize = 9pt
         ),
         Axis = (
+            fontsize = 9pt,
             backgroundcolor=:transparent,
-            titlesize = 20.0f0,
-            xlabelsize = 20.0f0,
-            ylabelsize = 20.0f0,
+            titlesize = 11pt,
+            xlabelsize = 9pt, # defults if :fontsize
+            ylabelsize = 9pt, # defults if :fontsize
             titlecolor= :black,
             ylabelcolor= :black,
             xlabelcolor= :black,
@@ -126,13 +149,19 @@ function DiplodocusLight()
             ytickwidth = 2.0,
             xticklabelcolor=:black,
             yticklabelcolor=:black,
+            xticklabelsize = 10pt,
+            yticklabelsize = 10pt,
         ),
         Colorbar = (
+            fontsize = 9pt,
+            labelsize = 9pt,
+            ticklabelsize = 9pt,
             backgroundcolor = :transparent,
             spinewidth=1.5,
-            labelsize = 20.0f0
         ),
         Legend = (
+            fontsize = 9pt,
+            labelsize = 9pt,
             backgroundcolor = :transparent,
             framecolor = :black,
             framewidth = 2.0,
@@ -141,6 +170,10 @@ function DiplodocusLight()
             linewidth = 3.0f0,
         ),
         PolarAxis = (
+            fontsize = 9pt,
+            labelsize = 9pt,
+            rticklabelsize = 9pt,
+            thetaticklabelsize = 5pt,
             rticksvisible = true,
             rticksmirrored = true,
             rtickcolor = :black,
@@ -149,7 +182,6 @@ function DiplodocusLight()
             gridwidth = 1.0,
             tickcolor = :black,
             tickwidth = 2.0,
-            labelsize = 20.0f0,
             labelcolor = :black,
             spinewidth = 2.0,
             spinecolor = :black,
