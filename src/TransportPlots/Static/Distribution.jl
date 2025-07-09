@@ -61,7 +61,7 @@ function MomentumDistributionPlot(sol,species::String,PhaseSpace::PhaseSpaceStru
 
     for i in 1:t_save
 
-        if i in values || i == 1
+        if (i in values || i == 1 || i == 2) # plot first step for initial conds, second for kernel 
 
             t = sol.t[i]
 
