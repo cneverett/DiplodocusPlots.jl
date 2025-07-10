@@ -129,8 +129,8 @@ function InteractiveBinaryGainLossPlot(Output::Tuple)
     p4_gain = @lift($(cbAngAvg.checked) ? log10.(GainMatrix4Avg[1:end,$p1_idx,$p2_idx]) : log10.(GainMatrix4[1:end,$u4_idx,$h4_idx,$p1_idx,$u1_idx,$h1_idx,$p2_idx,$u2_idx,$h2_idx]))
 
     # limits
-    y_max = @lift(max($p1_loss,$p2_loss)+2.0)
-    y_min = @lift(max($p1_loss,$p2_loss)-12.0)
+    y_max = @lift(max($p1_loss,$p2_loss,-40.0)+2.0)
+    y_min = @lift(max($p1_loss,$p2_loss,-40.0)-12.0)
     x_min = @lift(min($p1_val,$p2_val)-2.0)
     x_max = @lift(max($p1_val,$p2_val)+2.0)
 
@@ -138,35 +138,33 @@ function InteractiveBinaryGainLossPlot(Output::Tuple)
 
      
     onany(x_min,x_max,y_min,y_max) do _x_min, _x_max, _y_min, _y_max
-        if isnan(_y_max) == false # there are value to plot
-            ylims!(ax1,_y_min,_y_max)
-            xlims!(ax1,_x_min,_x_max)
+        ylims!(ax1,_y_min,_y_max)
+        xlims!(ax1,_x_min,_x_max)
+    end
 
-            ax1.aspect = DataAspect()
+    ax1.aspect = DataAspect()
 
-            scatterlines!(ax1,p1_val,p1_loss, label = "$name1 Loss Spectrum")
-            scatterlines!(ax1,p2_val,p2_loss, label = "$name2 Loss Spectrum")   
-            scatterlines!(ax1,log10.(p3_m),p3_gain, label = "$name3 Gain Spectrum")
-            scatterlines!(ax1,log10.(p4_m),p4_gain, label = "$name4 Gain Spectrum")
-        
+    scatterlines!(ax1,p1_val,p1_loss, label = "$name1 Loss Spectrum")
+    scatterlines!(ax1,p2_val,p2_loss, label = "$name2 Loss Spectrum")   
+    scatterlines!(ax1,log10.(p3_m),p3_gain, label = "$name3 Gain Spectrum")
+    scatterlines!(ax1,log10.(p4_m),p4_gain, label = "$name4 Gain Spectrum")
 
-            # lines for what the incoming state momenta are
-            vlines!(ax1,p1_val,color=:black,linestyle=:dash)
-            vlines!(ax1,p2_val,color=:black,linestyle=:dot)
 
-            # analytic kernels
-            if Analytic[]
-                if name1 == "Ele" && name2 == "Pho" && name3 == "Ele" && name4 == "Pho" # Inverse Compton
-                    p3_val_true = @lift(log10.(replace(IC_kernel.(p2_m[$p2_idx],p1_m[$p1_idx],p2_m[$p2_idx]+sqrt(p1_m[$p1_idx]^2+1e0^2).- sqrt.(p1_m.^2 .+1e0^2)),0.0 => NaN) .* (p1_m ./ sqrt.(p1_m.^2 .+ 1e0^2)).* p1_d))
-                    p4_val_true = @lift(log10.(replace(IC_kernel.(p2_m[$p2_idx],p1_m[$p1_idx],p2_m),0.0 => NaN) .* p2_d))
-                    scatterlines!(ax1,log10.(p1_m),p3_val_true,color=:black,linestyle=:dot,strokewidth=1.0,markersize=0.0, label = "ISO Inverse Compton Ele Spectrum")
-                    scatterlines!(ax1,log10.(p2_m),p4_val_true,markersize=0.0,color=:black,linestyle=:dash, strokewidth=1.0, label = "ISO Inverse Compton Pho Spectrum")
-                end
-            end
+    # lines for what the incoming state momenta are
+    vlines!(ax1,p1_val,color=:black,linestyle=:dash)
+    vlines!(ax1,p2_val,color=:black,linestyle=:dot)
 
-            Legend(subgl2[1,1:2],ax1)
+    # analytic kernels
+    if Analytic[]
+        if name1 == "Ele" && name2 == "Pho" && name3 == "Ele" && name4 == "Pho" # Inverse Compton
+            p3_val_true = @lift(log10.(replace(IC_kernel.(p2_m[$p2_idx],p1_m[$p1_idx],p2_m[$p2_idx]+sqrt(p1_m[$p1_idx]^2+1e0^2).- sqrt.(p1_m.^2 .+1e0^2)),0.0 => NaN) .* (p1_m ./ sqrt.(p1_m.^2 .+ 1e0^2)).* p1_d))
+            p4_val_true = @lift(log10.(replace(IC_kernel.(p2_m[$p2_idx],p1_m[$p1_idx],p2_m),0.0 => NaN) .* p2_d))
+            scatterlines!(ax1,log10.(p1_m),p3_val_true,color=:black,linestyle=:dot,strokewidth=1.0,markersize=0.0, label = "ISO Inverse Compton Ele Spectrum")
+            scatterlines!(ax1,log10.(p2_m),p4_val_true,markersize=0.0,color=:black,linestyle=:dash, strokewidth=1.0, label = "ISO Inverse Compton Pho Spectrum")
         end
     end
+
+    Legend(subgl2[1,1:2],ax1)
 
     return fig
 
