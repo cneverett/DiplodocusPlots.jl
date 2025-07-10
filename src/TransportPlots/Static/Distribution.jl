@@ -108,7 +108,7 @@ function MomentumDistributionPlot(sol,species::String,PhaseSpace::PhaseSpaceStru
         Pressure = DiplodocusTransport.ScalarPressure(Tᵃᵇ,Δab)
         Temperature = DiplodocusTransport.ScalarTemperature(Pressure,num)
 
-        MJ = DiplodocusTransport.MaxwellJuttner_Distribution(PhaseSpace,"Sph",Temperature;n=num)
+        MJ = DiplodocusTransport.MaxwellJuttner_Distribution(PhaseSpace,species,Temperature;n=num)
 
         MJ = MJ .* (meanp.^(order-1))
 
