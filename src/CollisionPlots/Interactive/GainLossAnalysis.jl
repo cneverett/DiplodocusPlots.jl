@@ -165,9 +165,9 @@ function InteractiveBinaryGainLossPlot(Output::Tuple)
 
         Legend(subgl2[1,1:2],ax1)
     else
-        ylims!(ax1,-5.0,5.0)
-        xlims!(ax1,-5.0,5.0)
-        text!(ax1,0.0,0.0,"No data to plot")
+        #ylims!(ax1,-5.0,5.0)
+        #xlims!(ax1,-5.0,5.0)
+        #text!(ax1,0.0,0.0,"No data to plot")
     end
 
     return fig
