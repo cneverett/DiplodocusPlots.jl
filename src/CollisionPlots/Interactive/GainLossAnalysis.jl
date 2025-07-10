@@ -130,21 +130,24 @@ function InteractiveBinaryGainLossPlot(Output::Tuple)
 
     # limits
     y_max = @lift(max($p1_loss,$p2_loss)+2.0)
-    y_min = @lift(min($p1_loss,$p2_loss)-12.0)
+    y_min = @lift(max($p1_loss,$p2_loss)-12.0)
     x_min = @lift(min($p1_val,$p2_val)-2.0)
     x_max = @lift(max($p1_val,$p2_val)+2.0)
 
     ax1 = Axis(fig[1:2, 1:2],xlabel=L"$\log_{10} \text{momentum}[m_\text{Ele}c]$",ylabel= L"$\log_{10} p\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}t} [\text{some units}]$")
-    onany(x_min,x_max,y_min,y_max) do _x_min, _x_max, _y_min, _y_max
-        ylims!(ax1,_y_min,_y_max)
-        xlims!(ax1,_x_min,_x_max)
-    end
-    ax1.aspect = DataAspect()
 
-    scatterlines!(ax1,p1_val,p1_loss, label = "$name1 Loss Spectrum")
-    scatterlines!(ax1,p2_val,p2_loss, label = "$name2 Loss Spectrum")   
-    scatterlines!(ax1,log10.(p3_m),p3_gain, label = "$name3 Gain Spectrum")
-    scatterlines!(ax1,log10.(p4_m),p4_gain, label = "$name4 Gain Spectrum")
+    if isnan(y_max) == false # there are value to plot 
+        onany(x_min,x_max,y_min,y_max) do _x_min, _x_max, _y_min, _y_max
+            ylims!(ax1,_y_min,_y_max)
+            xlims!(ax1,_x_min,_x_max)
+        end
+        ax1.aspect = DataAspect()
+
+        scatterlines!(ax1,p1_val,p1_loss, label = "$name1 Loss Spectrum")
+        scatterlines!(ax1,p2_val,p2_loss, label = "$name2 Loss Spectrum")   
+        scatterlines!(ax1,log10.(p3_m),p3_gain, label = "$name3 Gain Spectrum")
+        scatterlines!(ax1,log10.(p4_m),p4_gain, label = "$name4 Gain Spectrum")
+    end
 
     # lines for what the incoming state momenta are
     vlines!(ax1,p1_val,color=:black,linestyle=:dash)
