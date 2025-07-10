@@ -136,7 +136,7 @@ function InteractiveBinaryGainLossPlot(Output::Tuple)
 
     ax1 = Axis(fig[1:2, 1:2],xlabel=L"$\log_{10} \text{momentum}[m_\text{Ele}c]$",ylabel= L"$\log_{10} p\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}t} [\text{some units}]$")
 
-    if isnan(y_max) == false # there are value to plot 
+    if @lift(isnan($y_max)) == false # there are value to plot 
         onany(x_min,x_max,y_min,y_max) do _x_min, _x_max, _y_min, _y_max
             ylims!(ax1,_y_min,_y_max)
             xlims!(ax1,_x_min,_x_max)
