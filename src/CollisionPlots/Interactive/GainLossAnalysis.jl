@@ -147,23 +147,28 @@ function InteractiveBinaryGainLossPlot(Output::Tuple)
         scatterlines!(ax1,p2_val,p2_loss, label = "$name2 Loss Spectrum")   
         scatterlines!(ax1,log10.(p3_m),p3_gain, label = "$name3 Gain Spectrum")
         scatterlines!(ax1,log10.(p4_m),p4_gain, label = "$name4 Gain Spectrum")
-    end
+    
 
-    # lines for what the incoming state momenta are
-    vlines!(ax1,p1_val,color=:black,linestyle=:dash)
-    vlines!(ax1,p2_val,color=:black,linestyle=:dot)
+        # lines for what the incoming state momenta are
+        vlines!(ax1,p1_val,color=:black,linestyle=:dash)
+        vlines!(ax1,p2_val,color=:black,linestyle=:dot)
 
-    # analytic kernels
-    if Analytic[]
-        if name1 == "Ele" && name2 == "Pho" && name3 == "Ele" && name4 == "Pho" # Inverse Compton
-            p3_val_true = @lift(log10.(replace(IC_kernel.(p2_m[$p2_idx],p1_m[$p1_idx],p2_m[$p2_idx]+sqrt(p1_m[$p1_idx]^2+1e0^2).- sqrt.(p1_m.^2 .+1e0^2)),0.0 => NaN) .* (p1_m ./ sqrt.(p1_m.^2 .+ 1e0^2)).* p1_d))
-            p4_val_true = @lift(log10.(replace(IC_kernel.(p2_m[$p2_idx],p1_m[$p1_idx],p2_m),0.0 => NaN) .* p2_d))
-            scatterlines!(ax1,log10.(p1_m),p3_val_true,color=:black,linestyle=:dot,strokewidth=1.0,markersize=0.0, label = "ISO Inverse Compton Ele Spectrum")
-            scatterlines!(ax1,log10.(p2_m),p4_val_true,markersize=0.0,color=:black,linestyle=:dash, strokewidth=1.0, label = "ISO Inverse Compton Pho Spectrum")
+        # analytic kernels
+        if Analytic[]
+            if name1 == "Ele" && name2 == "Pho" && name3 == "Ele" && name4 == "Pho" # Inverse Compton
+                p3_val_true = @lift(log10.(replace(IC_kernel.(p2_m[$p2_idx],p1_m[$p1_idx],p2_m[$p2_idx]+sqrt(p1_m[$p1_idx]^2+1e0^2).- sqrt.(p1_m.^2 .+1e0^2)),0.0 => NaN) .* (p1_m ./ sqrt.(p1_m.^2 .+ 1e0^2)).* p1_d))
+                p4_val_true = @lift(log10.(replace(IC_kernel.(p2_m[$p2_idx],p1_m[$p1_idx],p2_m),0.0 => NaN) .* p2_d))
+                scatterlines!(ax1,log10.(p1_m),p3_val_true,color=:black,linestyle=:dot,strokewidth=1.0,markersize=0.0, label = "ISO Inverse Compton Ele Spectrum")
+                scatterlines!(ax1,log10.(p2_m),p4_val_true,markersize=0.0,color=:black,linestyle=:dash, strokewidth=1.0, label = "ISO Inverse Compton Pho Spectrum")
+            end
         end
-    end
 
-    Legend(subgl2[1,1:2],ax1)
+        Legend(subgl2[1,1:2],ax1)
+    else
+        ylims!(ax1,-5.0,5.0)
+        xlims!(ax1,-5.0,5.0)
+        text!(ax1,0.0,0.0,"No data to plot")
+    end
 
     return fig
 
