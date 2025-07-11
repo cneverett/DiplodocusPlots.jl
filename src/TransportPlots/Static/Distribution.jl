@@ -68,7 +68,7 @@ function MomentumDistributionPlot(sol,species::String,PhaseSpace::PhaseSpaceStru
     end
 
     if perp 
-        error("Perpendicular not yet implemented correctly")
+        #=error("Perpendicular not yet implemented correctly")
         xs = zeros(Float64,p_num,u_num)
         ys = zeros(Float64,p_num,u_num)
         for px in 1:p_num, py in 1:u_num
@@ -102,7 +102,7 @@ function MomentumDistributionPlot(sol,species::String,PhaseSpace::PhaseSpaceStru
             u = idx[2]
             f2D_cart[x,y] = 1.0meanp[p]^2*xim[x]*xid[x]*yid[y]/(dp[p]*du[u])
         end
-        
+        =#
     end
 
     max_total = -Inf32
@@ -130,7 +130,7 @@ function MomentumDistributionPlot(sol,species::String,PhaseSpace::PhaseSpaceStru
                 scatterlines!(ax,log10.(meanp),dj[:,1],linewidth=2.0,color = my_colors[color_counter],markersize=1.0)
                 scatterlines!(ax,log10.(meanp),dj[:,2],linewidth=2.0,color = my_colors[color_counter],markersize=1.0,linestyle=:dash)=#
             if perp  
-                f2D .= dropdims(sum(f3D, dims=(2,3)),dims=(2,3))
+                #=f2D .= dropdims(sum(f3D, dims=(2,3)),dims=(2,3))
                 f2D_flat = reshape(f2D,(p_num*u_num))
                 for x in eachindex(xim), y in eachindex(yim)
                     f2D_cart[x,y] *= f2D_flat[rmin_idx[x,y]]
@@ -139,7 +139,10 @@ function MomentumDistributionPlot(sol,species::String,PhaseSpace::PhaseSpaceStru
                 for px in 1:length(xim)
                     pdNdp[px] = pdNdp[px] * (xim[px]^(order-1))
                 end
-                scatterlines!(ax,log10.(xi),log10.(pdNdp),linewidth=2.0,color = my_colors[color_counter],markersize=1.0)
+                scatterlines!(ax,log10.(xi),log10.(pdNdp),linewidth=2.0,color = my_colors[color_counter],markersize=1.0)=#
+                f2D .= dropdims(sum(f3D, dims=(3)),dims=(3))
+                pdNdp = f2D[:,Int64(u_num/2)]#= /(2*pi*du[Int64(u_num/2)]) =#+f2D[:,Int64(u_num//2+1)]#= /(2*pi*du[Int64(u_num/2+1)]) =#
+                scatterlines!(ax,log10.(meanp),log10.(pdNdp),linewidth=2.0,color = my_colors[color_counter],markersize=1.0)
             else
                 # sum along u and h directions
                 pdNdp = dropdims(sum(f3D, dims=(2,3)),dims=(2,3))
@@ -284,9 +287,9 @@ function MomentumAndPolarAngleDistributionPlot(sol,species::String,PhaseSpace::P
 
     pt = 4/3
     text!(ax1,L"$\log_{10}p$ $[m_\text{Ele}c]$",position=(-3.05,log10(p_r[end])),rotation=pi/2,fontsize=9pt)
-    text!(ax1,L"$t=%$(time[1])$",position=(2.6,log10(p_r[end])+3.2),fontsize=10pt)
-    text!(ax2,L"$t=%$(time[2])$",position=(2.6,log10(p_r[end])+3.2),fontsize=10pt)
-    text!(ax3,L"$t=%$(time[3])$",position=(2.6,log10(p_r[end])+3.2),fontsize=10pt)
+    text!(ax1,L"$t=%$(t[1])$",position=(2.6,log10(p_r[end])+3.2),fontsize=10pt)
+    text!(ax2,L"$t=%$(t[2])$",position=(2.6,log10(p_r[end])+3.2),fontsize=10pt)
+    text!(ax3,L"$t=%$(t[3])$",position=(2.6,log10(p_r[end])+3.2),fontsize=10pt)
 
     colsize!(fig.layout,1,Relative(0.1))
     colsize!(fig.layout,2,Relative(0.3))
