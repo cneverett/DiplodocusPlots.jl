@@ -141,7 +141,11 @@ function MomentumDistributionPlot(sol,species::String,PhaseSpace::PhaseSpaceStru
                 end
                 scatterlines!(ax,log10.(xi),log10.(pdNdp),linewidth=2.0,color = my_colors[color_counter],markersize=1.0)=#
                 f2D .= dropdims(sum(f3D, dims=(3)),dims=(3))
-                pdNdp = f2D[:,Int64(u_num/2)]#= /(2*pi*du[Int64(u_num/2)]) =#+f2D[:,Int64(u_num//2+1)]#= /(2*pi*du[Int64(u_num/2+1)]) =#
+                if iseven(u_num) 
+                    pdNdp = f2D[:,Int64(u_num/2)]#= /(2*pi*du[Int64(u_num/2)]) =#+f2D[:,Int64(u_num//2+1)]#= /(2*pi*du[Int64(u_num/2+1)]) =#
+                else
+                    pdNdp = f2D[:,Int64((u_num+1)/2)]
+                end
                 scatterlines!(ax,log10.(meanp),log10.(pdNdp),linewidth=2.0,color = my_colors[color_counter],markersize=1.0)
             else
                 # sum along u and h directions
