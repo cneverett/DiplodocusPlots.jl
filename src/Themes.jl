@@ -5,7 +5,7 @@ cm = inch / 2.54
 #= 
 Latex double column width is 236pt which is 3.29 inches or 8.36cm
 
-Deault figure size will be designed for single column with a width of 3 inches or 7.62cm and a aspect ratio of 4:3, therefore height of 2.25 inches or 5.72cm
+Deault figure size will be designed for single column with a width of 3.25 inches or 8.255cm and a aspect ratio of 4:3, therefore height of 2.4375 inches or 6.19125cm
 
 =#
 
@@ -112,7 +112,7 @@ function DiplodocusLight()
         backgroundcolor=:transparent,
         textcolor=:black,
         linecolor=:black,
-        size=(3inch,2.25inch),
+        size=(3.25inch,2.4375inch),
         fontsize = 9pt,
         #palette = Makie.generate_default_palette(:white),
         fonts = Attributes(
