@@ -149,8 +149,8 @@ function DiplodocusLight()
             ytickwidth = 2.0,
             xticklabelcolor=:black,
             yticklabelcolor=:black,
-            xticklabelsize = 10pt,
-            yticklabelsize = 10pt,
+            xticklabelsize = 9pt,
+            yticklabelsize = 9pt,
         ),
         Colorbar = (
             fontsize = 9pt,
