@@ -15,7 +15,7 @@ function DiplodocusDark()
         backgroundcolor=:transparent,
         textcolor=:white,
         linecolor=:white,
-        size=(3inch,2.25inch),
+        size=(3.25inch,2.4375inch),
         fontsize = 9pt,
         #palette = Makie.generate_default_palette(:black),
         fonts = Attributes(

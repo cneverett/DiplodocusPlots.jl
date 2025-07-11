@@ -176,7 +176,7 @@ function MomentumAndPolarAngleDistributionPlot(sol,species::String,PhaseSpace::P
     elseif typeof(time) == Tuple{Float64,Float64,Float64}
         for i in 1:3
         t[i] = time[i]
-        t_idx[i] = findfirst(x->x==t[i],sol.t)
+        t_idx[i] = findmin(abs(sol.t-t[i]))[2] #findfirst(x->x==t[i],sol.t)
         end
     end
 
