@@ -10,6 +10,9 @@ module DiplodocusPlots
     using Makie
     using CairoMakie
     using GLMakie
+    #using Interpolations
+    #using ScatteredInterpolation
+    #using DIVAnd
 
     import DiplodocusCollisions as DC
     using DiplodocusTransport

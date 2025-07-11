@@ -6,8 +6,9 @@ Plots the angle averaged distribution function of of a given particle `species` 
 Optional arguments:
 - `step`: the step size in time to plot, default is 1.
 - `order`: the order of p in p^order * dN/dp dV, default is 1, i.e. number density spectrum. 2 is "energy" density spectrum.
+- `perp`: interpolates the spherical distribution function to parallel and perpendicular directions and then averages over the parallel direction. (NOT YET IMPLEMENTED CORRECTLY)
 """
-function MomentumDistributionPlot(sol,species::String,PhaseSpace::PhaseSpaceStruct;step=1,order::Int64=1,thermal=false,uDis=false,logt=false,plot_limits=(nothing,nothing),theme=DiplodocusDark(),wide=false)
+function MomentumDistributionPlot(sol,species::String,PhaseSpace::PhaseSpaceStruct;step=1,order::Int64=1,thermal=false,perp=false,uDis=false,logt=false,plot_limits=(nothing,nothing),theme=DiplodocusDark(),wide=false)
 
     CairoMakie.activate!(inline=true) # plot in vs code window
 
@@ -37,15 +38,19 @@ function MomentumDistributionPlot(sol,species::String,PhaseSpace::PhaseSpaceStru
 
     p_num = Momentum.px_num_list[species_index]  
     u_num = Momentum.py_num_list[species_index]
+    h_num = Momentum.pz_num_list[species_index]
     dp = Grids.dpx_list[species_index]
     du = Grids.dpy_list[species_index]
     meanp = Grids.mpx_list[species_index]
+    meanu = Grids.mpy_list[species_index]
+    meanh = Grids.mpz_list[species_index]
     p_r = Grids.pxr_list[species_index]
     u_r = Grids.pyr_list[species_index]
     mass = Grids.mass_list[species_index]
 
-    d = zeros(Float32,p_num,u_num)
-    dj = zeros(Float32,p_num,2)
+    f3D = zeros(Float32,p_num,u_num,h_num)
+    f2D = zeros(Float32,p_num,u_num)
+    f1D = zeros(Float32,p_num)
 
     t_save = length(sol.t)
 
@@ -62,6 +67,44 @@ function MomentumDistributionPlot(sol,species::String,PhaseSpace::PhaseSpaceStru
         my_colors = [cgrad(:rainbow)[z] for z ∈ range(0.0, 1.0, length = t_plot+1)]
     end
 
+    if perp 
+        error("Perpendicular not yet implemented correctly")
+        xs = zeros(Float64,p_num,u_num)
+        ys = zeros(Float64,p_num,u_num)
+        for px in 1:p_num, py in 1:u_num
+            xs[px,py] = meanp[px]*sqrt(1-meanu[py]^2)
+            ys[px,py] = meanp[px]*meanu[py]
+        end
+        xs = reshape(xs,(p_num*u_num))
+        ys = reshape(ys,(p_num*u_num))
+        xi = range(meanp[1],meanp[end],length=201)
+        yi = range(-meanp[end],meanp[end],length=401)
+        xid = zeros(Float64,length(xi)-1)
+        yid = zeros(Float64,length(yi)-1)
+        xim = zeros(Float64,length(xi)-1)
+        yim = zeros(Float64,length(yi)-1)
+        r = zeros(Float64,p_num*u_num)
+        rmin_idx = zeros(Int64,length(xi),length(yi))
+        f2D_cart = zeros(Float64,length(xi),length(yi))
+        for x in eachindex(xim), y in eachindex(yim)
+            xim[x] = (xi[x+1] + xi[x])/2
+            xid[x] = (xi[x+1] - xi[x])
+            yim[y] = (yi[y+1] + yi[y])/2
+            yid[y] = (yi[y+1] - yi[y])
+            for i in 1:p_num*u_num
+                r[i] = sqrt((xs[i]-xim[x])^2 + (ys[i]-yim[y])^2)
+            end
+            # find closest
+            rmin_idx[x,y] = findmin(r)[2]
+            # area ratios for correct number density
+            idx = CartesianIndices(f2D)[rmin_idx[x,y]]
+            p = idx[1]
+            u = idx[2]
+            f2D_cart[x,y] = 1.0meanp[p]^2*xim[x]*xid[x]*yid[y]/(dp[p]*du[u])
+        end
+        
+    end
+
     max_total = -Inf32
 
     for i in 1:t_save
@@ -70,24 +113,37 @@ function MomentumDistributionPlot(sol,species::String,PhaseSpace::PhaseSpaceStru
 
             t = sol.t[i]
 
-            d .= reshape(sol.f[i].x[species_index],(p_num,u_num))
+            f3D .= reshape(sol.f[i].x[species_index],(p_num,u_num,h_num))
 
-            max_d = maximum(x for x in d if !isnan(x))
-            max_total = max(max_d,max_total)
+            max_f = maximum(x for x in f3D if !isnan(x))
+            max_total = max(max_f,max_total)
 
-            @. d = d*(d!=Inf)
+            @. f3D = f3D*(f3D!=Inf)
+            #scale by order-1
+            for px in 1:p_num, py in 1:u_num, pz in 1:h_num
+                f3D[px,py,pz] = f3D[px,py,pz] * (meanp[px]^(order-1))
+            end
 
-            if uDis
-                dj .= log10.(d .* dp)[:,4:3:8] # print just aligned and antialigned with field
+            #=if uDis
+                dj .= log10.(d .* dp)[:,4:3:8] # print just aligned and anti-aligned with field
 
                 scatterlines!(ax,log10.(meanp),dj[:,1],linewidth=2.0,color = my_colors[color_counter],markersize=1.0)
-                scatterlines!(ax,log10.(meanp),dj[:,2],linewidth=2.0,color = my_colors[color_counter],markersize=1.0,linestyle=:dash)
+                scatterlines!(ax,log10.(meanp),dj[:,2],linewidth=2.0,color = my_colors[color_counter],markersize=1.0,linestyle=:dash)=#
+            if perp  
+                f2D .= dropdims(sum(f3D, dims=(2,3)),dims=(2,3))
+                f2D_flat = reshape(f2D,(p_num*u_num))
+                for x in eachindex(xim), y in eachindex(yim)
+                    f2D_cart[x,y] *= f2D_flat[rmin_idx[x,y]]
+                end
+                pdNdp = dropdims(sum(f2D_cart, dims=(2)),dims=(2))
+                for px in 1:length(xim)
+                    pdNdp[px] = pdNdp[px] * (xim[px]^(order-1))
+                end
+                scatterlines!(ax,log10.(xi),log10.(pdNdp),linewidth=2.0,color = my_colors[color_counter],markersize=1.0)
             else
-                # sum along u direction
-                pdNdp = dropdims(sum(d, dims=2),dims=2)
-                # scale by order-1
-                dj[:,1] .= log10.(pdNdp .* (meanp.^(order-1)))
-                scatterlines!(ax,log10.(meanp),dj[:,1],linewidth=2.0,color = my_colors[color_counter],markersize=1.0)
+                # sum along u and h directions
+                pdNdp = dropdims(sum(f3D, dims=(2,3)),dims=(2,3))
+                scatterlines!(ax,log10.(meanp),log10.(pdNdp),linewidth=2.0,color = my_colors[color_counter],markersize=1.0)
             end
 
             color_counter += 1
