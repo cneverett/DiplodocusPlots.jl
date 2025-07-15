@@ -71,7 +71,7 @@ function InteractiveBinaryGainLossPlot(Output::Tuple)
     cbAngAvg = Checkbox(subgl2[2,1],checked=false)
     cbAnalytic = Checkbox(subgl2[3,1],checked=false)
     Label(subgl2[2,2],"Angle Averaged",halign=:left)
-    Label(subgl2[3,2],"Analytic Kernels",halign=:left)
+    Label(subgl2[3,2],"Analytic ISO Spectrum",halign=:left)
 
     p1_idx = sg1.sliders[1].value
     u1_idx = sg1.sliders[2].value
@@ -155,14 +155,21 @@ function InteractiveBinaryGainLossPlot(Output::Tuple)
     vlines!(ax1,p2_val,color=:black,linestyle=:dot)
 
     # analytic kernels
-    if Analytic[]
-        if name1 == "Ele" && name2 == "Pho" && name3 == "Ele" && name4 == "Pho" # Inverse Compton
-            p3_val_true = @lift(log10.(replace(IC_kernel.(p2_m[$p2_idx],p1_m[$p1_idx],p2_m[$p2_idx]+sqrt(p1_m[$p1_idx]^2+1e0^2).- sqrt.(p1_m.^2 .+1e0^2)),0.0 => NaN) .* (p1_m ./ sqrt.(p1_m.^2 .+ 1e0^2)).* p1_d))
-            p4_val_true = @lift(log10.(replace(IC_kernel.(p2_m[$p2_idx],p1_m[$p1_idx],p2_m),0.0 => NaN) .* p2_d))
-            scatterlines!(ax1,log10.(p1_m),p3_val_true,color=:black,linestyle=:dot,strokewidth=1.0,markersize=0.0, label = "ISO Inverse Compton Ele Spectrum")
-            scatterlines!(ax1,log10.(p2_m),p4_val_true,markersize=0.0,color=:black,linestyle=:dash, strokewidth=1.0, label = "ISO Inverse Compton Pho Spectrum")
-        end
-    end
+    #on(Analytic) do _Analytic
+    #if _Analytic == true
+
+    #if name1 == "Ele" && name2 == "Pho" && name3 == "Ele" && name4 == "Pho" # Inverse Compton
+        p3_val_true = @lift(log10.(replace(IC_kernel.(p2_m[$p2_idx],p1_m[$p1_idx],p2_m[$p2_idx]+sqrt(p1_m[$p1_idx]^2+1e0^2).- sqrt.(p1_m.^2 .+1e0^2)),0.0 => NaN) .* (p1_m ./ sqrt.(p1_m.^2 .+ 1e0^2)).* p1_d))
+        p4_val_true = @lift(log10.(replace(IC_kernel.(p2_m[$p2_idx],p1_m[$p1_idx],p2_m),0.0 => NaN) .* p2_d))
+        lines!(ax1,log10.(p1_m),p3_val_true,linestyle=:dot,linewidth=1.0, label = "ISO Inverse Compton Ele Spectrum",alpha = @lift($(cbAnalytic.checked) ? 1.0 : 0.0),color=:black)
+        lines!(ax1,log10.(p2_m),p4_val_true,linestyle=:dash, linewidth=1.0, label = "ISO Inverse Compton Pho Spectrum",alpha = @lift($(cbAnalytic.checked) ? 1.0 : 0.0),color=:black)
+      
+    #end
+    #end
+    #end
+    
+
+    
 
     Legend(subgl2[1,1:2],ax1)
 
