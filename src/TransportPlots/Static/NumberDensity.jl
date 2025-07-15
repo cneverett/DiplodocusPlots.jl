@@ -3,7 +3,7 @@
 
 Returns a plot of the number density of all species as a function of time.
 """
-function NumberDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::String="All",fig=nothing,theme=DiplodocusDark(),title=true)
+function NumberDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::String="All",fig=nothing,theme=DiplodocusDark(),title=nothing)
 
     CairoMakie.activate!(inline=true) # plot in vs code window
 
@@ -32,8 +32,8 @@ function NumberDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;specie
         ax = Axis(fig,xlabel="Time",ylabel=L"$n$ $[\mathrm{m}^{-3}]$",xgridvisible=false,ygridvisible=false)
     end
 
-    if title
-        ax.title = "Number Density"
+    if !isnothing(title)
+        ax.title = title
     end
 
     for j in (species != "All" ? findfirst(x->x==species,name_list) : eachindex(name_list))
@@ -74,7 +74,7 @@ end
 
 Returns a plot of the fractional change in number density of all species between time setups as a function of time.
 """
-function FracNumberDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::String="All",fig=nothing,theme=DiplodocusDark(),title=true)
+function FracNumberDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::String="All",fig=nothing,theme=DiplodocusDark(),title=nothing)
 
     CairoMakie.activate!(inline=true) # plot in vs code window
 
@@ -101,8 +101,8 @@ function FracNumberDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;sp
         ax = Axis(fig,xlabel="Time",ylabel="Num. Den. Frac. Change",xgridvisible=false,ygridvisible=false)
     end
 
-    if title 
-        ax.title = "Frac. Change in Number Density"
+    if !isnothing(title)
+        ax.title = title
     end
 
     frac_num = zeros(Float64,length(sol.t))
