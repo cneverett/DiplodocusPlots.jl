@@ -6,6 +6,7 @@ module DiplodocusPlots
     export FracNumberDensityPlot, NumberDensityPlot
     export FracEnergyDensityPlot, EnergyDensityPlot
     export IsThermalPlot, IsIsotropicPlot, IsThermalAndIsotropicPlot
+    export InteractiveEmissionGainLossPlot
 
     using Makie
     using CairoMakie
