@@ -509,18 +509,13 @@ function AM3_MomentumDistributionPlot(filePath,t_max,t_min,t_grid;plot_limits=(n
     end
 
     if t_grid == "u"
-        Colorbar(fig[1,2],colormap = Makie.ColorSchemes.hawaii,limits=(TimeUnits(sol.t[1]),TimeUnits(sol.t[end])),label=L"$t$ $[\text{s} * \sigma_{T}c]$")
+        Colorbar(fig[1,2],colormap = Makie.ColorSchemes.hawaii,limits=(TimeUnits(t_min),TimeUnits(t_max)),label=L"$t$ $[\text{s} * \sigma_{T}c]$")
     elseif t_grid == "l"
-        Colorbar(fig[1,2],colormap = Makie.ColorSchemes.hawaii,limits=(log10(sol.t[1]),log10(sol.t[end])),label=L"$\log_{10}\left(t [\text{s}]\right)$")
+        Colorbar(fig[1,2],colormap = Makie.ColorSchemes.hawaii,limits=(log10(t_min),log10(t_max)),label=L"$\log_{10}\left(t [\text{s}]\right)$")
     end
 
     axislegend(ax,legend_elements,line_labels,position = :lt)
-
-    if plot_limits == (nothing,nothing)
-        xlims!(ax,(log10(p_min)-1.0,log10(p_max)+1.0))
-        ylims!(ax,(log10(max_total)-9.0,log10(max_total)+1.0)) 
-    end
-    
+   
     return fig
 
     end # with_theme
