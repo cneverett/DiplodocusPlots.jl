@@ -466,7 +466,7 @@ function AM3_MomentumDistributionPlot(filePath,t_max,t_min,t_grid;plot_limits=(n
     else
         fig = Figure() # default single column 4:3 aspect ratio
     end
-    xlab = L"$\log_{10}\left(E [m_\text{Ele}c]\right)$"
+    xlab = L"$\log_{10}\left(E [m_\text{Ele}c^2]\right)$"
     ylab = L"$\log_{10}\left(E^2\frac{\mathrm{d}N}{\mathrm{d}E\mathrm{d}V} [\text{m}^{-3}\left(m_\text{Ele}c^2\right)]\right)$"
     ax = Axis(fig[1,1],xlabel=xlab,ylabel=ylab,aspect=DataAspect())
     ax.limits = plot_limits
