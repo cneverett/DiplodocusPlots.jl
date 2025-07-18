@@ -344,7 +344,7 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
     if Time.t_grid == "u"
         Colorbar(fig[1,2],colormap = my_colors,limits=(TimeUnits(sol.t[1]),TimeUnits(sol.t[end])),label=L"$t$ $[\text{s} * \sigma_{T}c]$")
     elseif Time.t_grid == "l"
-        Colorbar(fig[1,2],colormap = my_colors,limits=(log10(TimeUnits(sol.t[1])),log10(TimeUnits(sol.t[end]))),label=L"$\log_{10}\left(t"TimeUnits()*L"$\right)$")
+        Colorbar(fig[1,2],colormap = my_colors,limits=(log10(TimeUnits(sol.t[1])),log10(TimeUnits(sol.t[end]))),label=L"$\log_{10}\left(t"*TimeUnits()*L"$\right)$")
     end
 
     axislegend(ax,legend_elements,line_labels,position = :lt,rowgap=-5)
