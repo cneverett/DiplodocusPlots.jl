@@ -227,7 +227,7 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
     p_min = Inf32
     p_max = -Inf32
 
-    legend_element = []
+    legend_elements = []
     line_labels = []
 
     t_save = length(sol.t)
