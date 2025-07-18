@@ -115,9 +115,6 @@ function MomentumDistributionPlot(sol,species::String,PhaseSpace::PhaseSpaceStru
 
             f3D .= reshape(sol.f[i].x[species_index],(p_num,u_num,h_num))
 
-            max_f = maximum(x for x in f3D if !isnan(x))
-            max_total = max(max_f,max_total)
-
             @. f3D = f3D*(f3D!=Inf)
             #scale by order-1
             for px in 1:p_num, py in 1:u_num, pz in 1:h_num
@@ -147,10 +144,16 @@ function MomentumDistributionPlot(sol,species::String,PhaseSpace::PhaseSpaceStru
                     pdNdp = f2D[:,Int64((u_num+1)/2)]
                 end
                 scatterlines!(ax,log10.(meanp),log10.(pdNdp),linewidth=2.0,color = my_colors[color_counter],markersize=1.0)
+
+                max_f = maximum(x for x in pdNdp if !isnan(x))
+                max_total = max(max_f,max_total)
             else
                 # sum along u and h directions
                 pdNdp = dropdims(sum(f3D, dims=(2,3)),dims=(2,3))
                 scatterlines!(ax,log10.(meanp),log10.(pdNdp),linewidth=2.0,color = my_colors[color_counter],markersize=1.0)
+
+                max_f = maximum(x for x in pdNdp if !isnan(x))
+                max_total = max(max_f,max_total)
             end
 
             color_counter += 1
@@ -275,9 +278,6 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
 
             f3D .= reshape(sol.f[i].x[species_index],(p_num,u_num,h_num))
 
-            max_f = maximum(x for x in f3D if !isnan(x))
-            max_total = max(max_f,max_total)
-
             @. f3D = f3D*(f3D!=Inf)
             #scale by order-1
             for px in 1:p_num, py in 1:u_num, pz in 1:h_num
@@ -297,10 +297,16 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
                     pdNdp = f2D[:,Int64((u_num+1)/2)]
                 end
                 scatterlines!(ax,log10.(meanp),log10.(pdNdp),linewidth=2.0,color = my_colors[color_counter],markersize=1.0,linestyle=linestyles[species_idx])
+
+                max_f = maximum(x for x in pdNdp if !isnan(x))
+                max_total = max(max_f,max_total)
             else
                 # sum along u and h directions
                 pdNdp = dropdims(sum(f3D, dims=(2,3)),dims=(2,3))
                 scatterlines!(ax,log10.(meanp),log10.(pdNdp),linewidth=2.0,color = my_colors[color_counter],markersize=1.0,linestyle=linestyles[species_idx])
+
+                max_f = maximum(x for x in pdNdp if !isnan(x))
+                max_total = max(max_f,max_total)
             end
 
             color_counter += 1
