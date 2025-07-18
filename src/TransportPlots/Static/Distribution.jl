@@ -455,7 +455,7 @@ function AM3_MomentumDistributionPlot(filePath,t_max,t_min,t_grid;plot_limits=(n
     end
 
     # unit conversion 
-    eV_to_mElec2 = 1.6e-19 / 9.11e-31 / 3e8^2
+    eV_to_mElec2 = 1.60217e-19 / 9.109e-31 / 2.9979e8^2
     cm3_to_m3 = 1e6 
 
     CairoMakie.activate!(inline=true) # plot in vs code window
