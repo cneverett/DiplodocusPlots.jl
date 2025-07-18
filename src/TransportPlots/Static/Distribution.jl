@@ -481,9 +481,9 @@ function AM3_MomentumDistributionPlot(filePath,t_max,t_min,t_grid;plot_limits=(n
         end
 
         # sum along u and h directions
-        pdNdp = f_pho[i,:]
-        println("$pdNdp")
-        scatterlines!(ax,log10.(meanp_pho),log10.(pdNdp),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[1])
+        pdNdp = f_pho[i,:][1]
+        #println("$pdNdp")
+        scatterlines!(ax,log10.(meanp_pho[1]),log10.(pdNdp),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[1])
 
         push!(legend_elements,LineElement(color = theme.textcolor[], linestyle = linestyles[1],linewidth = 2.0))
         push!(line_labels,"Pho")
@@ -500,8 +500,8 @@ function AM3_MomentumDistributionPlot(filePath,t_max,t_min,t_grid;plot_limits=(n
             end
 
             # sum along u and h directions
-            pdNdp = f_ele[i,:]
-            scatterlines!(ax,log10.(meanp_ele),log10.(pdNdp),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[2])
+            pdNdp = f_ele[i,:][1]
+            scatterlines!(ax,log10.(meanp_ele[1]),log10.(pdNdp),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[2])
 
             push!(legend_elements,LineElement(color = theme.textcolor[], linestyle = linestyles[2],linewidth = 2.0))
             push!(line_labels,"Ele")
