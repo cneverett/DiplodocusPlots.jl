@@ -7,6 +7,7 @@ Optional arguments:
 - `step`: the step size in time to plot, default is 1.
 - `order`: the order of p in p^order * dN/dp dV, default is 1, i.e. number density spectrum. 2 is "energy" density spectrum.
 - `perp`: interpolates the spherical distribution function to parallel and perpendicular directions and then averages over the parallel direction. (NOT YET IMPLEMENTED CORRECTLY)
+- `TimeUnits`: a function that converts the time given in code units to the desired units for plotting
 """
 function MomentumDistributionPlot(sol,species::String,PhaseSpace::PhaseSpaceStruct;step=1,order::Int64=1,thermal=false,perp=false,logt=false,plot_limits=(nothing,nothing),theme=DiplodocusDark(),wide=false,TimeUnits::Function=CodeUnitsTime)
 
