@@ -311,6 +311,8 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
         xlims!(ax,(log10(p_min)-1.0,log10(p_max)+1.0))
         ylims!(ax,(log10(max_total)-9.0,log10(max_total)+1.0)) 
     end
+    println("$((log10(p_min)-1.0,log10(p_max)+1.0))")
+    println("$((log10(max_total)-9.0,log10(max_total)+1.0))")
     
     return fig
 
