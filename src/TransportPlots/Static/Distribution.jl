@@ -447,7 +447,7 @@ function AM3_MomentumDistributionPlot(filePath,t_max,t_min,t_grid;plot_limits=(n
         f_pho = f["f_pho"];
         t_pho = f["t_pho"];
 
-        close(f)  
+        DC.close(f)  
     else
         error("no file at $filePath found")
     end
