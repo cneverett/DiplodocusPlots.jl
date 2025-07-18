@@ -68,6 +68,7 @@ function DiplodocusDark()
             framecolor = :white,
             backgroundcolor = :transparent,
             framewidth = 2.0,
+            rowgap = 0.0,
         ),
         Colorbar = (
             fontsize = 9pt,
@@ -165,6 +166,7 @@ function DiplodocusLight()
             backgroundcolor = :transparent,
             framecolor = :black,
             framewidth = 2.0,
+            rowgap = 0.0,
         ),
         ScatterLines = (
             linewidth = 2.0,

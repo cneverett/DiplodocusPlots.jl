@@ -186,8 +186,8 @@ function MomentumDistributionPlot(sol,species::String,PhaseSpace::PhaseSpaceStru
     end
 
     if plot_limits == (nothing,nothing)
-        xlims!(ax,(log10.(p_r[1]),log10.(p_r[end])))
-        ylims!(ax,(max_total-11.0,max_total+1.0)) 
+        xlims!(ax,(log10(p_r[1]),log10(p_r[end])))
+        ylims!(ax,(log10(max_total)-9.0,log10(max_total)+1.0)) 
     end
     
     return fig
@@ -340,11 +340,11 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
         Colorbar(fig[1,2],colormap = my_colors,limits=(log10(sol.t[1]),log10(sol.t[end])),label=L"$\log_{10}\left(t[\text{s} \times \sigma_{T}c]\right)$")
     end
 
-    axislegend(ax,legend_elements,line_labels)
+    axislegend(ax,legend_elements,line_labels,position = :lt)
 
     if plot_limits == (nothing,nothing)
-        xlims!(ax,(log10.(p_min)-1.0,log10.(p_max)+1.0))
-        ylims!(ax,(max_total-11.0,max_total+1.0)) 
+        xlims!(ax,(log10(p_min)-1.0,log10(p_max)+1.0))
+        ylims!(ax,(log10(max_total)-9.0,log10(max_total)+1.0)) 
     end
     
     return fig
