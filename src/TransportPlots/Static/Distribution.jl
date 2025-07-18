@@ -230,6 +230,18 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
     legend_element = []
     line_labels = []
 
+    t_save = length(sol.t)
+    t_plot = ceil(Int64,t_save/step)
+
+    if logt
+        log_t = log10.(sol.t)
+        values = findall(x->x%1==0,log_t)
+        my_colors = [cgrad(:rainbow)[z] for z ∈ range(0.0, 1.0, length = length(values)+1)]
+    else
+        values = (1:t_save)*step
+        my_colors = [cgrad(:rainbow)[z] for z ∈ range(0.0, 1.0, length = t_plot+1)]
+    end
+
     for (species_idx, species_name) in enumerate(species) 
 
     species_index = findfirst(x->x==species_name,name_list)
@@ -253,19 +265,7 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
     p_min = min(p_min,p_r[1])
     p_max = max(p_max,p_r[end])
 
-    t_save = length(sol.t)
-    t_plot = ceil(Int64,t_save/step)
-
     color_counter = 1
-
-    if logt
-        log_t = log10.(sol.t)
-        values = findall(x->x%1==0,log_t)
-        my_colors = [cgrad(:rainbow)[z] for z ∈ range(0.0, 1.0, length = length(values)+1)]
-    else
-        values = (1:t_save)*step
-        my_colors = [cgrad(:rainbow)[z] for z ∈ range(0.0, 1.0, length = t_plot+1)]
-    end
 
     for i in 1:t_save
 
