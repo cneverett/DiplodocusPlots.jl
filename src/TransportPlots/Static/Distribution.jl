@@ -452,6 +452,10 @@ function AM3_MomentumDistributionPlot(filePath,t_max,t_min,t_grid;plot_limits=(n
         error("no file at $filePath found")
     end
 
+    # unit conversion 
+    eV_to_mElec = 1.6e-19 / 9.11e-31 / 3e8
+    ergcm_to_mElecm = 1.0 
+
     CairoMakie.activate!(inline=true) # plot in vs code window
 
     with_theme(theme) do
@@ -462,8 +466,8 @@ function AM3_MomentumDistributionPlot(filePath,t_max,t_min,t_grid;plot_limits=(n
     else
         fig = Figure() # default single column 4:3 aspect ratio
     end
-    xlab = L"$\log_{10}\left(p [m_\text{Ele}c]\right)$"
-    ylab = L"$\log_{10}\left(p^2\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V} [\text{m}^{-3}\left(m_\text{Ele}c\right)]\right)$"
+    xlab = L"$\log_{10}\left(E [m_\text{Ele}c]\right)$"
+    ylab = L"$\log_{10}\left(E^2\frac{\mathrm{d}N}{\mathrm{d}E\mathrm{d}V} [\text{m}^{-3}\left(m_\text{Ele}c\right)]\right)$"
     ax = Axis(fig[1,1],xlabel=xlab,ylabel=ylab,aspect=DataAspect())
     ax.limits = plot_limits
 
@@ -483,12 +487,12 @@ function AM3_MomentumDistributionPlot(filePath,t_max,t_min,t_grid;plot_limits=(n
         # sum along u and h directions
         pdNdp = f_pho[i,:][1]
         #println("$pdNdp")
-        scatterlines!(ax,log10.(meanp_pho),log10.(meanp_pho .* pdNdp),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[1])
-
-        push!(legend_elements,LineElement(color = theme.textcolor[], linestyle = linestyles[1],linewidth = 2.0))
-        push!(line_labels,"Pho")
+        scatterlines!(ax,log10.(meanp_pho .* eV_to_mElec),log10.(meanp_pho .* pdNdp),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[1])
 
     end
+
+    push!(legend_elements,LineElement(color = theme.textcolor[], linestyle = linestyles[1],linewidth = 2.0))
+    push!(line_labels,"Pho")
 
     for i in 1:length(t_ele)
 
@@ -501,12 +505,12 @@ function AM3_MomentumDistributionPlot(filePath,t_max,t_min,t_grid;plot_limits=(n
 
             # sum along u and h directions
             pdNdp = f_ele[i,:][1]
-            scatterlines!(ax,log10.(meanp_ele),log10.(meanp_ele .*pdNdp),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[2])
-
-            push!(legend_elements,LineElement(color = theme.textcolor[], linestyle = linestyles[2],linewidth = 2.0))
-            push!(line_labels,"Ele")
+            scatterlines!(ax,log10.(meanp_ele .* eV_to_mElec),log10.(meanp_ele .* pdNdp),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[2])
 
     end
+
+    push!(legend_elements,LineElement(color = theme.textcolor[], linestyle = linestyles[2],linewidth = 2.0))
+    push!(line_labels,"Ele")
 
     if t_grid == "u"
         Colorbar(fig[1,2],colormap = Makie.ColorSchemes.hawaii,limits=(TimeUnits(t_min),TimeUnits(t_max)),label=L"$t$ $[\text{s} * \sigma_{T}c]$")
