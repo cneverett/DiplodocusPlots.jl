@@ -340,7 +340,7 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
         Colorbar(fig[1,2],colormap = my_colors,limits=(log10(sol.t[1]),log10(sol.t[end])),label=L"$\log_{10}\left(t[\text{s} \times \sigma_{T}c]\right)$")
     end
 
-    axislegend(ax,legend_elements,line_labels,position = :lt,rowgap=-1)
+    axislegend(ax,legend_elements,line_labels,position = :lt,rowgap=-5)
 
     if plot_limits == (nothing,nothing)
         xlims!(ax,(log10(p_min)-1.0,log10(p_max)+1.0))
