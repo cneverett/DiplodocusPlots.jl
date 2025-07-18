@@ -507,7 +507,7 @@ function AM3_MomentumDistributionPlot(filePath,t_max,t_min,t_grid;plot_limits=(n
 
             # sum along u and h directions
             pdNdp = f_ele[i,:][1]
-            scatterlines!(ax,log10.(meanp_ele .* eV_to_mElec2),log10.(meanp_ele .* pdNdp .* cm3_to_m3 .* eV_to_mElec2),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[2])
+            scatterlines!(ax,log10.(sqrt.((meanp_ele .* eV_to_mElec2).^2-1)),log10.(meanp_ele .* pdNdp .* cm3_to_m3 .* eV_to_mElec2),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[2])
 
     end
 
