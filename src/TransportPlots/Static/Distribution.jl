@@ -432,7 +432,7 @@ end
 
 # ============== AM3 Test Plots ============== #
 
-function AM3_MomentumDistributionPlot(filePath,t_max,t_min,t_grid,plot_limits=(nothing,nothing),theme=DiplodocusDark(),wide=false)
+function AM3_MomentumDistributionPlot(filePath,t_max,t_min,t_grid;plot_limits=(nothing,nothing),theme=DiplodocusDark(),wide=false)
 
     fileExist = isfile(filePath)
 
