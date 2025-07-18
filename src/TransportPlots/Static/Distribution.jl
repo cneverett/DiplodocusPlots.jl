@@ -8,7 +8,7 @@ Optional arguments:
 - `order`: the order of p in p^order * dN/dp dV, default is 1, i.e. number density spectrum. 2 is "energy" density spectrum.
 - `perp`: interpolates the spherical distribution function to parallel and perpendicular directions and then averages over the parallel direction. (NOT YET IMPLEMENTED CORRECTLY)
 """
-function MomentumDistributionPlot(sol,species::String,PhaseSpace::PhaseSpaceStruct;step=1,order::Int64=1,thermal=false,perp=false,logt=false,plot_limits=(nothing,nothing),theme=DiplodocusDark(),wide=false)
+function MomentumDistributionPlot(sol,species::String,PhaseSpace::PhaseSpaceStruct;step=1,order::Int64=1,thermal=false,perp=false,logt=false,plot_limits=(nothing,nothing),theme=DiplodocusDark(),wide=false,TimeUnits::Function=CodeUnitsTime)
 
     CairoMakie.activate!(inline=true) # plot in vs code window
 
@@ -183,9 +183,9 @@ function MomentumDistributionPlot(sol,species::String,PhaseSpace::PhaseSpaceStru
     end
 
     if Time.t_grid == "u"
-        Colorbar(fig[1,2],colormap = my_colors,limits=(sol.t[1],sol.t[end]),label=L"$t$ $[\text{s} * \sigma_{T}c]$")
+        Colorbar(fig[1,2],colormap = my_colors,limits=(TimeUnits(sol.t[1]),TimeUnits(sol.t[end])),label=L"$t$ $[\text{s} * \sigma_{T}c]$")
     elseif Time.t_grid == "l"
-        Colorbar(fig[1,2],colormap = my_colors,limits=(log10(sol.t[1]),log10(sol.t[end])),label=L"$\log_{10}\left(t[\text{s} \times \sigma_{T}c]\right)$")
+        Colorbar(fig[1,2],colormap = my_colors,limits=(log10(TimeUnits(sol.t[1])),log10(TimeUnits(sol.t[end]))),label=L"$\log_{10}\left(t[\text{s} \times \sigma_{T}c]\right)$")
     end
 
     if plot_limits == (nothing,nothing)
@@ -199,7 +199,7 @@ function MomentumDistributionPlot(sol,species::String,PhaseSpace::PhaseSpaceStru
 
 end
 
-function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseSpaceStruct;step=1,order::Int64=1,thermal=false,perp=false,logt=false,plot_limits=(nothing,nothing),theme=DiplodocusDark(),wide=false)
+function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseSpaceStruct;step=1,order::Int64=1,thermal=false,perp=false,logt=false,plot_limits=(nothing,nothing),theme=DiplodocusDark(),wide=false,TimeUnits::Function=CodeUnitsTime)
 
     CairoMakie.activate!(inline=true) # plot in vs code window
 
@@ -341,9 +341,9 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
     end # species loop 
 
     if Time.t_grid == "u"
-        Colorbar(fig[1,2],colormap = my_colors,limits=(sol.t[1],sol.t[end]),label=L"$t$ $[\text{s} * \sigma_{T}c]$")
+        Colorbar(fig[1,2],colormap = my_colors,limits=(TimeUnits(sol.t[1]),TimeUnits(sol.t[end])),label=L"$t$ $[\text{s} * \sigma_{T}c]$")
     elseif Time.t_grid == "l"
-        Colorbar(fig[1,2],colormap = my_colors,limits=(log10(sol.t[1]),log10(sol.t[end])),label=L"$\log_{10}\left(t[\text{s} \times \sigma_{T}c]\right)$")
+        Colorbar(fig[1,2],colormap = my_colors,limits=(log10(TimeUnits(sol.t[1])),log10(TimeUnits(sol.t[end]))),label=L"$\log_{10}\left(t[\text{s} \times \sigma_{T}c]\right)$")
     end
 
     axislegend(ax,legend_elements,line_labels,position = :lt,rowgap=-5)
