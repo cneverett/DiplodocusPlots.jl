@@ -141,7 +141,7 @@ function MomentumDistributionPlot(sol,species::String,PhaseSpace::PhaseSpaceStru
     t_unit_string = TimeUnits()
 
     if Time.t_grid == "u"
-        Colorbar(fig[1,2],colormap = Makie.ColorSchemes.hawaii,limits=(TimeUnits(sol.t[1]),TimeUnits(sol.t[end])),label=L"$t$ $[\text{s} * \sigma_{T}c]$")
+        Colorbar(fig[1,2],colormap = Makie.ColorSchemes.hawaii,limits=(TimeUnits(sol.t[1]),TimeUnits(sol.t[end])),label=L"$t %$t_unit_string$")
     elseif Time.t_grid == "l"
         Colorbar(fig[1,2],colormap = Makie.ColorSchemes.hawaii,limits=(log10(TimeUnits(sol.t[1])),log10(TimeUnits(sol.t[end]))),label=L"$\log_{10}\left(t %$t_unit_string \right)$")
     end
@@ -300,7 +300,7 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
     t_unit_string = TimeUnits()
 
     if Time.t_grid == "u"
-        Colorbar(fig[1,2],colormap = Makie.ColorSchemes.hawaii,limits=(TimeUnits(sol.t[1]),TimeUnits(sol.t[end])),label=L"$t$ $[\text{s} * \sigma_{T}c]$")
+        Colorbar(fig[1,2],colormap = Makie.ColorSchemes.hawaii,limits=(TimeUnits(sol.t[1]),TimeUnits(sol.t[end])),label=L"$t %$t_unit_string$")
     elseif Time.t_grid == "l"
         Colorbar(fig[1,2],colormap = Makie.ColorSchemes.hawaii,limits=(log10(TimeUnits(sol.t[1])),log10(TimeUnits(sol.t[end]))),label=L"$\log_{10}\left(t %$t_unit_string \right)$")
     end
@@ -420,6 +420,115 @@ function MomentumAndPolarAngleDistributionPlot(sol,species::String,PhaseSpace::P
     colsize!(fig.layout,2,Relative(0.3))
     colsize!(fig.layout,3,Relative(0.3))
     colsize!(fig.layout,4,Relative(0.3))
+    
+    return fig
+
+    end # with_theme
+
+end
+
+
+
+
+# ============== AM3 Test Plots ============== #
+
+function AM3_MomentumDistributionPlot(filePath,t_max,t_min,t_grid,plot_limits=(nothing,nothing),theme=DiplodocusDark(),wide=false)
+
+    fileExist = isfile(filePath)
+
+    if fileExist
+        f = jldopen(filePath,"r+");
+
+        meanp_ele = f["meanp_ele"];
+        f_ele = f["f_ele"];
+        t_ele = f["t_ele"];
+
+        meanp_pho = f["meanp_pho"];
+        f_pho = f["f_pho"];
+        t_pho = f["t_pho"];
+
+        close(f)  
+    else
+        error("no file at $filePath found")
+    end
+
+    CairoMakie.activate!(inline=true) # plot in vs code window
+
+    with_theme(theme) do
+
+    fig = Figure()
+    if wide
+        fig = Figure(size=(576,216)) # double column 8:3 aspect ratio
+    else
+        fig = Figure() # default single column 4:3 aspect ratio
+    end
+    xlab = L"$\log_{10}\left(p [m_\text{Ele}c]\right)$"
+    if order == 1
+        ylab = L"$\log_{10}\left(p\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V} [\text{m}^{-3}]\right)$"
+    elseif order != 1
+        ylab = L"$\log_{10}\left(p^{%$(order)}\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V} [\text{m}^{-3}\left(m_\text{Ele}c\right)^{%$(order-1)}]\right)$"
+    end
+    ax = Axis(fig[1,1],xlabel=xlab,ylabel=ylab,aspect=DataAspect())
+    ax.limits = plot_limits
+
+    name_list = PhaseSpace.name_list
+    Momentum = PhaseSpace.Momentum
+    Grids = PhaseSpace.Grids
+    Time = PhaseSpace.Time
+
+    linestyles = [:solid,:dash,:dot,:dashdot,:dashdotdot]
+    legend_elements = []
+    line_labels = []
+
+    
+    for i in 1:length(t_pho)
+
+        t = t_pho[i]
+        if t_grid == "u"
+            color = Makie.ColorSchemes.hawaii[(t - t_min) / (t_max - t_min)]
+        elseif t_grid == "l"
+            color = Makie.ColorSchemes.hawaii[(log10(t) - log10(t_min)) / (log10(t_max) - log10(t_min))]
+        end
+
+        # sum along u and h directions
+        pdNdp = f_pho[i,:]
+        scatterlines!(ax,log10.(meanp_pho),log10.(pdNdp),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[1])
+
+        push!(legend_elements,LineElement(color = theme.textcolor[], linestyle = linestyles[1],linewidth = 2.0))
+        push!(line_labels,"Pho")
+
+    end
+
+    for i in 1:length(t_ele)
+
+            t = t_ele[i]
+            if t_grid == "u"
+                color = Makie.ColorSchemes.hawaii[(t - t_min) / (t_max - t_min)]
+            elseif t_grid == "l"
+                color = Makie.ColorSchemes.hawaii[(log10(t) - log10(t_min)) / (log10(t_max) - log10(t_min))]
+            end
+
+            # sum along u and h directions
+            pdNdp = f_ele[i,:]
+            scatterlines!(ax,log10.(meanp_ele),log10.(pdNdp),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[2])
+
+            push!(legend_elements,LineElement(color = theme.textcolor[], linestyle = linestyles[2],linewidth = 2.0))
+            push!(line_labels,"Ele")
+
+    end
+
+    if Time.t_grid == "u"
+        Colorbar(fig[1,2],colormap = Makie.ColorSchemes.hawaii,limits=(TimeUnits(sol.t[1]),TimeUnits(sol.t[end])),label=L"$t$ $[\text{s} * \sigma_{T}c]$")
+    elseif Time.t_grid == "l"
+        Colorbar(fig[1,2],colormap = Makie.ColorSchemes.hawaii,limits=(log10(sol.t[1]),log10(sol.t[end])),label=L"$\log_{10}\left(t [\text{s}]\right)$")
+    end
+
+    axislegend(ax,legend_elements,line_labels,position = :lt)
+
+    if plot_limits == (nothing,nothing)
+        xlims!(ax,(log10(p_min)-1.0,log10(p_max)+1.0))
+        ylims!(ax,(log10(max_total)-9.0,log10(max_total)+1.0)) 
+    end
     
     return fig
 
