@@ -12,7 +12,7 @@ function SIUnitsTime(t_code::T) where T <: AbstractFloat
     return t_SI
 end
 function SIUnitsTime()
-    return L"[\text{s}]"
+    return raw"$[\text{s}]$"
 end
 
 """ 
@@ -24,5 +24,5 @@ function CodeUnitsTime(t_code::T) where T <: AbstractFloat
     return t_code
 end
 function CodeUnitsTime()
-    return L"[\text{s} \times \sigma_{T}c]"
+    return raw"$[\text{s} \times \sigma_{T}c]$"
 end
