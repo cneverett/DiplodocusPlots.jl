@@ -69,9 +69,9 @@ function MomentumDistributionPlot(sol,species::String,PhaseSpace::PhaseSpaceStru
 
             t = sol.t[i]
             if Time.t_grid == "u"
-                color = Makie.ColorSchemes.rainbow_bgyr_35_85_c72_n256[(t - sol.t[1]) / (sol.t[end] - sol.t[1])]
+                color = Makie.ColorSchemes.hawaii[(t - sol.t[1]) / (sol.t[end] - sol.t[1])]
             elseif Time.t_grid == "l"
-                color = Makie.ColorSchemes.rainbow_bgyr_35_85_c72_n256[(log10(t) - log10(sol.t[1])) / (log10(sol.t[end]) - log10(sol.t[1]))]
+                color = Makie.ColorSchemes.hawaii[(log10(t) - log10(sol.t[1])) / (log10(sol.t[end]) - log10(sol.t[1]))]
             end
 
             f3D .= reshape(sol.f[i].x[species_index],(p_num,u_num,h_num))
@@ -134,9 +134,9 @@ function MomentumDistributionPlot(sol,species::String,PhaseSpace::PhaseSpaceStru
     t_unit_string = TimeUnits()
 
     if Time.t_grid == "u"
-        Colorbar(fig[1,2],colormap = Makie.ColorSchemes.rainbow_bgyr_35_85_c72_n256,limits=(TimeUnits(sol.t[1]),TimeUnits(sol.t[end])),label=L"$t$ $[\text{s} * \sigma_{T}c]$")
+        Colorbar(fig[1,2],colormap = Makie.ColorSchemes.hawaii,limits=(TimeUnits(sol.t[1]),TimeUnits(sol.t[end])),label=L"$t$ $[\text{s} * \sigma_{T}c]$")
     elseif Time.t_grid == "l"
-        Colorbar(fig[1,2],colormap = Makie.ColorSchemes.rainbow_bgyr_35_85_c72_n256,limits=(log10(TimeUnits(sol.t[1])),log10(TimeUnits(sol.t[end]))),label=L"$\log_{10}\left(t %$t_unit_string \right)$")
+        Colorbar(fig[1,2],colormap = Makie.ColorSchemes.hawaii,limits=(log10(TimeUnits(sol.t[1])),log10(TimeUnits(sol.t[end]))),label=L"$\log_{10}\left(t %$t_unit_string \right)$")
     end
 
     if plot_limits == (nothing,nothing)
@@ -216,9 +216,9 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
 
             t = sol.t[i]
             if Time.t_grid == "u"
-                color = Makie.ColorSchemes.rainbow_bgyr_35_85_c72_n256[(t - sol.t[1]) / (sol.t[end] - sol.t[1])]
+                color = Makie.ColorSchemes.hawaii[(t - sol.t[1]) / (sol.t[end] - sol.t[1])]
             elseif Time.t_grid == "l"
-                color = Makie.ColorSchemes.rainbow_bgyr_35_85_c72_n256[(log10(t) - log10(sol.t[1])) / (log10(sol.t[end]) - log10(sol.t[1]))]
+                color = Makie.ColorSchemes.hawaii[(log10(t) - log10(sol.t[1])) / (log10(sol.t[end]) - log10(sol.t[1]))]
             end
 
             f3D .= reshape(sol.f[i].x[species_index],(p_num,u_num,h_num))
@@ -286,9 +286,9 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
     t_unit_string = TimeUnits()
 
     if Time.t_grid == "u"
-        Colorbar(fig[1,2],colormap = Makie.ColorSchemes.rainbow_bgyr_35_85_c72_n256,limits=(TimeUnits(sol.t[1]),TimeUnits(sol.t[end])),label=L"$t$ $[\text{s} * \sigma_{T}c]$")
+        Colorbar(fig[1,2],colormap = Makie.ColorSchemes.hawaii,limits=(TimeUnits(sol.t[1]),TimeUnits(sol.t[end])),label=L"$t$ $[\text{s} * \sigma_{T}c]$")
     elseif Time.t_grid == "l"
-        Colorbar(fig[1,2],colormap = Makie.ColorSchemes.rainbow_bgyr_35_85_c72_n256,limits=(log10(TimeUnits(sol.t[1])),log10(TimeUnits(sol.t[end]))),label=L"$\log_{10}\left(t %$t_unit_string \right)$")
+        Colorbar(fig[1,2],colormap = Makie.ColorSchemes.hawaii,limits=(log10(TimeUnits(sol.t[1])),log10(TimeUnits(sol.t[end]))),label=L"$\log_{10}\left(t %$t_unit_string \right)$")
     end
 
     axislegend(ax,legend_elements,line_labels,position = :lt)
