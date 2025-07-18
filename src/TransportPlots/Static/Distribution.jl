@@ -329,7 +329,7 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
 
     end
 
-    push!(legend_element,LineElement(color = theme.textcolor[], linestyle = linestyles[species_idx],linewidth = 2.0))
+    push!(legend_elements,LineElement(color = theme.textcolor[], linestyle = linestyles[species_idx],linewidth = 2.0))
     push!(line_labels,species_name)
 
     end # species loop 
