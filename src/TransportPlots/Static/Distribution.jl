@@ -508,9 +508,9 @@ function AM3_MomentumDistributionPlot(filePath,t_max,t_min,t_grid;plot_limits=(n
 
     end
 
-    if Time.t_grid == "u"
+    if t_grid == "u"
         Colorbar(fig[1,2],colormap = Makie.ColorSchemes.hawaii,limits=(TimeUnits(sol.t[1]),TimeUnits(sol.t[end])),label=L"$t$ $[\text{s} * \sigma_{T}c]$")
-    elseif Time.t_grid == "l"
+    elseif t_grid == "l"
         Colorbar(fig[1,2],colormap = Makie.ColorSchemes.hawaii,limits=(log10(sol.t[1]),log10(sol.t[end])),label=L"$\log_{10}\left(t [\text{s}]\right)$")
     end
 
