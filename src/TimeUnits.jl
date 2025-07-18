@@ -8,7 +8,7 @@ function SIUnitsTime(t_code::T) where T <: AbstractFloat
     σT = getfield(DC,Symbol("σT"))
     c = getfield(DC,Symbol("c"))  # σT is the time unit in seconds
 
-    t_SI::T = t_code * σT * c  # Convert time code to seconds
+    t_SI::T = t_code / (σT*c)  # Convert time code to seconds
     return t_SI
 end
 function SIUnitsTime()
