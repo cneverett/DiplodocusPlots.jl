@@ -47,9 +47,6 @@ function EnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;specie
             Tᵃᵇ = DiplodocusTransport.StressEnergyTensor(sol.f[i].x[j],p_num_list[j],u_num_list[j],pr_list[j],ur_list[j],mass_list[j]) 
 
             eng[i] = DiplodocusTransport.ScalarEnergyDensity(Tᵃᵇ,Uₐ,num)
-            if name_list[j] == "Pho" ## THIS NEEDS TO BE FIXED!!!!
-                eng[i] *= 2pi
-            end
         
         end
 
