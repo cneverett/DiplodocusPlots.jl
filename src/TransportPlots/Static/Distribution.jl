@@ -20,11 +20,11 @@ function MomentumDistributionPlot(sol,species::String,PhaseSpace::PhaseSpaceStru
     else
         fig = Figure() # default single column 4:3 aspect ratio
     end
-    xlab = L"$\log_{10}p$ $[m_\text{Ele}c]$"
+    xlab = L"$\log_{10}\left(p [m_\text{Ele}c]\right)$"
     if order == 1
-        ylab = L"$\log_{10}\left(p\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V}\right)$ $[\text{m}^{-3}]$"
+        ylab = L"$\log_{10}\left(p\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V} [\text{m}^{-3}]\right)$"
     elseif order != 1
-        ylab = L"$\log_{10}\left(p^{%$(order)}\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V}\right)$ $[\text{m}^{-3}]$"
+        ylab = L"$\log_{10}\left(p^{%$(order)}\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V} [\text{m}^{-3}\left(m_\text{Ele}c\right)^{%$(order-1)}]\right)$"
     end
     ax = Axis(fig[1,1],xlabel=xlab,ylabel=ylab,aspect=DataAspect())
     ax.limits = plot_limits
@@ -182,7 +182,7 @@ function MomentumDistributionPlot(sol,species::String,PhaseSpace::PhaseSpaceStru
     if Time.t_grid == "u"
         Colorbar(fig[1,2],colormap = my_colors,limits=(sol.t[1],sol.t[end]),label=L"$t$ $[\text{s} * \sigma_{T}c]$")
     elseif Time.t_grid == "l"
-        Colorbar(fig[1,2],colormap = my_colors,limits=(log10(sol.t[1]),log10(sol.t[end])),label=L"$\log_{10}(t)$ $[\text{s} * \sigma_{T}c]$")
+        Colorbar(fig[1,2],colormap = my_colors,limits=(log10(sol.t[1]),log10(sol.t[end])),label=L"$\log_{10}\left(t[\text{s} \times \sigma_{T}c]\right)$")
     end
 
     if plot_limits == (nothing,nothing)
@@ -284,13 +284,13 @@ function MomentumAndPolarAngleDistributionPlot(sol,species::String,PhaseSpace::P
     hidethetadecorations!(ax3, grid=false)
 
     if order == 1
-        Colorbar(fig[1,1],hm1,label=L"$\log_{10}\left(p\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V}\right)$ $[\text{m}^{-3}]$",flipaxis=false,height=176,tellheight=false)
+        Colorbar(fig[1,1],hm1,label=L"$\log_{10}\left(p\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V}[\text{m}^{-3}]\right)$",flipaxis=false,height=176,tellheight=false)
     elseif order != 1
-        Colorbar(fig[1,1],hm1,label=L"$\log_{10}\left(p^{%$order}\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V}\right)$ $[\text{m}^{-3}]$",flipaxis=false,height=176,tellheight=false)
+        Colorbar(fig[1,1],hm1,label=L"$\log_{10}\left(p^{%$order}\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V}[\text{m}^{-3}\left(m_\text{Ele}c\right)^{%$order-1}]\right)$ $$",flipaxis=false,height=176,tellheight=false)
     end
 
     pt = 4/3
-    text!(ax1,L"$\log_{10}p$ $[m_\text{Ele}c]$",position=(-3.05,log10(p_r[end])),rotation=pi/2,fontsize=9pt)
+    text!(ax1,L"$\log_{10}\left(p[m_\text{Ele}c]\right)$",position=(-3.05,log10(p_r[end])),rotation=pi/2,fontsize=9pt)
     text!(ax1,L"$t=%$(t[1])$",position=(2.6,log10(p_r[end])+3.2),fontsize=10pt)
     text!(ax2,L"$t=%$(t[2])$",position=(2.6,log10(p_r[end])+3.2),fontsize=10pt)
     text!(ax3,L"$t=%$(t[3])$",position=(2.6,log10(p_r[end])+3.2),fontsize=10pt)

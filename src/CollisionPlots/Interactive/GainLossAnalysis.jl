@@ -134,7 +134,7 @@ function InteractiveBinaryGainLossPlot(Output::Tuple)
     x_min = @lift(min($p1_val,$p2_val)-2.0)
     x_max = @lift(max($p1_val,$p2_val)+2.0)
 
-    ax1 = Axis(fig[1:2, 1:2],xlabel=L"$\log_{10} \text{momentum}[m_\text{Ele}c]$",ylabel= L"$\log_{10} p\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}t} [\text{some units}]$")
+    ax1 = Axis(fig[1:2, 1:2],xlabel=L"$\log_{10}\left(p[m_\text{Ele}c]\right)$",ylabel= L"$\log_{10} \left(p\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}t} [\text{some units}]\right)$")
 
      
     onany(x_min,x_max,y_min,y_max) do _x_min, _x_max, _y_min, _y_max
@@ -264,7 +264,7 @@ function InteractiveEmissionGainLossPlot(Output::Tuple)
     x_min = min(maximum(p1_r),maximum(p3_r))-1.0
     x_max = max(minimum(p1_r),minimum(p3_r))+1.0
     
-    ax1 = Axis(fig[1:2, 1:2],xlabel=L"$\log_{10} \text{momentum}[m_\text{Ele}c]$",ylabel= L"$\log_{10} p\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}t} [\text{some units}]$")
+    ax1 = Axis(fig[1:2, 1:2],xlabel=L"$\log_{10} \left(p[m_\text{Ele}c]\right)$",ylabel= L"$\log_{10}\left(p\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}t} [\text{some units}]\right)$")
 
     onany(x_min,x_max#= ,y_min,y_max =#) do _x_min, _x_max#= , _y_min, _y_max =#
         #ylims!(ax1,_y_min,_y_max)
