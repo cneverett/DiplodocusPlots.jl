@@ -467,15 +467,9 @@ function AM3_MomentumDistributionPlot(filePath,t_max,t_min,t_grid;plot_limits=(n
     ax = Axis(fig[1,1],xlabel=xlab,ylabel=ylab,aspect=DataAspect())
     ax.limits = plot_limits
 
-    name_list = PhaseSpace.name_list
-    Momentum = PhaseSpace.Momentum
-    Grids = PhaseSpace.Grids
-    Time = PhaseSpace.Time
-
     linestyles = [:solid,:dash,:dot,:dashdot,:dashdotdot]
     legend_elements = []
     line_labels = []
-
     
     for i in 1:length(t_pho)
 
