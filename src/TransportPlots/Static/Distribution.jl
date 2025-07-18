@@ -276,6 +276,7 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
         if (i in values || i == 1 || i == 2) # plot first step for initial conds, second for kernel 
 
             t = sol.t[i]
+            color = ColorSchemes.rainbow[(t - sol.t[1]) / (sol.t[end] - sol.t[1])]
 
             f3D .= reshape(sol.f[i].x[species_index],(p_num,u_num,h_num))
 
@@ -297,14 +298,14 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
                 else
                     pdNdp = f2D[:,Int64((u_num+1)/2)]
                 end
-                scatterlines!(ax,log10.(meanp),log10.(pdNdp),linewidth=2.0,color = my_colors[color_counter],markersize=1.0,linestyle=linestyles[species_idx])
+                scatterlines!(ax,log10.(meanp),log10.(pdNdp),linewidth=2.0,color = color,markersize=1.0,linestyle=linestyles[species_idx])
 
                 max_f = maximum(x for x in pdNdp if !isnan(x))
                 max_total = max(max_f,max_total)
             else
                 # sum along u and h directions
                 pdNdp = dropdims(sum(f3D, dims=(2,3)),dims=(2,3))
-                scatterlines!(ax,log10.(meanp),log10.(pdNdp),linewidth=2.0,color = my_colors[color_counter],markersize=1.0,linestyle=linestyles[species_idx])
+                scatterlines!(ax,log10.(meanp),log10.(pdNdp),linewidth=2.0,color = color,markersize=1.0,linestyle=linestyles[species_idx])
 
                 max_f = maximum(x for x in pdNdp if !isnan(x))
                 max_total = max(max_f,max_total)
@@ -344,9 +345,9 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
     t_unit_string = TimeUnits()
 
     if Time.t_grid == "u"
-        Colorbar(fig[1,2],colormap = my_colors,limits=(TimeUnits(sol.t[1]),TimeUnits(sol.t[end])),label=L"$t$ $[\text{s} * \sigma_{T}c]$")
+        Colorbar(fig[1,2],colormap = ColorSchemes.rainbow,limits=(TimeUnits(sol.t[1]),TimeUnits(sol.t[end])),label=L"$t$ $[\text{s} * \sigma_{T}c]$")
     elseif Time.t_grid == "l"
-        Colorbar(fig[1,2],colormap = my_colors,limits=(log10(TimeUnits(sol.t[1])),log10(TimeUnits(sol.t[end]))),label=L"$\log_{10}\left(t %$t_unit_string \right)$")
+        Colorbar(fig[1,2],colormap = ColorSchemes.rainbow,limits=(log10(TimeUnits(sol.t[1])),log10(TimeUnits(sol.t[end]))),label=L"$\log_{10}\left(t %$t_unit_string \right)$")
     end
 
     axislegend(ax,legend_elements,line_labels,position = :lt,rowgap=-5)
