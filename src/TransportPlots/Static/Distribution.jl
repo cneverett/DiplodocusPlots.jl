@@ -482,6 +482,7 @@ function AM3_MomentumDistributionPlot(filePath,t_max,t_min,t_grid;plot_limits=(n
 
         # sum along u and h directions
         pdNdp = f_pho[i,:]
+        println("$pdNdp")
         scatterlines!(ax,log10.(meanp_pho),log10.(pdNdp),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[1])
 
         push!(legend_elements,LineElement(color = theme.textcolor[], linestyle = linestyles[1],linewidth = 2.0))
