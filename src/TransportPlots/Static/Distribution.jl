@@ -276,7 +276,7 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
         if (i in values || i == 1 || i == 2) # plot first step for initial conds, second for kernel 
 
             t = sol.t[i]
-            color = ColorSchemes.rainbow[(t - sol.t[1]) / (sol.t[end] - sol.t[1])]
+            color = Makie.ColorSchemes.rainbow[(t - sol.t[1]) / (sol.t[end] - sol.t[1])]
 
             f3D .= reshape(sol.f[i].x[species_index],(p_num,u_num,h_num))
 
@@ -345,9 +345,9 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
     t_unit_string = TimeUnits()
 
     if Time.t_grid == "u"
-        Colorbar(fig[1,2],colormap = ColorSchemes.rainbow,limits=(TimeUnits(sol.t[1]),TimeUnits(sol.t[end])),label=L"$t$ $[\text{s} * \sigma_{T}c]$")
+        Colorbar(fig[1,2],colormap = Makie.ColorSchemes.rainbow,limits=(TimeUnits(sol.t[1]),TimeUnits(sol.t[end])),label=L"$t$ $[\text{s} * \sigma_{T}c]$")
     elseif Time.t_grid == "l"
-        Colorbar(fig[1,2],colormap = ColorSchemes.rainbow,limits=(log10(TimeUnits(sol.t[1])),log10(TimeUnits(sol.t[end]))),label=L"$\log_{10}\left(t %$t_unit_string \right)$")
+        Colorbar(fig[1,2],colormap = Makie.ColorSchemes.rainbow,limits=(log10(TimeUnits(sol.t[1])),log10(TimeUnits(sol.t[end]))),label=L"$\log_{10}\left(t %$t_unit_string \right)$")
     end
 
     axislegend(ax,legend_elements,line_labels,position = :lt,rowgap=-5)
