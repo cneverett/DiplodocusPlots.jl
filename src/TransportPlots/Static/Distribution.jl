@@ -481,9 +481,9 @@ function AM3_MomentumDistributionPlot(filePath,t_max,t_min,t_grid;plot_limits=(n
 
         t = t_pho[i]
         if t_grid == "u"
-            color = Makie.ColorSchemes.hawaii[(t - t_min) / (t_max - t_min)]
+            color = theme.colormap[][(t - t_min) / (t_max - t_min)]
         elseif t_grid == "l"
-            color = Makie.ColorSchemes.hawaii[(log10(t) - log10(t_min)) / (log10(t_max) - log10(t_min))]
+            color = theme.colormap[][(log10(t) - log10(t_min)) / (log10(t_max) - log10(t_min))]
         end
 
         # sum along u and h directions
@@ -500,9 +500,9 @@ function AM3_MomentumDistributionPlot(filePath,t_max,t_min,t_grid;plot_limits=(n
 
             t = t_ele[i]
             if t_grid == "u"
-                color = Makie.ColorSchemes.hawaii[(t - t_min) / (t_max - t_min)]
+                color = theme.colormap[][(t - t_min) / (t_max - t_min)]
             elseif t_grid == "l"
-                color = Makie.ColorSchemes.hawaii[(log10(t) - log10(t_min)) / (log10(t_max) - log10(t_min))]
+                color = theme.colormap[][(log10(t) - log10(t_min)) / (log10(t_max) - log10(t_min))]
             end
 
             # sum along u and h directions
@@ -515,9 +515,9 @@ function AM3_MomentumDistributionPlot(filePath,t_max,t_min,t_grid;plot_limits=(n
     push!(line_labels,"Ele")
 
     if t_grid == "u"
-        Colorbar(fig[1,2],colormap = Makie.ColorSchemes.hawaii,limits=(TimeUnits(t_min),TimeUnits(t_max)),label=L"$t$ $[\text{s} * \sigma_{T}c]$")
+        Colorbar(fig[1,2],colormap = theme.colormap,limits=(TimeUnits(t_min),TimeUnits(t_max)),label=L"$t$ $[\text{s} * \sigma_{T}c]$")
     elseif t_grid == "l"
-        Colorbar(fig[1,2],colormap = Makie.ColorSchemes.hawaii,limits=(log10(t_min),log10(t_max)),label=L"$\log_{10}\left(t [\text{s}]\right)$")
+        Colorbar(fig[1,2],colormap = theme.colormap,limits=(log10(t_min),log10(t_max)),label=L"$\log_{10}\left(t [\text{s}]\right)$")
     end
 
     axislegend(ax,legend_elements,line_labels,position = :lt)
