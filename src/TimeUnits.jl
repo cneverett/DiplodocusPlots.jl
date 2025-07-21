@@ -11,7 +11,7 @@ function CodeToSIUnitsTime(t_code::T) where T <: AbstractFloat
     t_SI::T = t_code / (σT*c)  # Convert time code to seconds
     return t_SI
 end
-function CoeToSIUnitsTime()
+function CodeToSIUnitsTime()
     return raw"$[\text{s}]$"
 end
 
@@ -39,5 +39,5 @@ function SIToCodeUnitsTime(t_SI::T) where T <: AbstractFloat
 
     t_code::T = t_SI * (σT*c)  # Convert time code to seconds
     return t_code
-    
+
 end
