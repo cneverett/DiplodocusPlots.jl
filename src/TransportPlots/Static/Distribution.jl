@@ -395,9 +395,9 @@ function MomentumAndPolarAngleDistributionPlot(sol,species::String,PhaseSpace::P
     ax3.radius_at_origin = log10(p_r[1])-1.0
     thetalims!(ax3,0,pi)
 
-    hm1 = heatmap!(ax1,acos.(u_r),log10.(p_r),log10.(dis1'),colorrange=col_range)
-    hm2 = heatmap!(ax2,acos.(u_r),log10.(p_r),log10.(dis2'),colorrange=col_range)
-    hm3 = heatmap!(ax3,acos.(u_r),log10.(p_r),log10.(dis3'),colorrange=col_range)
+    hm1 = heatmap!(ax1,acos.(u_r),log10.(p_r),log10.(dis1'),colormap=theme.colormap,colorrange=col_range)
+    hm2 = heatmap!(ax2,acos.(u_r),log10.(p_r),log10.(dis2'),colormap=theme.colormap,colorrange=col_range)
+    hm3 = heatmap!(ax3,acos.(u_r),log10.(p_r),log10.(dis3'),colormap=theme.colormap,colorrange=col_range)
 
     rlims!(ax1,log10(p_r[1]),log10(p_r[end])+1.0)
     rlims!(ax2,log10(p_r[1]),log10(p_r[end])+1.0)
