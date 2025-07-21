@@ -230,9 +230,9 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
 
             t = sol.t[i]
             if Time.t_grid == "u"
-                color = Makie.ColorSchemes.hawaii[(t - sol.t[1]) / (sol.t[end] - sol.t[1])]
+                color = theme.colormap[][(t - sol.t[1]) / (sol.t[end] - sol.t[1])]
             elseif Time.t_grid == "l"
-                color = Makie.ColorSchemes.hawaii[(log10(t) - log10(sol.t[1])) / (log10(sol.t[end]) - log10(sol.t[1]))]
+                color = theme.colormap[][(log10(t) - log10(sol.t[1])) / (log10(sol.t[end]) - log10(sol.t[1]))]#Makie.ColorSchemes.hawaii[(log10(t) - log10(sol.t[1])) / (log10(sol.t[end]) - log10(sol.t[1]))]
             end
 
             f3D .= reshape(sol.f[i].x[species_index],(p_num,u_num,h_num))
@@ -300,9 +300,9 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
     t_unit_string = TimeUnits()
 
     if Time.t_grid == "u"
-        Colorbar(fig[1,2],colormap = Makie.ColorSchemes.hawaii,limits=(TimeUnits(sol.t[1]),TimeUnits(sol.t[end])),label=L"$t %$t_unit_string$")
+        Colorbar(fig[1,2],colormap = theme.colormap,limits=(TimeUnits(sol.t[1]),TimeUnits(sol.t[end])),label=L"$t %$t_unit_string$")
     elseif Time.t_grid == "l"
-        Colorbar(fig[1,2],colormap = Makie.ColorSchemes.hawaii,limits=(log10(TimeUnits(sol.t[1])),log10(TimeUnits(sol.t[end]))),label=L"$\log_{10}\left(t %$t_unit_string \right)$")
+        Colorbar(fig[1,2],colormap = theme.colormap,limits=(log10(TimeUnits(sol.t[1])),log10(TimeUnits(sol.t[end]))),label=L"$\log_{10}\left(t %$t_unit_string \right)$")
     end
 
     axislegend(ax,legend_elements,line_labels,position = :lt)
@@ -311,8 +311,8 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
         xlims!(ax,(log10(p_min)-1.0,log10(p_max)+1.0))
         ylims!(ax,(log10(max_total)-9.0,log10(max_total)+1.0)) 
     end
-    println("$((log10(p_min)-1.0,log10(p_max)+1.0))")
-    println("$((log10(max_total)-9.0,log10(max_total)+1.0))")
+    #println("$((log10(p_min)-1.0,log10(p_max)+1.0))")
+    #println("$((log10(max_total)-9.0,log10(max_total)+1.0))")
     
     return fig
 

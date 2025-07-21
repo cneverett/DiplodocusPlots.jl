@@ -18,6 +18,7 @@ function DiplodocusDark()
         size=(3.25inch,2.4375inch),
         fontsize = 9pt,
         #palette = Makie.generate_default_palette(:black),
+        colormap = Makie.ColorSchemes.bamako,
         fonts = Attributes(
             :bold => Makie.texfont(:bold),
             :bolditalic => Makie.texfont(:bolditalic),
@@ -116,6 +117,7 @@ function DiplodocusLight()
         size=(3.25inch,2.4375inch),
         fontsize = 9pt,
         #palette = Makie.generate_default_palette(:white),
+        colormap = cgrad(Makie.ColorSchemes.bamako,rev=true),
         fonts = Attributes(
             :bold => Makie.texfont(:bold),
             :bolditalic => Makie.texfont(:bolditalic),
