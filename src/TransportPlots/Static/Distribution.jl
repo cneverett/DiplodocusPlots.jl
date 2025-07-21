@@ -183,7 +183,7 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
     Grids = PhaseSpace.Grids
     Time = PhaseSpace.Time
 
-    linestyles = [:solid,:dash,:dot,:dashdot,:dashdotdot]
+    linestyles = [:solid,(:dash,:dense),(:dot,:dense),(:dashdot,:dense),(:dashdotdot,:dense)]
     max_total = -Inf32
     p_min = Inf32
     p_max = -Inf32

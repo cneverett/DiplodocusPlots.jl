@@ -86,6 +86,8 @@ function DiplodocusDark()
         ),
         ScatterLines = (
             linewidth = 2.0,
+            joinstyle = :round,
+            linecap = :round
         ),
         PolarAxis = (
             fontsize = 9pt,
@@ -172,6 +174,8 @@ function DiplodocusLight()
         ),
         ScatterLines = (
             linewidth = 2.0,
+            joinstyle = :round,
+            linecap = :round
         ),
         PolarAxis = (
             fontsize = 9pt,
