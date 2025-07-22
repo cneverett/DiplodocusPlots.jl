@@ -24,6 +24,7 @@ function EnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;specie
     mass_list = Grids.mass_list
 
     eng = zeros(Float64,length(sol.t))
+    eng_total = zeros(Float64,length(sol.t))
 
     if isnothing(fig)
         fig = Figure()
@@ -47,6 +48,10 @@ function EnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;specie
             Tᵃᵇ = DiplodocusTransport.StressEnergyTensor(sol.f[i].x[j],p_num_list[j],u_num_list[j],pr_list[j],ur_list[j],mass_list[j]) 
 
             eng[i] = DiplodocusTransport.ScalarEnergyDensity(Tᵃᵇ,Uₐ,num)
+
+            if species== "All"
+                eng_total[i] += eng[i]
+            end
         
         end
 
@@ -60,8 +65,16 @@ function EnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;specie
 
     end
 
+    if species == "All"
+        if t_grid == "u"
+            scatterlines!(ax,sol.t,eng_total,linewidth=2.0,color = theme.textcolor[],markersize=0.0,linestyle=:dash,label="All")
+        elseif t_grid == "l"
+            scatterlines!(ax,log10.(sol.t),eng_total,linewidth=2.0,color = theme.textcolor[],markersize=0.0,linestyle=:dash,label="All")
+        end
+    end
+
     #fig[1,2] = Legend(fig,ax,"Particles")
-    axislegend(ax,position = :rb)
+    axislegend(ax,position = :rc)
 
     end # with_theme
 

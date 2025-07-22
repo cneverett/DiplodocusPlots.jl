@@ -24,6 +24,7 @@ function NumberDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;specie
     mass_list = Grids.mass_list
 
     num = zeros(Float64,length(sol.t))
+    num_total = zeros(Float64,length(sol.t))
 
     if isnothing(fig)
         fig = Figure()
@@ -44,6 +45,10 @@ function NumberDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;specie
             #Ua = HydroFourVelocity(Na)
             Uₐ = [-1,0,0,0] # static observer
             num[i] = DiplodocusTransport.ScalarNumberDensity(Nᵃ,Uₐ)
+
+            if species== "All"
+                num_total[i] += num[i]
+            end
         
         end
 
@@ -55,6 +60,14 @@ function NumberDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;specie
             xlims!(ax,log10(sol.t[1]),log10(sol.t[end]))
         end
 
+    end
+
+    if species == "All"
+        if t_grid == "u"
+            scatterlines!(ax,sol.t,num_total,linewidth=2.0,color = theme.textcolor[],markersize=0.0,linestyle=:dash,label="All")
+        elseif t_grid == "l"
+            scatterlines!(ax,log10.(sol.t),num_total,linewidth=2.0,color = theme.textcolor[],markersize=0.0,linestyle=:dash,label="All")
+        end
     end
 
     #fig[1,2] = Legend(fig,ax,"Particles")

@@ -232,7 +232,7 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
             if Time.t_grid == "u"
                 color = theme.colormap[][(t - sol.t[1]) / (sol.t[end] - sol.t[1])]
             elseif Time.t_grid == "l"
-                color = theme.colormap[][(log10(t) - log10(sol.t[1])) / (log10(sol.t[end]) - log10(sol.t[1]))]#Makie.ColorSchemes.hawaii[(log10(t) - log10(sol.t[1])) / (log10(sol.t[end]) - log10(sol.t[1]))]
+                color = theme.colormap[][(log10(t) - log10(sol.t[1])) / (log10(sol.t[end]) - log10(sol.t[1]))]
             end
 
             f3D .= reshape(sol.f[i].x[species_index],(p_num,u_num,h_num))
