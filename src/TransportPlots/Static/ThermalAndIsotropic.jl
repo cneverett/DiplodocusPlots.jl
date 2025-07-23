@@ -49,7 +49,7 @@ function IsThermalPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::S
             Pressure = DiplodocusTransport.ScalarPressure(Tᵃᵇ,Δab)
             Temperature = DiplodocusTransport.ScalarTemperature(Pressure,num)
 
-            MJ = DiplodocusTransport.MaxwellJuttner_Distribution(PhaseSpace,"Sph",Temperature,mass_list[j];n=num)
+            MJ = DiplodocusTransport.MaxwellJuttner_Distribution(PhaseSpace,"Sph",Temperature;n=num)
 
             f1D = dropdims(sum(reshape(f,(p_num_list[j],u_num_list[j])),dims=2),dims=2)
 
@@ -203,7 +203,7 @@ function IsThermalAndIsotropicPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruc
             Pressure = DiplodocusTransport.ScalarPressure(Tᵃᵇ,Δab)
             Temperature = DiplodocusTransport.ScalarTemperature(Pressure,num)
 
-            MJ = DiplodocusTransport.MaxwellJuttner_Distribution(PhaseSpace,"Sph",Temperature,mass_list[j];n=num)
+            MJ = DiplodocusTransport.MaxwellJuttner_Distribution(PhaseSpace,"Sph",Temperature;n=num)
 
             f1D = dropdims(sum(reshape(f,(p_num_list[j],u_num_list[j])),dims=2),dims=2)
 
