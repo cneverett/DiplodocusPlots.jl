@@ -134,7 +134,7 @@ function MomentumDistributionPlot(sol,species::String,PhaseSpace::PhaseSpaceStru
 
         MJ = MJ .* (meanp.^(order-1))
 
-        scatterlines!(ax,log10.(meanp),log10.(MJ),linewidth=2.0,color = theme.textcolor[],markersize=0.0,linestyle=:dash,label="Maxwell-Juttner")
+        scatterlines!(ax,log10.(meanp),log10.(MJ),linewidth=2.0,color = theme.textcolor[],markersize=0.0,linestyle=(:dot,:dense),label="Maxwell-Juttner")
 
     end
 
