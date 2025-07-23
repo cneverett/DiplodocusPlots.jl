@@ -3,7 +3,7 @@
 
 Returns a plot of the sum of squared residuals between the distribution function for each species and an expected Maxwell-Juttner distribution based on the current distribution of that species as a function of time.  
 """
-function IsThermalPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::String="All",fig=nothing,theme=DiplodocusDark(),title=true)
+function IsThermalPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::String="All",fig=nothing,theme=DiplodocusDark(),title=nothing)
 
     CairoMakie.activate!(inline=true) # plot in vs code window
 
@@ -32,8 +32,8 @@ function IsThermalPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::S
         ax = Axis(fig,xlabel="Time",ylabel=L"SSR",xgridvisible=false,ygridvisible=false)
     end
 
-    if title
-        ax.title = "Is Thermal?"
+    if ¬isnothing(title)
+        ax.title = title
     end
 
     for j in (species != "All" ? findfirst(x->x==species,name_list) : eachindex(name_list))
@@ -84,7 +84,7 @@ end
 
 Returns a plot of the sum of squared residuals between the distribution function for each species and an expected isotropic distribution based on the current distribution of that species as a function of time.  
 """
-function IsIsotropicPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::String="All",fig=nothing,theme=DiplodocusDark(),title=true)
+function IsIsotropicPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::String="All",fig=nothing,theme=DiplodocusDark(),title=nothing)
 
     CairoMakie.activate!(inline=true) # plot in vs code window
 
@@ -113,8 +113,8 @@ function IsIsotropicPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species:
         ax = Axis(fig,xlabel="Time",ylabel=L"SSR",xgridvisible=false,ygridvisible=false)
     end
 
-    if title
-        ax.title = "Is Isotropic?"
+    if !isnothing(title)
+        ax.title = title
     end
 
     for j in (species != "All" ? findfirst(x->x==species,name_list) : eachindex(name_list))
@@ -156,7 +156,7 @@ end
 
 Returns a plot of the sum of squared residuals between the distribution function for each species and an expected Maxwell-Juttner distribution and an isotropic distribution based on the current distribution of that species as a function of time.  
 """
-function IsThermalAndIsotropicPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::String="All",fig=nothing,theme=DiplodocusDark(),title=true)
+function IsThermalAndIsotropicPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::String="All",fig=nothing,theme=DiplodocusDark(),title=nothing)
 
     CairoMakie.activate!(inline=true) # plot in vs code window
 
@@ -185,8 +185,8 @@ function IsThermalAndIsotropicPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruc
         ax = Axis(fig,xlabel="Time",ylabel=L"SSR",xgridvisible=false,ygridvisible=false)
     end
 
-    if title
-        ax.title = "Is Thermal and Isotropic?"
+    if !isnothing(title)
+        ax.title = title
     end
 
     # Is Thermal?
