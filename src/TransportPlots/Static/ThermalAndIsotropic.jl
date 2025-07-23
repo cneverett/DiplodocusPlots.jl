@@ -32,7 +32,7 @@ function IsThermalPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::S
         ax = Axis(fig,xlabel="Time",ylabel=L"SSR",xgridvisible=false,ygridvisible=false)
     end
 
-    if ¬isnothing(title)
+    if !isnothing(title)
         ax.title = title
     end
 
