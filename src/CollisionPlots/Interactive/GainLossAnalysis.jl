@@ -284,7 +284,6 @@ function InteractiveEmissionGainLossPlot(Output::Tuple)
         # critical frequency
         ω0 = @lift(abs((z1*1.6e-19*Ext[1]))/(10^$p1_val*9.11e-31))
         pc = @lift(log10(1.054e-34*$ω0/(9.11e-31*3e8^2)*(10^$p1_val)^3))
-        println("$pc")
         vlines!(ax1,pc,color=:black,linestyle=(:dot,:dense))
     end
 
