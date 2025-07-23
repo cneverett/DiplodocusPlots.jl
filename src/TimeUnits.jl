@@ -20,7 +20,7 @@ end
 
 Returns the time in code units from the time in code units
 """
-function CodeUnitsToCodeUnitsTime(t_code::T) where T <: AbstractFloat
+function CodeToCodeUnitsTime(t_code::T) where T <: AbstractFloat
     return t_code
 end
 function CodeToCodeUnitsTime()
