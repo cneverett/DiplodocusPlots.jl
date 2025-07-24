@@ -171,9 +171,9 @@ function FracEnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;sp
             end
         end
         if t_grid == "u"
-            scatterlines!(ax,sol.t,frac_eng_total,linewidth=2.0,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,linestyle=:dash,label="All")
+            scatterlines!(ax,sol.t,frac_eng_total,linewidth=2.0,color = theme.textcolor[],markersize=0.0,linestyle=:dash,label="All")
         elseif t_grid == "l"
-            scatterlines!(ax,log10.(sol.t),frac_eng_total,linewidth=2.0,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,linestyle=:dash,label="All")
+            scatterlines!(ax,log10.(sol.t),frac_eng_total,linewidth=2.0,color = theme.textcolor[],markersize=0.0,linestyle=:dash,label="All")
         end
     end
 
