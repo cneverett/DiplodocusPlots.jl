@@ -24,7 +24,7 @@ function ObserverFlux(PhaseSpace::PhaseSpaceStruct,sol::OutputStruct,ObserverAng
     ur = Grids.pyr_list[photon_index]
     mp = Grids.mpx_list[photon_index]
 
-    Iν = zeros(length(sol.t),length(ObserverAngles),Momentum.px_num_list[photon_index])
+    Fν = zeros(length(sol.t),length(ObserverAngles),Momentum.px_num_list[photon_index])
 
     for (θ_idx, θ) in enumerate(ObserverAngles)
 
@@ -36,7 +36,9 @@ function ObserverFlux(PhaseSpace::PhaseSpaceStruct,sol::OutputStruct,ObserverAng
         u_low = cospi(θ+β)
         u_up = cospi(θ-β)
 
-        println("$a,$b")
+        #println("$a,$b")
+        #println("$u_low,$u_up")
+        #println("")
 
         for t in 1:length(sol.t)
 
@@ -46,45 +48,48 @@ function ObserverFlux(PhaseSpace::PhaseSpaceStruct,sol::OutputStruct,ObserverAng
                 Momentum.pz_num_list[photon_index]
             ))
 
-            for py in 1:(length(ur)-1)
-                if ur[py] <= u_low < ur[py+1] <= u_up  
-                    u0 = u_low
-                    u1 = ur[py+1]
-                elseif ur[py] <= u_low < u_up <= ur[py+1]
-                    u0 = u_low
-                    u1 = u_up
-                elseif u_low <= ur[py] < ur[py+1] <= u_up
-                    u0 = ur[py]
-                    u1 = ur[py+1]
-                elseif u_low <= ur[py] < u_up <= ur[py+1]
-                    u0 = ur[py]
-                    u1 = u_up
-                elseif u_low == u_up
-                    u0 = u1 = 1.0 # i.e. no integration
-                elseif ur[py] <= ur[py+1] < u_low <= u_up
-                    u0 = u1 = 1.0 # i.e. no integration
-                elseif  u_low < u_up <= ur[py] < ur[py+1] 
-                    u0 = u1 = 1.0 # i.e. no integration
-                elseif  ur[py] < ur[py+1] <= u_low < u_up
-                    u0 = u1 = 1.0 # i.e. no integration
-                elseif  u_low < u_up <= ur[py] < ur[py+1]
-                    u0 = u1 = 1.0 # i.e. no integration
-                else
-                    println("$u_low, $u_up, $(ur[py]), $(ur[py+1])")
-                    error("Didn't account for this")
-                end
+            for px in 1:(Momentum.px_num_list[photon_index]-1)
 
-                for px in 1:(Momentum.px_num_list[photon_index]-1)
+                val_total = 0.0
+
+                for py in 1:(length(ur)-1)
+
+                     if ur[py] <= u_low < ur[py+1] <= u_up  
+                    u0 = u_low
+                    u1 = ur[py+1]
+                    elseif ur[py] <= u_low < u_up <= ur[py+1]
+                        u0 = u_low
+                        u1 = u_up
+                    elseif u_low <= ur[py] < ur[py+1] <= u_up
+                        u0 = ur[py]
+                        u1 = ur[py+1]
+                    elseif u_low <= ur[py] < u_up <= ur[py+1]
+                        u0 = ur[py]
+                        u1 = u_up
+                    elseif u_low == u_up
+                        u0 = u1 = 1.0 # i.e. no integration
+                    elseif ur[py] <= ur[py+1] < u_low <= u_up
+                        u0 = u1 = 1.0 # i.e. no integration
+                    elseif  u_low < u_up <= ur[py] < ur[py+1] 
+                        u0 = u1 = 1.0 # i.e. no integration
+                    elseif  ur[py] < ur[py+1] <= u_low < u_up
+                        u0 = u1 = 1.0 # i.e. no integration
+                    elseif  u_low < u_up <= ur[py] < ur[py+1]
+                        u0 = u1 = 1.0 # i.e. no integration
+                    else
+                        println("$u_low, $u_up, $(ur[py]), $(ur[py+1])")
+                        error("Didn't account for this")
+                    end
 
                     #println("$u_low, $u_up, $(ur[py]), $(ur[py+1]), $u0, $u1, $a, $b")
                     #println("$(a+b)")
                     #println("$β")
                     if u0 != u1 && u0 != u_low && u1 != u_up
-                        val = mp[px] * photon_f[px,py,1] * (-atan(sqrt(a^2-(b-u1)^2),(u1-b))+atan(sqrt(a^2-(b-u0)^2),(u0-b)))
+                        val = mp[px] * photon_f[px,py,1] * (u1-u0)#* (-atan(sqrt(a^2-(b-u1)^2),(u1-b))+atan(sqrt(a^2-(b-u0)^2),(u0-b)))
                     elseif u0 != u1 && u0 == u_low 
-                        val = mp[px] * photon_f[px,py,1] * (-atan(sqrt(a^2-(b-u1)^2),(u1-b)) + (sign(u0-b)==1 ? 0 : pi))
+                        val = mp[px] * photon_f[px,py,1] * (u1-u0) #* (-atan(sqrt(a^2-(b-u1)^2),(u1-b)) + (sign(u0-b)==1 ? 0 : pi))
                     elseif u0 != u1 && u1 == u_up
-                        val = mp[px] * photon_f[px,py,1] * (-(sign(u1-b)==1 ? 0 : pi)+atan(sqrt(a^2-(b-u0)^2),(u0-b)))
+                        val = mp[px] * photon_f[px,py,1] * (u1-u0) #* (-(sign(u1-b)==1 ? 0 : pi)+atan(sqrt(a^2-(b-u0)^2),(u0-b)))
                     else
                         val = 0.0
                     end
@@ -92,7 +97,7 @@ function ObserverFlux(PhaseSpace::PhaseSpaceStruct,sol::OutputStruct,ObserverAng
                     if β == 0.0
                         val = mp[px] * photon_f[px,py,1] * ((ur[py] <= cθ <= ur[py+1]) ? 1.0 : 0.0) * 2 * sθ 
                     elseif β == 1.0
-                        val = mp[px] * photon_f[px,py,1] * ((ur[py] <= -cθ <= ur[py+1]) ? 1.0 : 0.0) * 2 * sθ
+                        val = mp[px] * photon_f[px,py,1] * ((ur[py] <= -cθ <= ur[py+1]) ? 1.0 : 0.0) * 2 #* sθ
                     end
 
                     if val < 0
@@ -103,10 +108,12 @@ function ObserverFlux(PhaseSpace::PhaseSpaceStruct,sol::OutputStruct,ObserverAng
                         println("$(photon_f[px,py,1])")
                     end
 
-                    Iν[t,θ_idx,px] += val
-                    Iν[t,θ_idx,px] *= R*dz/(4*pi*d^2)
+                    val_total += val
 
-                end                
+                end  
+                
+                Fν[t,θ_idx,px] = val_total
+                Fν[t,θ_idx,px] *= R*dz/(4*pi*d^2)
 
             end
 
@@ -114,7 +121,7 @@ function ObserverFlux(PhaseSpace::PhaseSpaceStruct,sol::OutputStruct,ObserverAng
 
     end
 
-    return Iν
+    return Fν
 
 end
 

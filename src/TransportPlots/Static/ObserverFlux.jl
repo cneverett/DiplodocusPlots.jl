@@ -26,7 +26,7 @@ function ObserverFluxPlot(PhaseSpace::PhaseSpaceStruct,sol::OutputStruct,time_id
 
     fig = Figure()
 
-    t = TimeUnits(sol.t[time_idx])
+    t = round(TimeUnits(sol.t[time_idx]),sigdigits=3)
     t_unit_string = TimeUnits()
 
     xlab = L"$\log_{10}\left(p [m_\text{Ele}c]\right)$"
