@@ -51,7 +51,7 @@ function ObserverFluxPlot(PhaseSpace::PhaseSpaceStruct,sol::OutputStruct,time_id
 
     if plot_limits == (nothing,nothing)
         xlims!(ax,(log10(pr[1]),log10(pr[end])))
-        ylims!(ax,(log10(max_total)-9.0,log10(max_total)+1.0)) 
+        ylims!(ax,(max_total-9.0,max_total+1.0)) 
     end
 
     axislegend(ax)
