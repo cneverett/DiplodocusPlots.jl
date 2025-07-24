@@ -1,5 +1,5 @@
 """
-    NumberDensityPlot(sol,PhaseSpace;species="All",fig=nothing,theme=DiplodocusDark())
+    NumberDensityPlot(sol,PhaseSpace;species="All",fig=nothing,theme=DiplodocusDark(),title=nothing)
 
 Returns a plot of the number density of all species as a function of time.
 """
@@ -53,10 +53,10 @@ function NumberDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;specie
         end
 
         if t_grid == "u"
-            scatterlines!(ax,sol.t,num,marker = :circle,markersize=0.0,label=name_list[j])
+            scatterlines!(ax,sol.t,num,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j])
             xlims!(ax,sol.t[1],sol.t[end])
         elseif t_grid == "l"
-            scatterlines!(ax,log10.(sol.t),num,marker = :circle,markersize=0.0,label=name_list[j])
+            scatterlines!(ax,log10.(sol.t),num,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j])
             xlims!(ax,log10(sol.t[1]),log10(sol.t[end]))
         end
 
@@ -83,7 +83,7 @@ end
 
 
 """
-    FracNumberDensityPlot(sol,PhaseSpace;species="All",fig=nothing,theme=DiplodocusDark())
+    FracNumberDensityPlot(sol,PhaseSpace;species="All",fig=nothing,theme=DiplodocusDark(),title=nothing)
 
 Returns a plot of the fractional change in number density of all species between time setups as a function of time.
 """
@@ -139,10 +139,10 @@ function FracNumberDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;sp
         end
 
         if t_grid == "u"
-            scatterlines!(ax,sol.t,frac_num,marker = :circle,markersize=0.0,label=name_list[j])
+            scatterlines!(ax,sol.t,frac_num,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j])
             xlims!(ax,sol.t[1],sol.t[end])
         elseif t_grid == "l"
-            scatterlines!(ax,log10.(sol.t),frac_num,marker = :circle,markersize=0.0,label=name_list[j])
+            scatterlines!(ax,log10.(sol.t),frac_num,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j])
             xlims!(ax,log10(sol.t[1]),log10(sol.t[end]))
         end
 

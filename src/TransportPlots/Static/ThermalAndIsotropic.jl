@@ -61,10 +61,10 @@ function IsThermalPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::S
         end
 
         if t_grid == "u"
-            scatterlines!(ax,sol.t,SumSquaredResiduals,marker = :circle,markersize=0.0,label=name_list[j])
+            scatterlines!(ax,sol.t,SumSquaredResiduals,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j])
             xlims!(ax,sol.t[1],sol.t[end])
         elseif t_grid == "l"
-            scatterlines!(ax,log10.(sol.t),SumSquaredResiduals,marker = :circle,markersize=0.0,label=name_list[j])
+            scatterlines!(ax,log10.(sol.t),SumSquaredResiduals,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j])
             xlims!(ax,log10(sol.t[1]),log10(sol.t[end]))
         end
 
@@ -134,10 +134,10 @@ function IsIsotropicPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species:
         end
 
         if t_grid == "u"
-            scatterlines!(ax,sol.t,SumSquaredResiduals,marker = :circle,markersize=0.0,label=name_list[j])
+            scatterlines!(ax,sol.t,SumSquaredResiduals,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j])
             xlims!(ax,sol.t[1],sol.t[end])
         elseif t_grid == "l"
-            scatterlines!(ax,log10.(sol.t),SumSquaredResiduals,marker = :circle,markersize=0.0,label=name_list[j])
+            scatterlines!(ax,log10.(sol.t),SumSquaredResiduals,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j])
             xlims!(ax,log10(sol.t[1]),log10(sol.t[end]))
         end
 
@@ -215,10 +215,10 @@ function IsThermalAndIsotropicPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruc
         end
 
         if t_grid == "u"
-            scatterlines!(ax,sol.t,SumSquaredResiduals,marker = :circle,markersize=0.0,label=name_list[j]*" Thermal?")
+            scatterlines!(ax,sol.t,SumSquaredResiduals,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j]*" Thermal?")
             xlims!(ax,sol.t[1],sol.t[end])
         elseif t_grid == "l"
-            scatterlines!(ax,log10.(sol.t),SumSquaredResiduals,marker = :circle,markersize=0.0,label=name_list[j]*" Thermal?")
+            scatterlines!(ax,log10.(sol.t),SumSquaredResiduals,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j]*" Thermal?")
             xlims!(ax,log10(sol.t[1]),log10(sol.t[end]))
         end
 
@@ -242,10 +242,10 @@ function IsThermalAndIsotropicPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruc
         end
 
         if t_grid == "u"
-            scatterlines!(ax,sol.t,SumSquaredResiduals,marker = :circle,markersize=0.0,linestyle=:dash,label=name_list[j]*" Isotropic?")
+            scatterlines!(ax,sol.t,SumSquaredResiduals,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,linestyle=:dash,label=name_list[j]*" Isotropic?")
             xlims!(ax,sol.t[1],sol.t[end])
         elseif t_grid == "l"
-            scatterlines!(ax,log10.(sol.t),SumSquaredResiduals,marker = :circle,markersize=0.0,linestyle=:dash,label=name_list[j]*" Isotropic?")
+            scatterlines!(ax,log10.(sol.t),SumSquaredResiduals,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,linestyle=:dash,label=name_list[j]*" Isotropic?")
             xlims!(ax,log10(sol.t[1]),log10(sol.t[end]))
         end
 
