@@ -4,9 +4,9 @@
 """
 function ObserverFluxPlot(PhaseSpace::PhaseSpaceStruct,sol::OutputStruct,time_idx::Int64,ObserverAngles::Vector{Float64},ObserverDistance::Float64;plot_limits=(nothing,nothing),theme=DiplodocusDark(),title=nothing,TimeUnits::Function=CodeToCodeUnitsTime)
 
-    with_theme(theme) do
-
     CairoMakie.activate!(inline=false)
+
+    with_theme(theme) do
 
     name_list = PhaseSpace.name_list
     Space = PhaseSpace.Space
@@ -46,8 +46,8 @@ function ObserverFluxPlot(PhaseSpace::PhaseSpaceStruct,sol::OutputStruct,time_id
 
     axislegend(ax)
 
-    end # theme
-
     return fig
+
+    end # theme
 
 end
