@@ -38,7 +38,7 @@ function ObserverFluxPlot(PhaseSpace::PhaseSpaceStruct,sol::OutputStruct,time_id
 
     for θ in 1:length(ObserverAngles)
 
-        flux_val = @lift(log10.(mp .* Fν[time_idx,θ,:]))
+        flux_val = log10.(mp .* Fν[time_idx,θ,:])
 
         scatterlines!(ax,log10.(mp),flux_val,color=theme.palette.color[][mod(2*θ-1,7)+1],markersize=0.0,label= L"θ=%$(ObserverAngles[θ])\pi")
 
