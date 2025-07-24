@@ -8,6 +8,7 @@ module DiplodocusPlots
     export IsThermalPlot, IsIsotropicPlot, IsThermalAndIsotropicPlot
     export InteractiveEmissionGainLossPlot
     export CodeToSIUnitsTime, CodeToCodeUnitsTime, SIToCodeUnitsTime
+    export ObserverFluxPlot
 
     using Makie
     using CairoMakie

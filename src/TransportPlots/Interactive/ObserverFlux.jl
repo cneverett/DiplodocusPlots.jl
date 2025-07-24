@@ -117,7 +117,9 @@ function ObserverFlux(PhaseSpace::PhaseSpaceStruct,sol::OutputStruct,ObserverAng
 end
 
 
-function ObserverFluxPlot(PhaseSpace::PhaseSpaceStruct,sol::OutputStruct,ObserverAngles::Vector{Float64},ObserverDistance::Float64;plot_limits=(nothing,nothing))
+function ObserverFluxPlot(PhaseSpace::PhaseSpaceStruct,sol::OutputStruct,ObserverAngles::Vector{Float64},ObserverDistance::Float64;plot_limits=(nothing,nothing),theme=DiplodocusDark(),title=nothing)
+
+    with_theme(theme) do
 
     GLMakie.activate!(inline=false)
 
@@ -134,7 +136,7 @@ function ObserverFluxPlot(PhaseSpace::PhaseSpaceStruct,sol::OutputStruct,Observe
     ur = Grids.pyr_list[photon_index]
     mp = Grids.mpx_list[photon_index]
 
-    Iν = ObserverFlux(PhaseSpace,sol,ObserverAngles,ObserverDistance)
+    Fν = ObserverFlux(PhaseSpace,sol,ObserverAngles,ObserverDistance)
 
     fig = Figure()
     
@@ -148,21 +150,25 @@ function ObserverFluxPlot(PhaseSpace::PhaseSpaceStruct,sol::OutputStruct,Observe
 
     t_v = t[]
 
-    titlestr = @lift("Observer Flux at distance $ObserverDistance, with B-Field at an angle of β =$(β)π, at t=$(sol.t[$t_idx])")
-
-    ax = Axis(fig[1,1],title = titlestr,ylabel=L"$\log_{10}\left(p^2\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V}\right)$ $[\text{m}^{-3}]$",aspect=DataAspect())
+    ax = Axis(fig[1,1],ylabel=L"$\log_{10}\left(pF_{p}\right)$ $[\text{m}^{-3}]$",aspect=DataAspect())
     ax.limits = plot_limits
+
+    if !isnothing(title)
+        titlestr = @lift("Observer Flux at distance $ObserverDistance, with B-Field at an angle of β =$(β)π, at t=$(sol.t[$t_idx])")
+        ax.title = titlestr
+    end
 
     for θ in 1:length(ObserverAngles)
 
-        flux_val = @lift(log10.(Iν[$t_idx,θ,:]))
+        flux_val = @lift(log10.(mp .* Fν[$t_idx,θ,:]))
 
-        scatterlines!(ax,log10.(mp),flux_val,linewidth=2.0,markersize=1.0,label= "θ=$(ObserverAngles[θ])π")
+        scatterlines!(ax,log10.(mp),flux_val,color=theme.palette.color[][mod(2*θ-1,7)+1],markersize=0.0,label= "θ=$(ObserverAngles[θ])π")
 
     end
 
     axislegend(ax)
 
+    end # theme
 
     return fig
 
