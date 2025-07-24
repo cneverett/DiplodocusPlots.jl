@@ -26,12 +26,14 @@ module DiplodocusPlots
     include("CollisionPlots/Interactive/GainLossAnalysis.jl")
 
     # Transport Plots
+    #Interactive Plots
+    include("TransportPlots/Interactive/ObserverFlux.jl")
     # Static Plots
     include("TransportPlots/Static/Distribution.jl")
     include("TransportPlots/Static/NumberDensity.jl")
     include("TransportPlots/Static/EnergyDensity.jl")
     include("TransportPlots/Static/ThermalAndIsotropic.jl")
-    #Interactive Plots
-    include("TransportPlots/Interactive/ObserverFlux.jl")
+    include("TransportPlots/Static/ObserverFlux.jl")
+    
 
 end
