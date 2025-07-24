@@ -4,7 +4,7 @@
 """
 function ObserverFluxPlot(PhaseSpace::PhaseSpaceStruct,sol::OutputStruct,time_idx::Int64,ObserverAngles::Vector{Float64},ObserverDistance::Float64;plot_limits=(nothing,nothing),theme=DiplodocusDark(),title=nothing,TimeUnits::Function=CodeToCodeUnitsTime)
 
-    CairoMakie.activate!(inline=false)
+    CairoMakie.activate!(inline=true)
 
     with_theme(theme) do
 
@@ -19,6 +19,7 @@ function ObserverFluxPlot(PhaseSpace::PhaseSpaceStruct,sol::OutputStruct,time_id
     photon_index = findfirst(x->x=="Pho",name_list)
 
     ur = Grids.pyr_list[photon_index]
+    pr = Grids.pxr_list[photon_index]
     mp = Grids.mpx_list[photon_index]
 
     Fν = ObserverFlux(PhaseSpace,sol,ObserverAngles,ObserverDistance)
@@ -36,12 +37,21 @@ function ObserverFluxPlot(PhaseSpace::PhaseSpaceStruct,sol::OutputStruct,time_id
         ax.title = titlestr
     end
 
+    max_total = -Inf32
+
     for θ in 1:length(ObserverAngles)
 
         flux_val = log10.(mp .* Fν[time_idx,θ,:])
+        max_f = maximum(x for x in flux_val if !isnan(x))
+        max_total = max(max_total,max_f)
 
         scatterlines!(ax,log10.(mp),flux_val,color=theme.palette.color[][mod(2*θ-1,7)+1],markersize=0.0,label= L"θ=%$(ObserverAngles[θ])\pi")
 
+    end
+
+    if plot_limits == (nothing,nothing)
+        xlims!(ax,(log10(pr[1]),log10(pr[end])))
+        ylims!(ax,(log10(max_total)-9.0,log10(max_total)+1.0)) 
     end
 
     axislegend(ax)
