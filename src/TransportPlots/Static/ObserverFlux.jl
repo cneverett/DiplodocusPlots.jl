@@ -29,11 +29,11 @@ function ObserverFluxPlot(PhaseSpace::PhaseSpaceStruct,sol::OutputStruct,time_id
     t = TimeUnits(sol.t[time_idx])
     t_unit_string = TimeUnits()
 
-    ax = Axis(fig[1,1],ylabel=L"$\log_{10}\left(pF_{p}\right)$ $[\text{m}^{-3}]$",aspect=DataAspect())
+    ax = Axis(fig[1,1],ylabel=L"$\log_{10}\left(pF_{p}\right)$ $[\text{m}^{-3}m_\text{Ele}c]$",aspect=DataAspect())
     ax.limits = plot_limits
 
     if !isnothing(title)
-        titlestr = L"Observer Flux at distance %$ObserverDistance [\text{m}], with B-Field at an angle of β =%$(β)\pi, at t=%$(t) %$t_unit_string"
+        titlestr = L" β =%$(β)\pi, t=%$(t) %$t_unit_string"
         ax.title = titlestr
     end
 
