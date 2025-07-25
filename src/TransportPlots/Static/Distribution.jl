@@ -480,16 +480,18 @@ function AM3_MomentumDistributionPlot(filePath,t_max,t_min,t_grid;plot_limits=(n
     for i in 1:length(t_pho)
 
         t = t_pho[i]
-        if t_grid == "u"
-            color = theme.colormap[][(t - t_min) / (t_max - t_min)]
-        elseif t_grid == "l"
-            color = theme.colormap[][(log10(t) - log10(t_min)) / (log10(t_max) - log10(t_min))]
-        end
+        if log10(t) % 1 == 0.0 # 10^n timesteps
+            if t_grid == "u"
+                color = theme.colormap[][(t - t_min) / (t_max - t_min)]
+            elseif t_grid == "l"
+                color = theme.colormap[][(log10(t) - log10(t_min)) / (log10(t_max) - log10(t_min))]
+            end
 
-        # sum along u and h directions
-        pdNdp = f_pho[i,:][1]
-        #println("$pdNdp")
-        scatterlines!(ax,log10.(meanp_pho .* eV_to_mElec2),log10.(meanp_pho .* pdNdp .* cm3_to_m3 .* eV_to_mElec2),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[1])
+            # sum along u and h directions
+            pdNdp = f_pho[i,:][1]
+            #println("$pdNdp")
+            scatterlines!(ax,log10.(meanp_pho .* eV_to_mElec2),log10.(meanp_pho .* pdNdp .* cm3_to_m3 .* eV_to_mElec2),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[1])
+        end
 
     end
 
@@ -499,15 +501,17 @@ function AM3_MomentumDistributionPlot(filePath,t_max,t_min,t_grid;plot_limits=(n
     for i in 1:length(t_ele)
 
             t = t_ele[i]
-            if t_grid == "u"
-                color = theme.colormap[][(t - t_min) / (t_max - t_min)]
-            elseif t_grid == "l"
-                color = theme.colormap[][(log10(t) - log10(t_min)) / (log10(t_max) - log10(t_min))]
-            end
+            if log10(t) % 1 == 0.0 # 10^n timesteps
+                if t_grid == "u"
+                    color = theme.colormap[][(t - t_min) / (t_max - t_min)]
+                elseif t_grid == "l"
+                    color = theme.colormap[][(log10(t) - log10(t_min)) / (log10(t_max) - log10(t_min))]
+                end
 
-            # sum along u and h directions
-            pdNdp = f_ele[i,:][1]
-            scatterlines!(ax,log10.(sqrt.((meanp_ele .* eV_to_mElec2).^2 .-1)),log10.(sqrt.((meanp_ele .* eV_to_mElec2).^2 .-1) .* pdNdp .* cm3_to_m3),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[2])
+                # sum along u and h directions
+                pdNdp = f_ele[i,:][1]
+                scatterlines!(ax,log10.(sqrt.((meanp_ele .* eV_to_mElec2).^2 .-1)),log10.(sqrt.((meanp_ele .* eV_to_mElec2).^2 .-1) .* pdNdp .* cm3_to_m3),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[2])
+            end
 
     end
 
