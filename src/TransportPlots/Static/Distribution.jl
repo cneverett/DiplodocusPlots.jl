@@ -84,9 +84,10 @@ function MomentumDistributionPlot(sol,species::String,PhaseSpace::PhaseSpaceStru
             f3D .= reshape(sol.f[i].x[species_index],(p_num,u_num,h_num))
 
             @. f3D = f3D*(f3D!=Inf)
-            #scale by order-1
+            # scale by order
+            # f = dN/dpdudh * dpdudh therefore dN/dp = f / dp and p^order * dN/dp = f * mp^order / dp
             for px in 1:p_num, py in 1:u_num, pz in 1:h_num
-                f3D[px,py,pz] = f3D[px,py,pz] * (meanp[px]^(order-1))
+                f3D[px,py,pz] = f3D[px,py,pz] * (meanp[px]^(order)) / dp[px]
             end
 
             #=if uDis
@@ -238,9 +239,10 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
             f3D .= reshape(sol.f[i].x[species_index],(p_num,u_num,h_num))
 
             @. f3D = f3D*(f3D!=Inf)
-            #scale by order-1
+            # scale by order
+            # f = dN/dpdudh * dpdudh therefore dN/dp = f / dp and p^order * dN/dp = f * mp^order / dp
             for px in 1:p_num, py in 1:u_num, pz in 1:h_num
-                f3D[px,py,pz] = f3D[px,py,pz] * (meanp[px]^(order-1))
+                f3D[px,py,pz] = f3D[px,py,pz] * (meanp[px]^(order)) / dp[px]
             end
 
             #=if uDis
@@ -343,6 +345,7 @@ function MomentumAndPolarAngleDistributionPlot(sol,species::String,PhaseSpace::P
 
     p_num = Momentum.px_num_list[species_index]  
     u_num = Momentum.py_num_list[species_index]
+    h_num = Momentum.pz_num_list[species_index]
     dp = Grids.dpx_list[species_index]
     du = Grids.dpy_list[species_index]
     meanp = Grids.mpx_list[species_index]
@@ -368,16 +371,20 @@ function MomentumAndPolarAngleDistributionPlot(sol,species::String,PhaseSpace::P
 
     fig = Figure(size=(576,276)) # 8:3 aspect ratio
 
-    dis1 = reshape(sol.f[t_idx[1]].x[species_index],(p_num,u_num))
-    dis1 = dis1 .* (meanp.^(order-1))
-
+    dis1 = dropdims(sum(reshape(sol.f[t_idx[1]].x[species_index],(p_num,u_num,h_num)),dims=3),dims=3)
     replace!(dis1,0.0 => NaN) # replace Inf with NaN for plotting
-    dis2 = reshape(sol.f[t_idx[2]].x[species_index],(p_num,u_num))
-    dis2 = dis2 .* (meanp.^(order-1))
+    dis2 = dropdims(sum(reshape(sol.f[t_idx[2]].x[species_index],(p_num,u_num,h_num)),dims=3),dims=3)
     replace!(dis2,0.0 => NaN) # replace Inf with NaN for plotting
-    dis3 = reshape(sol.f[t_idx[3]].x[species_index],(p_num,u_num))
-    dis3 = dis3 .* (meanp.^(order-1))
+    dis3 = dropdims(sum(reshape(sol.f[t_idx[3]].x[species_index],(p_num,u_num,h_num)),dims=3),dims=3)
     replace!(dis3,0.0 => NaN) # replace Inf with NaN for plotting
+
+    # scale by order
+    # f = dN/dpdudh * dpdudh therefore dN/dpdu = f / dpdu and p^order * dN/dpdu = f * mp^order / dpdu
+    for px in 1:p_num, py in 1:u_num
+        dis1[px,py] *= (meanp[px]^(order)) / dp[px] / du[py]
+        dis2[px,py] *= (meanp[px]^(order)) / dp[px] / du[py]
+        dis3[px,py] *= (meanp[px]^(order)) / dp[px] / du[py]
+    end
 
     max_dis = maximum(x for x in [dis1; dis2; dis3] if !isnan(x))
     min_dis = minimum(x for x in [dis1; dis2; dis3] if !isnan(x))
@@ -395,16 +402,32 @@ function MomentumAndPolarAngleDistributionPlot(sol,species::String,PhaseSpace::P
     ax3.radius_at_origin = log10(p_r[1])-1.0
     thetalims!(ax3,0,pi)
 
-    hm1 = heatmap!(ax1,acos.(u_r),log10.(p_r),log10.(dis1'),colormap=theme.colormap,colorrange=col_range)
-    hm2 = heatmap!(ax2,acos.(u_r),log10.(p_r),log10.(dis2'),colormap=theme.colormap,colorrange=col_range)
-    hm3 = heatmap!(ax3,acos.(u_r),log10.(p_r),log10.(dis3'),colormap=theme.colormap,colorrange=col_range)
+    #hm1 = heatmap!(ax1,acos.(u_r),log10.(p_r),log10.(dis1'),colormap=theme.colormap,colorrange=col_range)
+    #hm2 = heatmap!(ax2,acos.(u_r),log10.(p_r),log10.(dis2'),colormap=theme.colormap,colorrange=col_range)
+    #hm3 = heatmap!(ax3,acos.(u_r),log10.(p_r),log10.(dis3'),colormap=theme.colormap,colorrange=col_range)
+
+    u_as_theta_grid = zeros(Float64,length(u_r))
+    u_as_theta_grid_tick_values = Vector{Float64}(-1:0.5:1)
+    u_as_theta_grid_tick_locations = zeros(Float64,length(u_as_theta_grid_tick_values))
+    @. u_as_theta_grid = pi - pi * (u_r+1)/2 # convert u grid to a set of theta values such that u can be plotted as polar angle
+    @. u_as_theta_grid_tick_locations = pi - pi * (u_as_theta_grid_tick_values+1)/2 # convert u grid ticks to a set of theta values such that u can be plotted as polar angle
+
+    hm1 = heatmap!(ax1,u_as_theta_grid,log10.(p_r),log10.(dis1'),colormap=theme.colormap,colorrange=col_range)
+    hm2 = heatmap!(ax2,u_as_theta_grid,log10.(p_r),log10.(dis2'),colormap=theme.colormap,colorrange=col_range)
+    hm3 = heatmap!(ax3,u_as_theta_grid,log10.(p_r),log10.(dis3'),colormap=theme.colormap,colorrange=col_range)
 
     rlims!(ax1,log10(p_r[1]),log10(p_r[end])+1.0)
     rlims!(ax2,log10(p_r[1]),log10(p_r[end])+1.0)
     rlims!(ax3,log10(p_r[1]),log10(p_r[end])+1.0)
-    hidethetadecorations!(ax1, grid=false)
-    hidethetadecorations!(ax2, grid=false)
-    hidethetadecorations!(ax3, grid=false)
+    ##################################################
+    # CHANGE THETA DECORATTIONS TO BE U GRID !!!!!!! #
+    ##################################################
+    ax1.xticks = (u_as_theta_grid_tick_locations,u_as_theta_grid_tick_values)
+    ax2.xticks = (u_as_theta_grid_tick_locations,u_as_theta_grid_tick_values)
+    ax3.xticks = (u_as_theta_grid_tick_locations,u_as_theta_grid_tick_values)
+    #hidethetadecorations!(ax1, grid=false)
+    #hidethetadecorations!(ax2, grid=false)
+    #hidethetadecorations!(ax3, grid=false)
 
     if order == 1
         Colorbar(fig[1,1],hm1,label=L"$\log_{10}\left(p\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V}[\text{m}^{-3}]\right)$",flipaxis=false,height=176,tellheight=false)
