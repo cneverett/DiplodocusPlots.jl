@@ -132,8 +132,9 @@ function MomentumDistributionPlot(sol,species::String,PhaseSpace::PhaseSpaceStru
         Temperature = DiplodocusTransport.ScalarTemperature(Pressure,num)
 
         MJ = DiplodocusTransport.MaxwellJuttner_Distribution(PhaseSpace,species,Temperature;n=num)
-
-        MJ = MJ .* (meanp.^(order-1))
+        # scale by order
+        # f = dN/dpdudh * dpdudh therefore dN/dp = f / dp and p^order * dN/dp = f * mp^order / dp
+        @. MJ *= (meanp^(order)) / dp
 
         scatterlines!(ax,log10.(meanp),log10.(MJ),linewidth=1.0,color = theme.textcolor[],markersize=0.0,linestyle=(:dot),label="Maxwell-Juttner")
 
@@ -287,8 +288,9 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
         Temperature = DiplodocusTransport.ScalarTemperature(Pressure,num)
 
         MJ = DiplodocusTransport.MaxwellJuttner_Distribution(PhaseSpace,species,Temperature;n=num)
-
-        MJ = MJ .* (meanp.^(order-1))
+        # scale by order
+        # f = dN/dpdudh * dpdudh therefore dN/dp = f / dp and p^order * dN/dp = f * mp^order / dp
+        @. MJ *= (meanp^(order)) / dp
 
         scatterlines!(ax,log10.(meanp),log10.(MJ),linewidth=1.0,color = :white,markersize=0.0,label="Maxwell-Juttner")
 
