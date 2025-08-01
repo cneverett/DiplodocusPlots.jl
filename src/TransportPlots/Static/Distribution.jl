@@ -67,7 +67,7 @@ function MomentumDistributionPlot(sol,species::String,PhaseSpace::PhaseSpaceStru
         log_t = log10.(sol.t)
         values = findall(x->x%1==0,log_t)
     else
-        values = (1:t_save)*step
+        values = (1:t_save)*step .+ 2 # add 2 to skip initial and kernel steps
     end
 
     for i in 1:t_save
@@ -200,7 +200,7 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
         log_t = log10.(sol.t)
         values = findall(x->x%1==0,log_t)
     else
-        values = (1:t_save)*step
+        values = (1:t_save)*step .+ 2 # add 2 to skip initial and kernel steps
     end
 
     for (species_idx, species_name) in enumerate(species) 
