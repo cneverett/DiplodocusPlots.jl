@@ -111,7 +111,7 @@ function MomentumDistributionPlot(sol,species::String,PhaseSpace::PhaseSpaceStru
                 pdNdp = dropdims(sum(f3D, dims=(2,3)),dims=(2,3))
                 if sum(@. !isnan(pdNdp) * !isinf(pdNdp) * !iszero(pdNdp)) == 1 # there is only one valid position so scatterlines doesn't work
                     idx = findfirst(!iszero,pdNdp)
-                    vlines!(ax,log10(meanp[idx]), ymax=log10(pdNdp[idx]),linewidth=2.0,color = color)
+                    lines!(ax,[log10(meanp[idx]), log10(meanp[idx])],[-Inf, log10(pdNdp[idx])],linewidth=2.0,color = color,linestyle=linestyles[species_idx])
                 else
                     scatterlines!(ax,log10.(meanp),log10.(pdNdp),linewidth=2.0,color = color,markersize=0.0)
                 end
@@ -298,7 +298,7 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
         Pressure = DiplodocusTransport.ScalarPressure(Tᵃᵇ,Δab)
         Temperature = DiplodocusTransport.ScalarTemperature(Pressure,num)
 
-        MJ = DiplodocusTransport.MaxwellJuttner_Distribution(PhaseSpace,species,Temperature;n=num)
+        MJ = DiplodocusTransport.MaxwellJuttner_Distribution(PhaseSpace,species[species_idx],Temperature;n=num)
         # scale by order
         # f = dN/dpdudh * dpdudh therefore dN/dp = f / dp and p^order * dN/dp = f * mp^order / dp
         @. MJ *= (meanp^(order)) / dp
