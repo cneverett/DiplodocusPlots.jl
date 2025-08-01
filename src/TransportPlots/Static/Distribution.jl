@@ -236,7 +236,7 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
         if (i in values || i == 1 || i == 2) # plot first step for initial conds, second for kernel 
 
             t = sol.t[i]
-            println("t=$(CodeUnitsToSIUnitsTimes(t))")
+            println("t=$(CodeToSIUnitsTimes(t))")
             if Time.t_grid == "u"
                 color = theme.colormap[][(t - sol.t[1]) / (sol.t[end] - sol.t[1])]
             elseif Time.t_grid == "l"
