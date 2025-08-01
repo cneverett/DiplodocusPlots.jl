@@ -111,7 +111,7 @@ function MomentumDistributionPlot(sol,species::String,PhaseSpace::PhaseSpaceStru
                 pdNdp = dropdims(sum(f3D, dims=(2,3)),dims=(2,3))
                 if sum(@. !isnan(pdNdp) * !isinf(pdNdp) * !iszero(pdNdp)) == 1 # there is only one valid position so scatterlines doesn't work
                     idx = findfirst(!iszero,pdNdp)
-                    lines!(ax,[log10(meanp[idx]), log10(meanp[idx])],[-Inf, log10(pdNdp[idx])],linewidth=2.0,color = color,linestyle=linestyles[species_idx])
+                    lines!(ax,[log10(meanp[idx]), log10(meanp[idx])],[-20.0, log10(pdNdp[idx])],linewidth=2.0,color = color,linestyle=linestyles[species_idx])
                 else
                     scatterlines!(ax,log10.(meanp),log10.(pdNdp),linewidth=2.0,color = color,markersize=0.0)
                 end
@@ -236,7 +236,7 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
         if (i in values || i == 1 || i == 2) # plot first step for initial conds, second for kernel 
 
             t = sol.t[i]
-            println("t=$t")
+            println("t=$(CodeUnitsToSIUnitsTimes(t))")
             if Time.t_grid == "u"
                 color = theme.colormap[][(t - sol.t[1]) / (sol.t[end] - sol.t[1])]
             elseif Time.t_grid == "l"
@@ -516,6 +516,7 @@ function AM3_MomentumDistributionPlot(filePath,t_max,t_min,t_grid;plot_limits=(n
     for i in 1:length(t_pho)
 
         t = t_pho[i]
+        println("t=$t")
         if log10(t) % 1 == 0.0 # 10^n timesteps
             if t_grid == "u"
                 color = theme.colormap[][(t - t_min) / (t_max - t_min)]
