@@ -268,7 +268,7 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
                 pdNdp = dropdims(sum(f3D, dims=(2,3)),dims=(2,3))
                 if sum(@. !isnan(ddNdp) * !isinf(pdNdp) * !iszero(pdNdp)) == 1 # there is only one valid position so scatterlines doesn't work
                     idx = findfirst(!iszero,pdNdp)
-                    vlines!(ax,log10(meanp[idx]),log10(pdNdp[idx]),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[species_idx])
+                    vlines!(ax,log10(meanp[idx]), ymax=log10(pdNdp[idx]),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[species_idx])
                 else
                     scatterlines!(ax,log10.(meanp),log10.(pdNdp),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[species_idx])
                 end
