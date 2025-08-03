@@ -21,6 +21,7 @@ module DiplodocusPlots
     using DiplodocusTransport
 
     include("Themes.jl")
+    include("PlotTypes.jl")
     include("TimeUnits.jl")
     include("CollisionPlots/Interactive/AnalyticalSpectra.jl/InverseCompton.jl")
     include("CollisionPlots/Interactive/GainLossAnalysis.jl")

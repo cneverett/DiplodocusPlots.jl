@@ -1,6 +1,6 @@
-inch = 96
-pt = 4/3
-cm = inch / 2.54 
+const inch = 96
+const pt = 4/3
+const cm = inch / 2.54 
 
 #= 
 Latex double column width is 236pt which is 3.29 inches or 8.36cm
@@ -12,13 +12,14 @@ Deault figure size will be designed for single column with a width of 3.25 inche
 function DiplodocusDark()
     # inspired from Makie's theme_black but with latex fonts and some modifications
     return Theme(
-        backgroundcolor=:transparent,
+        backgroundcolor=(:black,0.0),
         textcolor=:white,
         linecolor=:white,
         size=(3.25inch,2.4375inch),
         fontsize = 9pt,
         palette = (color = Makie.ColorScheme(get(Makie.ColorSchemes.batlow10,range(0.9,0.1,length=7))),),
-        colormap = Makie.ColorScheme(get(Makie.ColorSchemes.batlow10,range(0.1,0.9,length=256))), # use a subset to avoid very dark or very light colors
+        colormap = Makie.ColorScheme(get(Makie.ColorSchemes.batlow,range(0.1,0.9,length=256))), # use a subset to avoid very dark or very light colors
+        colormap_var = Makie.ColorScheme(get(Makie.ColorSchemes.hawaii,range(0.1,0.9,length=256))), # use a subset to avoid very dark or very light colors
         fonts = Attributes(
             :bold => Makie.texfont(:bold),
             :bolditalic => Makie.texfont(:bolditalic),
@@ -26,12 +27,12 @@ function DiplodocusDark()
             :regular => Makie.texfont(:regular)
         ),
         Figure = (
-            backgroundcolor = :transparent,
+            backgroundcolor = (:black,0.0),#:transparent,
             fontsize = 9pt
         ),
         Axis = (
             fontsize = 9pt,
-            backgroundcolor=:transparent,
+            backgroundcolor=(:black,0.0),
             bottomspinecolor = :white,
             topspinecolor = :white,
             leftspinecolor = :white,
@@ -67,7 +68,7 @@ function DiplodocusDark()
             fontsize = 9pt,
             labelsize = 8pt,
             framecolor = :white,
-            backgroundcolor = :transparent,
+            backgroundcolor = (:black,0.0),
             framewidth = 2.0,
             rowgap = -5,
             padding = (4f0,4f0,2f0,2f0),
@@ -90,15 +91,24 @@ function DiplodocusDark()
             joinstyle = :round,
             linecap = :round
         ),
+        Lines = (
+            linewidth = 2.0,
+            joinstyle = :round,
+            linecap = :round
+        ),
         PolarAxis = (
             fontsize = 9pt,
             labelsize = 9pt,
             rticklabelsize = 8pt,
-            backgroundcolor = :transparent,
+            thetaticklabelsize = 8pt,
+            backgroundcolor = (:black,0.0),
             rticksvisible = true,
             rticksmirrored = true,
+            thetaticksvisible = true,
             rtickcolor = :white,
             rtickwidth = 2.0,
+            thetatickcolor = :white,
+            thetatickwidth = 2.0,
             gridcolor = :grey45,
             gridwidth = 1.0,
             tickcolor = :white,
@@ -114,13 +124,14 @@ end
 function DiplodocusLight()
     # slight modifications from the default theme but with Latex fonts and some modifications
     return Theme(
-        backgroundcolor=:transparent,
+        backgroundcolor=(:white,0.0),
         textcolor=:black,
         linecolor=:black,
         size=(3.25inch,2.4375inch),
         fontsize = 9pt,
         palette = (color = Makie.ColorScheme(get(Makie.ColorSchemes.batlow10,range(0.1,0.9,length=7))),),
-        colormap = Makie.ColorScheme(get(Makie.ColorSchemes.batlow10,range(0.9,0.1,length=256))),
+        colormap = Makie.ColorScheme(get(Makie.ColorSchemes.batlow,range(0.9,0.1,length=256))),
+        colormap_var = Makie.ColorScheme(get(Makie.ColorSchemes.hawaii,range(0.9,0.1,length=256))),
         fonts = Attributes(
             :bold => Makie.texfont(:bold),
             :bolditalic => Makie.texfont(:bolditalic),
@@ -128,12 +139,12 @@ function DiplodocusLight()
             :regular => Makie.texfont(:regular)
         ),
         Figure = (
-            backgroundcolor = :transparent,
+            backgroundcolor = (:white,0.0),
             fontsize = 9pt
         ),
         Axis = (
             fontsize = 9pt,
-            backgroundcolor=:transparent,
+            backgroundcolor=(:white,0.0),
             titlesize = 11pt,
             xlabelsize = 9pt, # defults if :fontsize
             ylabelsize = 9pt, # defults if :fontsize
@@ -162,13 +173,13 @@ function DiplodocusLight()
             fontsize = 9pt,
             labelsize = 9pt,
             ticklabelsize = 8pt,
-            backgroundcolor = :transparent,
+            backgroundcolor = (:white,0.0),
             spinewidth=1.5,
         ),
         Legend = (
             fontsize = 9pt,
             labelsize = 8pt,
-            backgroundcolor = :transparent,
+            backgroundcolor = (:white,0.0),
             framecolor = :black,
             framewidth = 2.0,
             rowgap = -5,
@@ -179,15 +190,24 @@ function DiplodocusLight()
             joinstyle = :round,
             linecap = :round
         ),
+        Lines = (
+            linewidth = 2.0,
+            joinstyle = :round,
+            linecap = :round
+        ),
         PolarAxis = (
             fontsize = 9pt,
             labelsize = 9pt,
             rticklabelsize = 8pt,
-            thetaticklabelsize = 5pt,
+            thetaticklabelsize = 8pt,
+            backgroundcolor = (:white,0.0),
             rticksvisible = true,
             rticksmirrored = true,
+            thetaticksvisible = true,
             rtickcolor = :black,
             rtickwidth = 2.0,
+            thetatickcolor = :black,
+            thetatickwidth = 2.0,
             gridcolor = :grey45,
             gridwidth = 1.0,
             tickcolor = :black,
