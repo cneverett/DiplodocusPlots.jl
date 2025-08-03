@@ -186,7 +186,12 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
     if isnothing(figure)
         time_idx = Observable(1) # index of the current time step
         t = @lift(sol.t[$time_idx])
-        fig = Figure(size =(3.25inch,3.25inch)) # 1:1 aspect ratio
+        if wide
+            fig = Figure(size=(576,216)) # double column 8:3 aspect ratio
+        else
+            fig = Figure() # default single column 4:3 aspect ratio
+        end
+        #fig = Figure(size =(3.25inch,3.25inch)) # 1:1 aspect ratio
         ax = Axis(fig[1,1],xlabel=xlab,ylabel=ylab,aspect=DataAspect())
     else
         fig, time_idx = figure # use the provided figure and time index
