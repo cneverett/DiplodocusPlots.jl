@@ -255,7 +255,7 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
             idx = findfirst(@. !iszero(pdNdp_initial) & !isnan(pdNdp_initial) & !isinf(pdNdp_initial))
             lines!(ax,[log10(meanp[idx]), log10(meanp[idx])],[-20.0, pdNdp_initial[idx]],linewidth=2.0,color = color,linestyle=(:dot))
         else
-            scatterlines!(ax,log10.(meanp),log10.(pdNdp_initial),linewidth=2.0,color = color,markersize=0.0,linestyle=(:dot))
+            scatterlines!(ax,log10.(meanp),pdNdp_initial,linewidth=2.0,color = color,markersize=0.0,linestyle=(:dot))
         end
 
     end
