@@ -350,11 +350,11 @@ function MomentumAndPolarAngleDistributionPlot(sol,species::String,PhaseSpace::P
     if typeof(timevalues) == Tuple{Int64,Int64,Int64}
         for i in 1:3
         t_idx[i] = timevalues[i]
-        t[i] = sol.t[t_idx[i]]
+        t[i] = round(sol.t[t_idx[i]],sigdigits=3)
         end
     elseif typeof(timevalues) == Tuple{Float64,Float64,Float64}
         for i in 1:3
-        t[i] = timevalues[i]
+        t[i] = round(timevalues[i],sigdigits=3)
         t_idx[i] = findmin(abs.(sol.t .- t[i]))[2] #findfirst(x->x==t[i],sol.t)
         end
     end
@@ -362,11 +362,8 @@ function MomentumAndPolarAngleDistributionPlot(sol,species::String,PhaseSpace::P
     fig = Figure(size=(576,276)) # 8:3 aspect ratio
 
     dis1 = dropdims(sum(reshape(sol.f[t_idx[1]].x[species_index],(p_num,u_num,h_num)),dims=3),dims=3)
-    replace!(dis1,0.0 => NaN) # replace Inf with NaN for plotting
     dis2 = dropdims(sum(reshape(sol.f[t_idx[2]].x[species_index],(p_num,u_num,h_num)),dims=3),dims=3)
-    replace!(dis2,0.0 => NaN) # replace Inf with NaN for plotting
     dis3 = dropdims(sum(reshape(sol.f[t_idx[3]].x[species_index],(p_num,u_num,h_num)),dims=3),dims=3)
-    replace!(dis3,0.0 => NaN) # replace Inf with NaN for plotting
 
     # scale by order
     # f = dN/dpdudh * dpdudh therefore dN/dpdu = f / dpdu and p^order * dN/dpdu = f * mp^order / dpdu
@@ -375,10 +372,13 @@ function MomentumAndPolarAngleDistributionPlot(sol,species::String,PhaseSpace::P
         dis2[px,py] *= (meanp[px]^(order)) / dp[px] / du[py]
         dis3[px,py] *= (meanp[px]^(order)) / dp[px] / du[py]
     end
+    replace!(dis1,0.0 => NaN) # replace Inf with NaN for plotting
+    replace!(dis2,0.0 => NaN) # replace Inf with NaN for plotting
+    replace!(dis3,0.0 => NaN) # replace Inf with NaN for plotting
 
     max_dis = maximum(x for x in [dis1; dis2; dis3] if !isnan(x))
     min_dis = minimum(x for x in [dis1; dis2; dis3] if !isnan(x))
-    col_range = (log10(max_dis)-20.0,log10(max_dis))
+    col_range = (log10(max_dis)-40.0,log10(max_dis))
 
     ax1 = PolarAxis(fig[1,1+1],theta_0=-pi/2,direction=-1,width=176)
     ax1.radius_at_origin = log10(p_r[1])-1.0
@@ -392,10 +392,6 @@ function MomentumAndPolarAngleDistributionPlot(sol,species::String,PhaseSpace::P
     ax3.radius_at_origin = log10(p_r[1])-1.0
     thetalims!(ax3,0,pi)
 
-    #hm1 = heatmap!(ax1,acos.(u_r),log10.(p_r),log10.(dis1'),colormap=theme.colormap,colorrange=col_range)
-    #hm2 = heatmap!(ax2,acos.(u_r),log10.(p_r),log10.(dis2'),colormap=theme.colormap,colorrange=col_range)
-    #hm3 = heatmap!(ax3,acos.(u_r),log10.(p_r),log10.(dis3'),colormap=theme.colormap,colorrange=col_range)
-
     u_as_theta_grid = zeros(Float64,length(u_r))
     u_as_theta_grid_tick_values = Vector{Float64}(-1:0.5:1)
     u_as_theta_grid_tick_values_string = string.(u_as_theta_grid_tick_values)
@@ -404,9 +400,9 @@ function MomentumAndPolarAngleDistributionPlot(sol,species::String,PhaseSpace::P
     @. u_as_theta_grid = pi - pi * (u_r+1)/2 # convert u grid to a set of theta values such that u can be plotted as polar angle
     @. u_as_theta_grid_tick_locations = pi - pi * (u_as_theta_grid_tick_values+1)/2 # convert u grid ticks to a set of theta values such that u can be plotted as polar angle
 
-    hm1 = heatmap!(ax1,u_as_theta_grid,log10.(p_r),log10.(dis1'),colormap=theme.colormap_var,colorrange=col_range)
-    hm2 = heatmap!(ax2,u_as_theta_grid,log10.(p_r),log10.(dis2'),colormap=theme.colormap_var,colorrange=col_range)
-    hm3 = heatmap!(ax3,u_as_theta_grid,log10.(p_r),log10.(dis3'),colormap=theme.colormap_var,colorrange=col_range)
+    hm1 = heatmap!(ax1,u_as_theta_grid,log10.(p_r),log10.(dis1'),colormap=theme.colormap_var,colorrange=col_range,colorscale=asinh)
+    hm2 = heatmap!(ax2,u_as_theta_grid,log10.(p_r),log10.(dis2'),colormap=theme.colormap_var,colorrange=col_range,colorscale=asinh)
+    hm3 = heatmap!(ax3,u_as_theta_grid,log10.(p_r),log10.(dis3'),colormap=theme.colormap_var,colorrange=col_range,colorscale=asinh)
 
     rlims!(ax1,log10(p_r[1]),log10(p_r[end])+1.0)
     rlims!(ax2,log10(p_r[1]),log10(p_r[end])+1.0)
@@ -421,7 +417,7 @@ function MomentumAndPolarAngleDistributionPlot(sol,species::String,PhaseSpace::P
     if order == 1
         Colorbar(fig[1,1],hm1,label=L"$\log_{10}\left(p\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V}[\text{m}^{-3}]\right)$",flipaxis=false,height=176,tellheight=false)
     elseif order != 1
-        Colorbar(fig[1,1],hm1,label=L"$\log_{10}\left(p^{%$order}\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V}[\text{m}^{-3}\left(m_\text{Ele}c\right)^{%$order-1}]\right)$ $$",flipaxis=false,height=176,tellheight=false)
+        Colorbar(fig[1,1],hm1,label=L"$\log_{10}\left(p^{%$order}\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V}[\text{m}^{-3}\left(m_\text{Ele}c\right)^{%$(order-1)}]\right)$ $$",flipaxis=false,height=176,tellheight=false)
     end
 
     pt = 4/3
@@ -481,18 +477,18 @@ function MomentumAndPolarAngleDistributionPlot(sol,species::Vector{String},Phase
 
     dis = @lift begin
         f2D = dropdims(sum(reshape(sol.f[$time_idx].x[species_index],(p_num,u_num,h_num)),dims=3),dims=3)
-        replace!(f2D,0.0 => NaN) # replace Inf with NaN for plotting
         # scale by order
         # f = dN/dpdudh * dpdudh therefore dN/dpdu = f / dpdu and p^order * dN/dpdu = f * mp^order / dpdu
         for px in 1:p_num, py in 1:u_num
             f2D[px,py] *= (meanp[px]^(order)) / dp[px] / du[py]
         end
+        replace!(f2D,0.0 => NaN) # replace Inf with NaN for plotting
         log10.(f2D)'
     end
 
     max_dis = @lift(maximum(x for x in $dis if !isnan(x)))
     #min_dis = @lift(minimum(x for x in [dis] if !isnan(x)))
-    col_range = @lift(($max_dis-20.0,$max_dis))
+    col_range = @lift(($max_dis-30.0,$max_dis))
 
     ax = PolarAxis(fig[1,1+species_idx],theta_0=-pi/2,direction=-1,width=Relative(1.2))
     ax.radius_at_origin = log10(p_r[1])-1.0
@@ -510,7 +506,7 @@ function MomentumAndPolarAngleDistributionPlot(sol,species::Vector{String},Phase
     @. u_as_theta_grid = pi - pi * (u_r+1)/2 # convert u grid to a set of theta values such that u can be plotted as polar angle
     @. u_as_theta_grid_tick_locations = pi - pi * (u_as_theta_grid_tick_values+1)/2 # convert u grid ticks to a set of theta values such that u can be plotted as polar angle
 
-    hm = heatmap!(ax,u_as_theta_grid,log10.(p_r),dis,colormap=theme.colormap_var,colorrange=col_range)
+    hm = heatmap!(ax,u_as_theta_grid,log10.(p_r),dis,colormap=theme.colormap_var,colorrange=col_range,colorscale=asinh)
 
     rlims!(ax,log10(p_r[1]),log10(p_r[end])+1.0)
     ax.thetaticks = (u_as_theta_grid_tick_locations,u_as_theta_grid_tick_values_string)
@@ -566,10 +562,11 @@ Arguments:
 - `order`: the order of p in p^order * dN/dp dV, default is 1, i.e. number density spectrum. 2 is "energy" density spectrum.
 - `framerate`: the frame rate of the animation, default is 12 fps.
 - `filename`: the name of the file to save the animation to, default is "MomentumComboAnimation.mp4".
-
+- `plot_limits_momentum`: the limits of the momentum plot, default is `(nothing,nothing)`.
+- `thermal`: whether to plot the expected thermal spectrum based on the final time step, default is `false`.
 
 """
-function MomentumComboAnimation(sol,species::Vector{String},PhaseSpace::PhaseSpaceStruct;theme=DiplodocusDark(),order::Int64=1,framerate=12,filename="MomentumComboAnimation.mp4",plot_limits_momentum=(nothing,nothing))
+function MomentumComboAnimation(sol,species::Vector{String},PhaseSpace::PhaseSpaceStruct;theme=DiplodocusDark(),order::Int64=1,thermal=false,framerate=12,filename="MomentumComboAnimation.mp4",plot_limits_momentum=(nothing,nothing),TimeUnits=CodeToCodeUnitsTime)
 
     CairoMakie.activate!(inline=true) 
 
@@ -580,12 +577,14 @@ function MomentumComboAnimation(sol,species::Vector{String},PhaseSpace::PhaseSpa
         time_idx = Observable(1) # index of the current time step
         t = @lift(sol.t[$time_idx])
 
-        MomentumDistributionPlot(sol,species,PhaseSpace,Animated();theme=theme,order=order,TimeUnits=CodeToCodeUnitsTime,thermal=true,plot_limits=plot_limits_momentum,wide=false,legend=false,framerate=framerate,filename=nothing,initial=true,figure=(fig[2,1],time_idx))
+        MomentumDistributionPlot(sol,species,PhaseSpace,Animated();theme=theme,order=order,TimeUnits=CodeToCodeUnitsTime,thermal=thermal,plot_limits=plot_limits_momentum,wide=false,legend=false,framerate=framerate,filename=nothing,initial=true,figure=(fig[2,1],time_idx))
         MomentumAndPolarAngleDistributionPlot(sol,species,PhaseSpace,Animated();order=order,theme=theme,framerate=framerate,filename=nothing,figure=(fig[1:3,2],time_idx))
 
         grid = fig[3,1] = GridLayout()
+
+        t_unit_string = TimeUnits()
                
-        Label(grid[1,1],@lift("t = $(round($t, digits = 1))"),fontsize=20pt)
+        Label(grid[1,1],@lift("t = $(round(TimeUnits($t), sigdigits = 3))"),fontsize=20pt)
 
         rowsize!(fig.layout,1,Relative(0.02))
         rowsize!(fig.layout,2,Relative(0.8))
@@ -693,6 +692,7 @@ function AM3_MomentumDistributionPlot(filePath,t_max,t_min,t_grid;plot_limits=(n
 
     push!(legend_elements,LineElement(color = theme.textcolor[], linestyle = linestyles[2],linewidth = 2.0))
     push!(line_labels,"Ele")
+
 
     if t_grid == "u"
         Colorbar(fig[1,2],colormap = theme.colormap,limits=(TimeUnits(t_min),TimeUnits(t_max)),label=L"$t$ $[\text{s} * \sigma_{T}c]$")
