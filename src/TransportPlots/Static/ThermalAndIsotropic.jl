@@ -76,6 +76,8 @@ function IsThermalPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::S
 
     end
 
+    ylims!(ax,0.0,nothing)
+
     #fig[1,2] = Legend(fig,ax,"Particles")
     axislegend(ax,"Particles")
 
@@ -154,6 +156,8 @@ function IsIsotropicPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species:
         end
 
     end
+
+    ylims!(ax,0.0,nothing)
 
     axislegend(ax)
 
@@ -269,6 +273,8 @@ function IsThermalAndIsotropicPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruc
 
     end
 
+    ylims!(ax,0.0,nothing)
+    
     axislegend(ax)
 
     end # with_theme
