@@ -26,11 +26,17 @@ function NumberDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;specie
     num = zeros(Float64,length(sol.t))
     num_total = zeros(Float64,length(sol.t))
 
+    if t_grid == "u"
+        xlab = L"Time"
+    elseif t_grid == "l"
+        xlab = L"\log_{10}(Time)"
+    end
+
     if isnothing(fig)
         fig = Figure()
-        ax = Axis(fig[1,1],xlabel="Time",ylabel=L"$n$ $[\mathrm{m}^{-3}]$",xgridvisible=false,ygridvisible=false)
+        ax = Axis(fig[1,1],xlabel=xlab,ylabel=L"$n$ $[\mathrm{m}^{-3}]$",xgridvisible=false,ygridvisible=false)
     else
-        ax = Axis(fig,xlabel="Time",ylabel=L"$n$ $[\mathrm{m}^{-3}]$",xgridvisible=false,ygridvisible=false)
+        ax = Axis(fig,xlabel=xlab,ylabel=L"$n$ $[\mathrm{m}^{-3}]$",xgridvisible=false,ygridvisible=false)
     end
 
     if !isnothing(title)
@@ -107,11 +113,17 @@ function FracNumberDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;sp
 
     mass_list = Grids.mass_list
 
+    if t_grid == "u"
+        xlab = L"Time"
+    elseif t_grid == "l"
+        xlab = L"\log_{10}(Time)"
+    end
+
     if isnothing(fig)
         fig = Figure()
-        ax = Axis(fig[1,1],xlabel="Time",ylabel="Num. Den. Frac. Change",xgridvisible=false,ygridvisible=false)
+        ax = Axis(fig[1,1],xlabel=xlab,ylabel="Num. Den. Frac. Change",xgridvisible=false,ygridvisible=false)
     else
-        ax = Axis(fig,xlabel="Time",ylabel="Num. Den. Frac. Change",xgridvisible=false,ygridvisible=false)
+        ax = Axis(fig,xlabel=xlab,ylabel="Num. Den. Frac. Change",xgridvisible=false,ygridvisible=false)
     end
 
     if !isnothing(title)

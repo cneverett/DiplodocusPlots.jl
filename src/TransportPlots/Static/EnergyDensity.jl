@@ -26,11 +26,17 @@ function EnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;specie
     eng = zeros(Float64,length(sol.t))
     eng_total = zeros(Float64,length(sol.t))
 
+    if t_grid == "u"
+        xlab = L"Time"
+    elseif t_grid == "l"
+        xlab = L"\log_{10}(Time)"
+    end
+
     if isnothing(fig)
         fig = Figure()
-        ax = Axis(fig[1,1],xlabel="Time",ylabel=L"$e/c$ $[\mathrm{J}\mathrm{m}^{-3}]$",xgridvisible=false,ygridvisible=false) # check units
+        ax = Axis(fig[1,1],xlabel=xlab,ylabel=L"$e/c$ $[\mathrm{J}\mathrm{m}^{-3}]$",xgridvisible=false,ygridvisible=false) # check units
     else
-        ax = Axis(fig,xlabel="Time",ylabel=L"$e/c$ $[\mathrm{J}\mathrm{m}^{-3}]$",xgridvisible=false,ygridvisible=false) # check units
+        ax = Axis(fig,xlabel=xlab,ylabel=L"$e/c$ $[\mathrm{J}\mathrm{m}^{-3}]$",xgridvisible=false,ygridvisible=false) # check units
     end
 
     if !isnothing(title)
@@ -109,11 +115,17 @@ function FracEnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;sp
 
     mass_list = Grids.mass_list
 
+    if t_grid == "u"
+        xlab = L"Time"
+    elseif t_grid == "l"
+        xlab = L"\log_{10}(Time)"
+    end
+
     if isnothing(fig)
         fig = Figure()
-        ax = Axis(fig[1,1],xlabel="Time",ylabel="Eng. Den. Frac. Change",xgridvisible=false,ygridvisible=false) # check units
+        ax = Axis(fig[1,1],xlabel=xlab,ylabel="Eng. Den. Frac. Change",xgridvisible=false,ygridvisible=false) # check units
     else
-        ax = Axis(fig,xlabel="Time",ylabel="Eng. Den. Frac. Change",xgridvisible=false,ygridvisible=false) # check units
+        ax = Axis(fig,xlabel=xlab,ylabel="Eng. Den. Frac. Change",xgridvisible=false,ygridvisible=false) # check units
     end
 
     if !isnothing(title)

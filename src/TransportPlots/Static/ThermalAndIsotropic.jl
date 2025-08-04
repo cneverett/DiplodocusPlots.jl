@@ -25,11 +25,17 @@ function IsThermalPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::S
 
     SumSquaredResiduals = zeros(Float64,length(sol.t))
 
+    if t_grid == "u"
+        xlab = L"Time"
+    elseif t_grid == "l"
+        xlab = L"\log_{10}(Time)"
+    end
+
     if isnothing(fig)
         fig = Figure()
-        ax = Axis(fig[1,1],xlabel="Time",ylabel=L"SSR",xgridvisible=false,ygridvisible=false)
+        ax = Axis(fig[1,1],xlabel=xlab,ylabel=L"SSR",xgridvisible=false,ygridvisible=false)
     else
-        ax = Axis(fig,xlabel="Time",ylabel=L"SSR",xgridvisible=false,ygridvisible=false)
+        ax = Axis(fig,xlabel=xlab,ylabel=L"SSR",xgridvisible=false,ygridvisible=false)
     end
 
     if !isnothing(title)
@@ -106,11 +112,17 @@ function IsIsotropicPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species:
 
     SumSquaredResiduals = zeros(Float64,length(sol.t))
 
+    if t_grid == "u"
+        xlab = L"Time"
+    elseif t_grid == "l"
+        xlab = L"\log_{10}(Time)"
+    end
+
     if isnothing(fig)
         fig = Figure()
-        ax = Axis(fig[1,1],xlabel="Time",ylabel=L"SSR",xgridvisible=false,ygridvisible=false)
+        ax = Axis(fig[1,1],xlabel=xlab,ylabel=L"SSR",xgridvisible=false,ygridvisible=false)
     else
-        ax = Axis(fig,xlabel="Time",ylabel=L"SSR",xgridvisible=false,ygridvisible=false)
+        ax = Axis(fig,xlabel=xlab,ylabel=L"SSR",xgridvisible=false,ygridvisible=false)
     end
 
     if !isnothing(title)
@@ -178,11 +190,17 @@ function IsThermalAndIsotropicPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruc
 
     SumSquaredResiduals = zeros(Float64,length(sol.t))
 
+    if t_grid == "u"
+        xlab = L"Time"
+    elseif t_grid == "l"
+        xlab = L"\log_{10}(Time)"
+    end
+
     if isnothing(fig)
         fig = Figure(size=(288,216))
-        ax = Axis(fig[1,1],xlabel="Time",ylabel=L"SSR",xgridvisible=false,ygridvisible=false)
+        ax = Axis(fig[1,1],xlabel=xlab,ylabel=L"SSR",xgridvisible=false,ygridvisible=false)
     else
-        ax = Axis(fig,xlabel="Time",ylabel=L"SSR",xgridvisible=false,ygridvisible=false)
+        ax = Axis(fig,xlabel=xlab,ylabel=L"SSR",xgridvisible=false,ygridvisible=false)
     end
 
     if !isnothing(title)
