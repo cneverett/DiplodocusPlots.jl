@@ -164,10 +164,10 @@ function FracEnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;sp
 
         if !only_all
             if t_grid == "u"
-                scatterlines!(ax,sol.t,frac_eng,marker = :circle,markersize=0.0,label=name_list[j])
+                scatterlines!(ax,sol.t,frac_eng,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j])
                 xlims!(ax,sol.t[1],sol.t[end])
             elseif t_grid == "l"
-                scatterlines!(ax,log10.(sol.t),frac_eng,marker = :circle,markersize=0.0,label=name_list[j])
+                scatterlines!(ax,log10.(sol.t),frac_eng,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j])
                 xlims!(ax,log10(sol.t[1]),log10(sol.t[end]))
             end
         end
