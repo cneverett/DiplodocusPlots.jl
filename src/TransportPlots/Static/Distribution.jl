@@ -117,7 +117,7 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
                 end
             elseif paraperp == true # assumes only a single particle species
                 pdNdp_para = dropdims(sum(f3D, dims=(3)),dims=(3))[:,1]
-                pdNdp_perp = dropdims(sum(f3D, dims=(3)),dims=(3))[:,round(u_num/2)]
+                pdNdp_perp = dropdims(sum(f3D, dims=(3)),dims=(3))[:,round(Int64,u_num/2)]
 
                 if sum(@. !isnan(pdNdp_para) * !isinf(pdNdp_para) * !iszero(pdNdp_para)) == 1 # there is only one valid position so scatterlines doesn't work
                     idx = findfirst(!iszero,pdNdp_para)
@@ -163,10 +163,19 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
 
     end
 
-    push!(legend_elements,LineElement(color = theme.textcolor[], linestyle = linestyles[species_idx],linewidth = 2.0))
-    push!(line_labels,species_name)
+    if paraperp == false
+        push!(legend_elements,LineElement(color = theme.textcolor[], linestyle = linestyles[species_idx],linewidth = 2.0))
+        push!(line_labels,species_name)
+    end
 
     end # species loop 
+
+    if paraperp == true
+        push!(legend_elements,LineElement(color = theme.textcolor[], linestyle = linestyles[1],linewidth = 2.0))
+        push!(legend_elements,LineElement(color = theme.textcolor[], linestyle = linestyles[2],linewidth = 2.0))
+        push!(line_labels,L"\parallel")
+        push!(line_labels,L"\perp")
+    end
 
     t_unit_string = TimeUnits()
 
