@@ -366,9 +366,17 @@ function MomentumAndPolarAngleDistributionPlot(sol,species::String,PhaseSpace::P
 
     fig = Figure(size=(576,276)) # 8:3 aspect ratio
 
-    dis1 = dropdims(sum(reshape(sol.f[t_idx[1]].x[species_index],(p_num,u_num,h_num)),dims=3),dims=3)
-    dis2 = dropdims(sum(reshape(sol.f[t_idx[2]].x[species_index],(p_num,u_num,h_num)),dims=3),dims=3)
-    dis3 = dropdims(sum(reshape(sol.f[t_idx[3]].x[species_index],(p_num,u_num,h_num)),dims=3),dims=3)
+    f1 = copy(Location_Species_To_StateVector(sol.f[t_idx[1]],PhaseSpace,species_index=species_index))
+    f2 = copy(Location_Species_To_StateVector(sol.f[t_idx[2]],PhaseSpace,species_index=species_index))
+    f3 = copy(Location_Species_To_StateVector(sol.f[t_idx[3]],PhaseSpace,species_index=species_index))
+
+    #dis1 = dropdims(sum(reshape(sol.f[t_idx[1]].x[species_index],(p_num,u_num,h_num)),dims=3),dims=3)
+    #dis2 = dropdims(sum(reshape(sol.f[t_idx[2]].x[species_index],(p_num,u_num,h_num)),dims=3),dims=3)
+    #dis3 = dropdims(sum(reshape(sol.f[t_idx[3]].x[species_index],(p_num,u_num,h_num)),dims=3),dims=3)
+
+    dis1 = dropdims(sum(reshape(f1,(p_num,u_num,h_num)),dims=3),dims=3)
+    dis2 = dropdims(sum(reshape(f2,(p_num,u_num,h_num)),dims=3),dims=3)
+    dis3 = dropdims(sum(reshape(f3,(p_num,u_num,h_num)),dims=3),dims=3)
 
     # scale by order
     # f = dN/dpdudh * dpdudh therefore dN/dpdu = f / dpdu and p^order * dN/dpdu = f * mp^order / dpdu
