@@ -16,13 +16,14 @@ Common arguments:
 
 Static arguments:
 - `step`: the step size in time to plot, default is 1.
+- `paraperp`: default is `false`. If `true` the first and center `u` bins will be plotted to represent the distribution parallel to the axis and perpendicular.
 
 Animated arguments:
 - `framerate`: the frame rate of the animation, default is 12 fps.
 - `filename`: the name of the file to save the animation to, default is "MomentumDistribution.mp4".
 - `figure`: default is `nothing`, which creates a new figure. If a figure is provided, the plot is added to that figure instead of creating a new one, this should be of the form of a tuple of `figure` and `time_idx` from the main plot.
 """
-function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseSpaceStruct,type::Static;theme=DiplodocusDark(),order::Int64=1,TimeUnits::Function=CodeToCodeUnitsTime,thermal=false,plot_limits=(nothing,nothing),wide=false,legend=true,step=1)
+function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseSpaceStruct,type::Static;theme=DiplodocusDark(),order::Int64=1,TimeUnits::Function=CodeToCodeUnitsTime,thermal=false,plot_limits=(nothing,nothing),wide=false,legend=true,paraperp=false,step=1)
 
     CairoMakie.activate!(inline=true) # plot in vs code window
 
@@ -105,13 +106,33 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
                 f3D[px,py,pz] = f3D[px,py,pz] * (meanp[px]^(order)) / dp[px]
             end
 
-            # sum along u and h directions
-            pdNdp = dropdims(sum(f3D, dims=(2,3)),dims=(2,3))
-            if sum(@. !isnan(pdNdp) * !isinf(pdNdp) * !iszero(pdNdp)) == 1 # there is only one valid position so scatterlines doesn't work
-                idx = findfirst(!iszero,pdNdp)
-                lines!(ax,[log10(meanp[idx]), log10(meanp[idx])],[-20.0, log10(pdNdp[idx])],linewidth=2.0,color = color,linestyle=linestyles[species_idx])
-            else
-                scatterlines!(ax,log10.(meanp),log10.(pdNdp),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[species_idx])
+            if paraperp == false
+                # sum along u and h directions
+                pdNdp = dropdims(sum(f3D, dims=(2,3)),dims=(2,3))
+                if sum(@. !isnan(pdNdp) * !isinf(pdNdp) * !iszero(pdNdp)) == 1 # there is only one valid position so scatterlines doesn't work
+                    idx = findfirst(!iszero,pdNdp)
+                    lines!(ax,[log10(meanp[idx]), log10(meanp[idx])],[-20.0, log10(pdNdp[idx])],linewidth=2.0,color = color,linestyle=linestyles[species_idx])
+                else
+                    scatterlines!(ax,log10.(meanp),log10.(pdNdp),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[species_idx])
+                end
+            elseif paraperp == true # assumes only a single particle species
+                pdNdp_para = dropdims(sum(f3D, dims=(3)),dims=(3))[:,1]
+                pdNdp_perp = dropdims(sum(f3D, dims=(3)),dims=(3))[:,round(u_num/2)]
+
+                if sum(@. !isnan(pdNdp_para) * !isinf(pdNdp_para) * !iszero(pdNdp_para)) == 1 # there is only one valid position so scatterlines doesn't work
+                    idx = findfirst(!iszero,pdNdp_para)
+                    lines!(ax,[log10(meanp[idx]), log10(meanp[idx])],[-20.0, log10(pdNdp_para[idx])],linewidth=2.0,color = color,linestyle=linestyles[1])
+                else
+                    scatterlines!(ax,log10.(meanp),log10.(pdNdp_para),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[1])
+                end
+
+                if sum(@. !isnan(pdNdp_perp) * !isinf(pdNdp_perp) * !iszero(pdNdp_perp)) == 1 # there is only one valid position so scatterlines doesn't work
+                    idx = findfirst(!iszero,pdNdp_perp)
+                    lines!(ax,[log10(meanp[idx]), log10(meanp[idx])],[-20.0, log10(pdNdp_perp[idx])],linewidth=2.0,color = color,linestyle=linestyles[2])
+                else
+                    scatterlines!(ax,log10.(meanp),log10.(pdNdp_perp),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[2])
+                end
+
             end
 
             max_f = maximum(x for x in pdNdp if !isnan(x))
