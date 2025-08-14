@@ -77,8 +77,7 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
     mass = Grids.mass_list[species_index]
 
     f3D = zeros(Float32,p_num,u_num,h_num)
-    f2D = zeros(Float32,p_num,u_num)
-    f1D = zeros(Float32,p_num)
+    f1D = zeros(Float32,p_num*u_num*h_num)
 
     p_min = min(p_min,p_r[1])
     p_max = max(p_max,p_r[end])
