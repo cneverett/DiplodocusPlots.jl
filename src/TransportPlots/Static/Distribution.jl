@@ -95,7 +95,9 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
                 color = theme.colormap[][(log10(t) - log10(sol.t[1])) / (log10(sol.t[end]) - log10(sol.t[1]))]
             end
 
-            f3D .= reshape(sol.f[i].x[species_index],(p_num,u_num,h_num))
+            f1D .= copy(Location_Species_To_StateVector(sol.f[i],PhaseSpace,species_index=species_index))
+
+            f3D .= reshape(f1D,(p_num,u_num,h_num))
 
             @. f3D = f3D*(f3D!=Inf)
             # scale by order
@@ -123,7 +125,7 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
     if thermal
 
         # expected thermal spectrum based on final time step
-        f = sol.f[end].x[species_index]
+        f = copy(Location_Species_To_StateVector(sol.f[end],PhaseSpace,species_index=species_index))
         Nᵃ = DiplodocusTransport.FourFlow(f,p_num,u_num,p_r,u_r,mass)
         Uₐ = [-1.0,0.0,0.0,0.0] # static observer
         num = DiplodocusTransport.ScalarNumberDensity(Nᵃ,Uₐ)
@@ -226,8 +228,10 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
     mass = Grids.mass_list[species_index]
 
     pdNdp = @lift begin
+        f1D = zeros(Float32,p_num*u_num*h_num)
+        f1D .= copy(Location_Species_To_StateVector(sol.f[$time_idx],PhaseSpace,species_index=species_index))
         f3D = zeros(Float32,p_num,u_num,h_num)
-        f3D .= reshape(sol.f[$time_idx].x[species_index],(p_num,u_num,h_num))
+        f3D .= reshape(f1D,(p_num,u_num,h_num))
         @. f3D = f3D*(f3D!=Inf)
         # scale by order
         # f = dN/dpdudh * dpdudh therefore dN/dp = f / dp and p^order * dN/dp = f * mp^order / dp
@@ -244,8 +248,10 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
     if initial
 
         pdNdp_initial = begin
+            f1D_initial = zeros(Float32,p_num*u_num*h_num)
+            f1D_initial .= copy(Location_Species_To_StateVector(sol.f[1],PhaseSpace,species_index=species_index))
             f3D_initial = zeros(Float32,p_num,u_num,h_num)
-            f3D_initial .= reshape(sol.f[1].x[species_index],(p_num,u_num,h_num))
+            f3D_initial .= reshape(f1D_initial,(p_num,u_num,h_num))
             @. f3D_initial = f3D_initial*(f3D_initial!=Inf)
             # scale by order
             # f = dN/dpdudh * dpdudh therefore dN/dp = f / dp and p^order * dN/dp = f * mp^order / dp
@@ -268,7 +274,7 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
     if thermal
 
         # expected thermal spectrum based on final time step
-        f = sol.f[end].x[species_index]
+        f = copy(Location_Species_To_StateVector(sol.f[end],PhaseSpace,species_index=species_index))
         Nᵃ = DiplodocusTransport.FourFlow(f,p_num,u_num,p_r,u_r,mass)
         Uₐ = [-1.0,0.0,0.0,0.0] # static observer
         num = DiplodocusTransport.ScalarNumberDensity(Nᵃ,Uₐ)
@@ -464,7 +470,6 @@ function MomentumAndPolarAngleDistributionPlot(sol,species::Vector{String},Phase
         fig, time_idx = figure # use the provided figure and time index
     end
 
-
     num_species = length(species)
 
     name_list = PhaseSpace.name_list
@@ -489,7 +494,8 @@ function MomentumAndPolarAngleDistributionPlot(sol,species::Vector{String},Phase
 
 
     dis = @lift begin
-        f2D = dropdims(sum(reshape(sol.f[$time_idx].x[species_index],(p_num,u_num,h_num)),dims=3),dims=3)
+        f1D = copy(Location_Species_To_StateVector(sol.f[$time_idx],PhaseSpace,species_index=species_index))
+        f2D = dropdims(sum(reshape(f1D,(p_num,u_num,h_num)),dims=3),dims=3)
         # scale by order
         # f = dN/dpdudh * dpdudh therefore dN/dpdu = f / dpdu and p^order * dN/dpdu = f * mp^order / dpdu
         for px in 1:p_num, py in 1:u_num
