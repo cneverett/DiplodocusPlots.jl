@@ -115,6 +115,8 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
                 else
                     scatterlines!(ax,log10.(meanp),log10.(pdNdp),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[species_idx])
                 end
+                max_f = maximum(x for x in pdNdp if !isnan(x))
+                max_total = max(max_f,max_total)
             elseif paraperp == true # assumes only a single particle species
                 pdNdp_para = dropdims(sum(f3D, dims=(3)),dims=(3))[:,1]
                 pdNdp_perp = dropdims(sum(f3D, dims=(3)),dims=(3))[:,round(Int64,u_num/2)]
@@ -126,6 +128,9 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
                     scatterlines!(ax,log10.(meanp),log10.(pdNdp_para),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[1])
                 end
 
+                max_f = maximum(x for x in pdNdp_para if !isnan(x))
+                max_total = max(max_f,max_total)
+
                 if sum(@. !isnan(pdNdp_perp) * !isinf(pdNdp_perp) * !iszero(pdNdp_perp)) == 1 # there is only one valid position so scatterlines doesn't work
                     idx = findfirst(!iszero,pdNdp_perp)
                     lines!(ax,[log10(meanp[idx]), log10(meanp[idx])],[-20.0, log10(pdNdp_perp[idx])],linewidth=2.0,color = color,linestyle=linestyles[2])
@@ -133,10 +138,12 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
                     scatterlines!(ax,log10.(meanp),log10.(pdNdp_perp),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[2])
                 end
 
+                max_f = maximum(x for x in pdNdp_perp if !isnan(x))
+                max_total = max(max_f,max_total)
+
             end
 
-            max_f = maximum(x for x in pdNdp if !isnan(x))
-            max_total = max(max_f,max_total)
+            
 
         end
 
