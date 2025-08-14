@@ -47,7 +47,9 @@ function NumberDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;specie
 
         for i in eachindex(sol.t)
 
-            Nᵃ = DiplodocusTransport.FourFlow(sol.f[i].x[j],p_num_list[j],u_num_list[j],pr_list[j],ur_list[j],mass_list[j])
+            f1D = copy(Location_Species_To_StateVector(sol.f[i],PhaseSpace,species_index=j))
+
+            Nᵃ = DiplodocusTransport.FourFlow(f1D,p_num_list[j],u_num_list[j],pr_list[j],ur_list[j],mass_list[j])
             #Ua = HydroFourVelocity(Na)
             Uₐ = [-1.0,0.0,0.0,0.0] # static observer
             num[i] = DiplodocusTransport.ScalarNumberDensity(Nᵃ,Uₐ)
@@ -137,7 +139,9 @@ function FracNumberDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;sp
 
         for i in eachindex(sol.t)
 
-            Nᵃ = DiplodocusTransport.FourFlow(sol.f[i].x[j],p_num_list[j],u_num_list[j],pr_list[j],ur_list[j],mass_list[j])
+            f1D = copy(Location_Species_To_StateVector(sol.f[i],PhaseSpace,species_index=j))
+
+            Nᵃ = DiplodocusTransport.FourFlow(f1D,p_num_list[j],u_num_list[j],pr_list[j],ur_list[j],mass_list[j])
             Uₐ = [-1.0,0.0,0.0,0.0]
 
             if i == 1
