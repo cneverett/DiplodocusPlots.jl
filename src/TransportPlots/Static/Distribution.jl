@@ -470,9 +470,9 @@ function MomentumAndPolarAngleDistributionPlot(sol,species::String,PhaseSpace::P
     #hidethetadecorations!(ax3, grid=false)
 
     if order == 1
-        Colorbar(fig[1,1],hm1,label=L"$\log_{10}\left(p\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V}[\text{m}^{-3}]\right)$",flipaxis=false,height=176,tellheight=false)
+        Colorbar(fig[1,1],hm1,label=L"$\log_{10}\left(p\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}u\mathrm{d}V}[\text{m}^{-3}]\right)$",flipaxis=false,height=176,tellheight=false)
     elseif order != 1
-        Colorbar(fig[1,1],hm1,label=L"$\log_{10}\left(p^{%$order}\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V}[\text{m}^{-3}\left(m_\text{Ele}c\right)^{%$(order-1)}]\right)$ $$",flipaxis=false,height=176,tellheight=false)
+        Colorbar(fig[1,1],hm1,label=L"$\log_{10}\left(p^{%$order}\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}u\mathrm{d}V}[\text{m}^{-3}\left(m_\text{Ele}c\right)^{%$(order-1)}]\right)$ $$",flipaxis=false,height=176,tellheight=false)
     end
 
     pt = 4/3
