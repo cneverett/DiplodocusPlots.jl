@@ -325,7 +325,7 @@ Animated arguments:
 - `filename`: the name of the file to save the animation to, default is "MomentumAndPolarAngleDistribution.mp4".
 
 """
-function MomentumAndPolarAngleDistributionPlot(sol,species::String,PhaseSpace::PhaseSpaceStruct,type::Static,timevalues::T;theme=DiplodocusDark(),order::Int64=1) where T <: Union{Tuple{Float64,Float64,Float64},Tuple{Int64,Int64,Int64}}
+function MomentumAndPolarAngleDistributionPlot(sol,species::String,PhaseSpace::PhaseSpaceStruct,type::Static,timevalues::T;theme=DiplodocusDark(),order::Int64=1,TimeUnits::Function=CodeToCodeUnitsTime) where T <: Union{Tuple{Float64,Float64,Float64},Tuple{Int64,Int64,Int64}}
 
     CairoMakie.activate!(inline=true) # plot in vs code window
 
@@ -435,9 +435,9 @@ function MomentumAndPolarAngleDistributionPlot(sol,species::String,PhaseSpace::P
 
     pt = 4/3
     text!(ax1,L"$\log_{10}\left(p[m_\text{Ele}c]\right)$",position=(-3.05,log10(p_r[end])),rotation=pi/2,fontsize=9pt)
-    text!(ax1,L"$t=%$(t[1])$",position=(2.8,log10(p_r[end])+4.5),fontsize=10pt)
-    text!(ax2,L"$t=%$(t[2])$",position=(2.8,log10(p_r[end])+4.5),fontsize=10pt)
-    text!(ax3,L"$t=%$(t[3])$",position=(2.8,log10(p_r[end])+4.5),fontsize=10pt)
+    text!(ax1,L"$t=%$(TimeUnits(t[1]))$",position=(2.8,log10(p_r[end])+4.5),fontsize=10pt)
+    text!(ax2,L"$t=%$(TimeUnits(t[2]))$",position=(2.8,log10(p_r[end])+4.5),fontsize=10pt)
+    text!(ax3,L"$t=%$(TimeUnits(t[3]))$",position=(2.8,log10(p_r[end])+4.5),fontsize=10pt)
 
     colsize!(fig.layout,1,Relative(0.1))
     colsize!(fig.layout,2,Relative(0.3))
