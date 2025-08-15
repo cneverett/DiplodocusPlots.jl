@@ -397,11 +397,11 @@ function MomentumAndPolarAngleDistributionPlot(sol,species::String,PhaseSpace::P
     if typeof(timevalues) == Tuple{Int64,Int64,Int64}
         for i in 1:3
         t_idx[i] = timevalues[i]
-        t[i] = round(sol.t[t_idx[i]],sigdigits=3)
+        t[i] = sol.t[t_idx[i]]
         end
     elseif typeof(timevalues) == Tuple{Float64,Float64,Float64}
         for i in 1:3
-        t[i] = round(timevalues[i],sigdigits=3)
+        t[i] = timevalues[i]
         t_idx[i] = findmin(abs.(sol.t .- t[i]))[2] #findfirst(x->x==t[i],sol.t)
         end
     end
@@ -455,9 +455,9 @@ function MomentumAndPolarAngleDistributionPlot(sol,species::String,PhaseSpace::P
     @. u_as_theta_grid = pi - pi * (u_r+1)/2 # convert u grid to a set of theta values such that u can be plotted as polar angle
     @. u_as_theta_grid_tick_locations = pi - pi * (u_as_theta_grid_tick_values+1)/2 # convert u grid ticks to a set of theta values such that u can be plotted as polar angle
 
-    hm1 = heatmap!(ax1,u_as_theta_grid,log10.(p_r),log10.(dis1'),colormap=theme.colormap_var,colorrange=col_range,colorscale=asinh)
-    hm2 = heatmap!(ax2,u_as_theta_grid,log10.(p_r),log10.(dis2'),colormap=theme.colormap_var,colorrange=col_range,colorscale=asinh)
-    hm3 = heatmap!(ax3,u_as_theta_grid,log10.(p_r),log10.(dis3'),colormap=theme.colormap_var,colorrange=col_range,colorscale=asinh)
+    hm1 = heatmap!(ax1,u_as_theta_grid,log10.(p_r),log10.(dis1'),colormap=theme.colormap_var,colorrange=col_range,colorscale=x->asinh(x-log10(max_dis)))
+    hm2 = heatmap!(ax2,u_as_theta_grid,log10.(p_r),log10.(dis2'),colormap=theme.colormap_var,colorrange=col_range,colorscale=x->asinh(x-log10(max_dis)))
+    hm3 = heatmap!(ax3,u_as_theta_grid,log10.(p_r),log10.(dis3'),colormap=theme.colormap_var,colorrange=col_range,colorscale=x->asinh(x-log10(max_dis)))
 
     rlims!(ax1,log10(p_r[1]),log10(p_r[end])+1.0)
     rlims!(ax2,log10(p_r[1]),log10(p_r[end])+1.0)
@@ -477,9 +477,9 @@ function MomentumAndPolarAngleDistributionPlot(sol,species::String,PhaseSpace::P
 
     pt = 4/3
     text!(ax1,L"$\log_{10}\left(p[m_\text{Ele}c]\right)$",position=(-3.05,log10(p_r[end])),rotation=pi/2,fontsize=9pt)
-    text!(ax1,L"$t=%$(TimeUnits(t[1]))$",position=(2.8,log10(p_r[end])+4.5),fontsize=10pt)
-    text!(ax2,L"$t=%$(TimeUnits(t[2]))$",position=(2.8,log10(p_r[end])+4.5),fontsize=10pt)
-    text!(ax3,L"$t=%$(TimeUnits(t[3]))$",position=(2.8,log10(p_r[end])+4.5),fontsize=10pt)
+    text!(ax1,L"$t=%$(round(TimeUnits(t[1]),sigdigits=3))$",position=(2.8,log10(p_r[end])+4.5),fontsize=10pt)
+    text!(ax2,L"$t=%$(round(TimeUnits(t[2]),sigdigits=3))$",position=(2.8,log10(p_r[end])+4.5),fontsize=10pt)
+    text!(ax3,L"$t=%$(round(TimeUnits(t[3]),sigdigits=3))$",position=(2.8,log10(p_r[end])+4.5),fontsize=10pt)
 
     colsize!(fig.layout,1,Relative(0.1))
     colsize!(fig.layout,2,Relative(0.3))
@@ -561,7 +561,7 @@ function MomentumAndPolarAngleDistributionPlot(sol,species::Vector{String},Phase
     @. u_as_theta_grid = pi - pi * (u_r+1)/2 # convert u grid to a set of theta values such that u can be plotted as polar angle
     @. u_as_theta_grid_tick_locations = pi - pi * (u_as_theta_grid_tick_values+1)/2 # convert u grid ticks to a set of theta values such that u can be plotted as polar angle
 
-    hm = heatmap!(ax,u_as_theta_grid,log10.(p_r),dis,colormap=theme.colormap_var,colorrange=col_range,colorscale=asinh)
+    hm = heatmap!(ax,u_as_theta_grid,log10.(p_r),dis,colormap=theme.colormap_var,colorrange=col_range,colorscale=x->asinh(x-log10(max_dis)))
 
     rlims!(ax,log10(p_r[1]),log10(p_r[end])+1.0)
     ax.thetaticks = (u_as_theta_grid_tick_locations,u_as_theta_grid_tick_values_string)
