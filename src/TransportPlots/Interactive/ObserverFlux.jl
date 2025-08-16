@@ -42,7 +42,9 @@ function ObserverFlux(PhaseSpace::PhaseSpaceStruct,sol::OutputStruct,ObserverAng
 
         for t in 1:length(sol.t)
 
-            photon_f = reshape(sol.f[t].x[photon_index],(
+            f1D = copy(Location_Species_To_StateVector(sol.f[i],PhaseSpace,species_index=photon_index))
+
+            photon_f = reshape(f1D,(
                 Momentum.px_num_list[photon_index],
                 Momentum.py_num_list[photon_index],
                 Momentum.pz_num_list[photon_index]
