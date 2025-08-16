@@ -21,6 +21,7 @@ function ObserverFluxPlot(PhaseSpace::PhaseSpaceStruct,sol::OutputStruct,time_id
     ur = Grids.pyr_list[photon_index]
     pr = Grids.pxr_list[photon_index]
     mp = Grids.mpx_list[photon_index]
+    dp = Grids.dpx_list[photon_index]
 
     Fν = ObserverFlux(PhaseSpace,sol,ObserverAngles,ObserverDistance)
 
@@ -44,7 +45,7 @@ function ObserverFluxPlot(PhaseSpace::PhaseSpaceStruct,sol::OutputStruct,time_id
 
     for θ in 1:length(ObserverAngles)
 
-        flux_val = log10.(mp .* Fν[time_idx,θ,:])
+        flux_val = log10.(mp .* Fν[time_idx,θ,:] ./ dp)
         max_f = maximum(x for x in flux_val if !isnan(x))
         max_total = max(max_total,max_f)
 
