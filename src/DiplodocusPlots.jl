@@ -29,7 +29,7 @@ module DiplodocusPlots
 
     # Transport Plots
     #Interactive Plots
-    include("TransportPlots/Interactive/ObserverFlux.jl")
+    #include("TransportPlots/Interactive/ObserverFlux.jl")
     # Static Plots
     include("TransportPlots/Static/Distribution.jl")
     include("TransportPlots/Static/NumberDensity.jl")
