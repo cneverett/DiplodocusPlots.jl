@@ -692,7 +692,7 @@ function MomentumComboAnimation(sol,species::Vector{String},PhaseSpace::PhaseSpa
 
         t_unit_string = TimeUnits()
                
-        Label(grid[1,1],@lift("t=$(round(TimeUnits($(t)), sigdigits = 3))"),fontsize=18pt)
+        Label(grid[1,1],@lift("t=$(round($(t), sigdigits = 3))"),fontsize=18pt)
         Label(grid[1,2],L"%$t_unit_string",fontsize=18pt)
 
         rowsize!(fig.layout,1,Relative(0.02))
