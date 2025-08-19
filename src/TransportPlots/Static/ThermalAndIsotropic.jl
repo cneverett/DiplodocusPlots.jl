@@ -201,9 +201,9 @@ function IsThermalAndIsotropicPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruc
     t_unit_string = TimeUnits()
 
     if t_grid == "u"
-        xlab = L"$t %$t_unit_string$"
+        xlab = L"$t$ $%$t_unit_string$"
     elseif t_grid == "l"
-        xlab = L"\log_{10}($t %$t_unit_string$)"
+        xlab = L"\log_{10}($t$ $%$t_unit_string$)"
     end
 
     if isnothing(fig)
