@@ -24,7 +24,7 @@ function CodeToCodeUnitsTime(t_code::T) where T <: AbstractFloat
     return t_code
 end
 function CodeToCodeUnitsTime()
-    return raw"$[\text{s} \times \sigma_{T}c]$"
+    return raw"$[\text{code units}]$"
 end
 
 """ 
