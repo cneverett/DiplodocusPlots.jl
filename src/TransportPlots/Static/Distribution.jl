@@ -13,15 +13,16 @@ Common arguments:
 - `wide`: if `true`, the plot is generated in a wide format (double column 8:3 aspect ratio), default is `false` (single column 4:3 aspect ratio).
 - `legend`: if `true`, a legend is added to the plot, default is `true`.
 - `thermal`: default is `false`. If `true` the expected thermal distribution for each species is plotted based on the final time step of the simulation.
+- `paraperp`: default is `false`. If `true` the first and center `u` bins will be plotted to represent the distribution parallel to the axis and perpendicular.
 
 Static arguments:
 - `step`: the step size in time to plot, default is 1.
-- `paraperp`: default is `false`. If `true` the first and center `u` bins will be plotted to represent the distribution parallel to the axis and perpendicular.
 
 Animated arguments:
 - `framerate`: the frame rate of the animation, default is 12 fps.
 - `filename`: the name of the file to save the animation to, default is "MomentumDistribution.mp4".
 - `figure`: default is `nothing`, which creates a new figure. If a figure is provided, the plot is added to that figure instead of creating a new one, this should be of the form of a tuple of `figure` and `time_idx` from the main plot.
+- `initial`: default is `false`, if `true` causes the initial distribution to remain on the plot
 """
 function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseSpaceStruct,type::Static;theme=DiplodocusDark(),order::Int64=1,TimeUnits::Function=CodeToCodeUnitsTime,thermal=false,plot_limits=(nothing,nothing),wide=false,legend=true,paraperp=false,step=1)
 
@@ -209,7 +210,7 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
 
 end
 
-function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseSpaceStruct,type::Animated;theme=DiplodocusDark(),order::Int64=1,TimeUnits::Function=CodeToCodeUnitsTime,thermal=false,plot_limits=(nothing,nothing),wide=false,legend=true,framerate=12,filename="MomentumDistribution.mp4",initial=true,figure=nothing)
+function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseSpaceStruct,type::Animated;theme=DiplodocusDark(),order::Int64=1,TimeUnits::Function=CodeToCodeUnitsTime,thermal=false,plot_limits=(nothing,nothing),wide=false,legend=true,framerate=12,filename="MomentumDistribution.mp4",initial=true,paraperp=false,figure=nothing)
 
     CairoMakie.activate!(inline=true) # plot in vs code window
     with_theme(theme) do
@@ -238,6 +239,7 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
 
     ax.limits = plot_limits
 
+    linestyles = [:solid,(:dash,:dense),(:dot,:dense),(:dashdot,:dense),(:dashdotdot,:dense)]
     line_labels = []
     legend_elements = []    
 
@@ -249,8 +251,10 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
     for (species_idx, species_name) in enumerate(species) 
 
     color=theme.palette.color[][mod(2*species_idx-1,7)+1]
-    push!(legend_elements,LineElement(color = color, linestyle = :solid,linewidth = 2.0))
-    push!(line_labels,species_name)
+    if paraperp == false
+        push!(legend_elements,LineElement(color = color, linestyle = :solid,linewidth = 2.0))
+        push!(line_labels,species_name)
+    end
 
     species_index = findfirst(x->x==species_name,name_list)
 
@@ -263,7 +267,8 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
     u_r = Grids.pyr_list[species_index]
     mass = Grids.mass_list[species_index]
 
-    pdNdp = @lift begin
+    if paraperp == false 
+        pdNdp = @lift begin
         f1D = zeros(Float32,p_num*u_num*h_num)
         f1D .= copy(Location_Species_To_StateVector(sol.f[$time_idx],PhaseSpace,species_index=species_index))
         f3D = zeros(Float32,p_num,u_num,h_num)
@@ -276,10 +281,46 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
         end
         # sum along u and h directions
         log10.(dropdims(sum(f3D, dims=(2,3)),dims=(2,3)))
+        end
+
+        scatterlines!(ax,log10.(meanp),pdNdp,linewidth=2.0,color = color,markersize=0.0,linestyle=:solid)
+
+    elseif paraperp == true
+
+        pdNdp_para = @lift begin
+        f1D = zeros(Float32,p_num*u_num*h_num)
+        f1D .= copy(Location_Species_To_StateVector(sol.f[$time_idx],PhaseSpace,species_index=species_index))
+        f3D = zeros(Float32,p_num,u_num,h_num)
+        f3D .= reshape(f1D,(p_num,u_num,h_num))
+        @. f3D = f3D*(f3D!=Inf)
+        # scale by order
+        # f = dN/dpdudh * dpdudh therefore dN/dp = f / dp and p^order * dN/dp = f * mp^order / dp
+        for px in 1:p_num, py in 1:u_num, pz in 1:h_num
+            f3D[px,py,pz] = f3D[px,py,pz] * (meanp[px]^(order)) / dp[px]
+        end
+        # sum along u and h directions
+        log10.(dropdims(sum(f3D, dims=(3)),dims=(3)))[:,1]
+        end
+
+        pdNdp_perp = @lift begin
+        f1D = zeros(Float32,p_num*u_num*h_num)
+        f1D .= copy(Location_Species_To_StateVector(sol.f[$time_idx],PhaseSpace,species_index=species_index))
+        f3D = zeros(Float32,p_num,u_num,h_num)
+        f3D .= reshape(f1D,(p_num,u_num,h_num))
+        @. f3D = f3D*(f3D!=Inf)
+        # scale by order
+        # f = dN/dpdudh * dpdudh therefore dN/dp = f / dp and p^order * dN/dp = f * mp^order / dp
+        for px in 1:p_num, py in 1:u_num, pz in 1:h_num
+            f3D[px,py,pz] = f3D[px,py,pz] * (meanp[px]^(order)) / dp[px]
+        end
+        # sum along u and h directions
+        log10.(dropdims(sum(f3D, dims=(3)),dims=(3)))[:,round(Int64,u_num/2)]
+        end
+
+        scatterlines!(ax,log10.(meanp),pdNdp_para,linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[1])
+        scatterlines!(ax,log10.(meanp),pdNdp_perp,linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[2])
+
     end
-
-    scatterlines!(ax,log10.(meanp),pdNdp,linewidth=2.0,color = color,markersize=0.0,linestyle=:solid)
-
 
     if initial
 
@@ -329,6 +370,13 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
     end
 
     end # species loop 
+
+    if paraperp == true
+        push!(legend_elements,LineElement(color = theme.textcolor[], linestyle = linestyles[1],linewidth = 2.0))
+        push!(legend_elements,LineElement(color = theme.textcolor[], linestyle = linestyles[2],linewidth = 2.0))
+        push!(line_labels,L"\parallel")
+        push!(line_labels,L"\perp")
+    end
 
     if legend
         axislegend(ax,legend_elements,line_labels,position = :lt)
@@ -621,9 +669,12 @@ Arguments:
 - `filename`: the name of the file to save the animation to, default is "MomentumComboAnimation.mp4".
 - `plot_limits_momentum`: the limits of the momentum plot, default is `(nothing,nothing)`.
 - `thermal`: whether to plot the expected thermal spectrum based on the final time step, default is `false`.
+- `paraperp`: default is `false`. If `true` the first and center `u` bins will be plotted to represent the distribution parallel to the axis and perpendicular.
+- `initial`: default is `false`, if `true` causes the initial distribution to remain on the plot
+
 
 """
-function MomentumComboAnimation(sol,species::Vector{String},PhaseSpace::PhaseSpaceStruct;theme=DiplodocusDark(),order::Int64=1,thermal=false,framerate=12,filename="MomentumComboAnimation.mp4",plot_limits_momentum=(nothing,nothing),TimeUnits::Function=CodeToCodeUnitsTime)
+function MomentumComboAnimation(sol,species::Vector{String},PhaseSpace::PhaseSpaceStruct;theme=DiplodocusDark(),order::Int64=1,thermal=false,paraperp=false,legend=false,initial=false,framerate=12,filename="MomentumComboAnimation.mp4",plot_limits_momentum=(nothing,nothing),TimeUnits::Function=CodeToCodeUnitsTime)
 
     CairoMakie.activate!(inline=true) 
 
@@ -634,7 +685,7 @@ function MomentumComboAnimation(sol,species::Vector{String},PhaseSpace::PhaseSpa
         time_idx = Observable(1) # index of the current time step
         t = @lift(TimeUnits(sol.t[$time_idx]))
 
-        MomentumDistributionPlot(sol,species,PhaseSpace,Animated();theme=theme,order=order,TimeUnits=CodeToCodeUnitsTime,thermal=thermal,plot_limits=plot_limits_momentum,wide=false,legend=false,framerate=framerate,filename=nothing,initial=true,figure=(fig[2,1],time_idx))
+        MomentumDistributionPlot(sol,species,PhaseSpace,Animated();theme=theme,order=order,TimeUnits=CodeToCodeUnitsTime,thermal=thermal,plot_limits=plot_limits_momentum,wide=false,legend=legend,framerate=framerate,filename=nothing,initial=initial,paraperp=paraperp,figure=(fig[2,1],time_idx))
         MomentumAndPolarAngleDistributionPlot(sol,species,PhaseSpace,Animated();order=order,theme=theme,framerate=framerate,filename=nothing,figure=(fig[1:3,2],time_idx))
 
         grid = fig[3,1] = GridLayout()
