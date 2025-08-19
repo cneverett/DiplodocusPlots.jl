@@ -477,9 +477,9 @@ function MomentumAndPolarAngleDistributionPlot(sol,species::String,PhaseSpace::P
 
     pt = 4/3
     text!(ax1,L"$\log_{10}\left(p[m_\text{Ele}c]\right)$",position=(-3.05,log10(p_r[end])),rotation=pi/2,fontsize=9pt)
-    text!(ax1,L"$t=%$(round(TimeUnits(t[1]),sigdigits=3))$",position=(2.8,log10(p_r[end])+4.5),fontsize=10pt)
-    text!(ax2,L"$t=%$(round(TimeUnits(t[2]),sigdigits=3))$",position=(2.8,log10(p_r[end])+4.5),fontsize=10pt)
-    text!(ax3,L"$t=%$(round(TimeUnits(t[3]),sigdigits=3))$",position=(2.8,log10(p_r[end])+4.5),fontsize=10pt)
+    text!(ax1,L"$t=%$(round(TimeUnits(t[1]),sigdigits=3))$ $%$t_unit_string$",position=(2.8,log10(p_r[end])+4.5),fontsize=10pt)
+    text!(ax2,L"$t=%$(round(TimeUnits(t[2]),sigdigits=3))$ $%$t_unit_string$",position=(2.8,log10(p_r[end])+4.5),fontsize=10pt)
+    text!(ax3,L"$t=%$(round(TimeUnits(t[3]),sigdigits=3))$ $%$t_unit_string$",position=(2.8,log10(p_r[end])+4.5),fontsize=10pt)
 
     colsize!(fig.layout,1,Relative(0.1))
     colsize!(fig.layout,2,Relative(0.3))
