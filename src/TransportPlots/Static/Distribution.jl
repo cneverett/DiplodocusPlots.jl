@@ -433,7 +433,7 @@ function MomentumAndPolarAngleDistributionPlot(sol,species::String,PhaseSpace::P
 
     max_dis = maximum(x for x in [dis1; dis2; dis3] if !isnan(x))
     min_dis = minimum(x for x in [dis1; dis2; dis3] if !isnan(x))
-    col_range = (log10(max_dis)-40.0,log10(max_dis))
+    col_range = (log10(max_dis)-24.0,log10(max_dis))
 
     ax1 = PolarAxis(fig[1,1+1],theta_0=-pi/2,direction=-1,width=176)
     ax1.radius_at_origin = log10(p_r[1])-1.0
@@ -543,7 +543,7 @@ function MomentumAndPolarAngleDistributionPlot(sol,species::Vector{String},Phase
 
     max_dis = @lift(maximum(x for x in $dis if !isnan(x)))
     #min_dis = @lift(minimum(x for x in [dis] if !isnan(x)))
-    col_range = @lift(($max_dis-30.0,$max_dis))
+    col_range = @lift(($max_dis-24.0,$max_dis))
 
     ax = PolarAxis(fig[1,1+species_idx],theta_0=-pi/2,direction=-1,width=Relative(1.2))
     ax.radius_at_origin = log10(p_r[1])-1.0
@@ -561,7 +561,7 @@ function MomentumAndPolarAngleDistributionPlot(sol,species::Vector{String},Phase
     @. u_as_theta_grid = pi - pi * (u_r+1)/2 # convert u grid to a set of theta values such that u can be plotted as polar angle
     @. u_as_theta_grid_tick_locations = pi - pi * (u_as_theta_grid_tick_values+1)/2 # convert u grid ticks to a set of theta values such that u can be plotted as polar angle
 
-    hm = @lift(heatmap!(ax,u_as_theta_grid,log10.(p_r),dis,colormap=theme.colormap_var,colorrange=col_range,colorscale=x->asinh(x-log10($max_dis))))
+    hm = @lift(heatmap!(ax,u_as_theta_grid,log10.(p_r),dis,colormap=theme.colormap_var,colorrange=col_range,colorscale=x->asinh(x-$max_dis)))
 
     rlims!(ax,log10(p_r[1]),log10(p_r[end])+1.0)
     ax.thetaticks = (u_as_theta_grid_tick_locations,u_as_theta_grid_tick_values_string)
