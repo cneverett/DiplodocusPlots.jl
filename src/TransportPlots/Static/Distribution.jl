@@ -492,7 +492,7 @@ function MomentumAndPolarAngleDistributionPlot(sol,species::String,PhaseSpace::P
 
 end
 
-function MomentumAndPolarAngleDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseSpaceStruct,type::Animated;theme=DiplodocusDark(),order::Int64=1,framerate=12,filename="MomentumAndPolarAngleDistribution.mp4",figure=nothing)
+function MomentumAndPolarAngleDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseSpaceStruct,type::Animated;theme=DiplodocusDark(),order::Int64=1,framerate=12,filename="MomentumAndPolarAngleDistribution.mp4",figure=nothing,TimeUnits::Function=CodeToCodeUnitsTime)
 
     CairoMakie.activate!(inline=true) # plot in vs code window
 
@@ -621,7 +621,7 @@ Arguments:
 - `thermal`: whether to plot the expected thermal spectrum based on the final time step, default is `false`.
 
 """
-function MomentumComboAnimation(sol,species::Vector{String},PhaseSpace::PhaseSpaceStruct;theme=DiplodocusDark(),order::Int64=1,thermal=false,framerate=12,filename="MomentumComboAnimation.mp4",plot_limits_momentum=(nothing,nothing),TimeUnits=CodeToCodeUnitsTime)
+function MomentumComboAnimation(sol,species::Vector{String},PhaseSpace::PhaseSpaceStruct;theme=DiplodocusDark(),order::Int64=1,thermal=false,framerate=12,filename="MomentumComboAnimation.mp4",plot_limits_momentum=(nothing,nothing),TimeUnits::Function=CodeToCodeUnitsTime)
 
     CairoMakie.activate!(inline=true) 
 
@@ -630,7 +630,7 @@ function MomentumComboAnimation(sol,species::Vector{String},PhaseSpace::PhaseSpa
         fig = Figure(size=(5.416inch,3.25inch)) # 5:3 aspect ratio
 
         time_idx = Observable(1) # index of the current time step
-        t = @lift(sol.t[$time_idx])
+        t = @lift(TimeUnits(sol.t[$time_idx]))
 
         MomentumDistributionPlot(sol,species,PhaseSpace,Animated();theme=theme,order=order,TimeUnits=CodeToCodeUnitsTime,thermal=thermal,plot_limits=plot_limits_momentum,wide=false,legend=false,framerate=framerate,filename=nothing,initial=true,figure=(fig[2,1],time_idx))
         MomentumAndPolarAngleDistributionPlot(sol,species,PhaseSpace,Animated();order=order,theme=theme,framerate=framerate,filename=nothing,figure=(fig[1:3,2],time_idx))
@@ -639,7 +639,8 @@ function MomentumComboAnimation(sol,species::Vector{String},PhaseSpace::PhaseSpa
 
         t_unit_string = TimeUnits()
                
-        Label(grid[1,1],@lift("t = $(round(TimeUnits($t), sigdigits = 3))"),fontsize=20pt)
+        Label(grid[1,1],@lift("t=$(round(TimeUnits($(t)), sigdigits = 3))"),fontsize=18pt)
+        Label(grid[1,2],L"%$t_unit_string",fontsize=18pt)
 
         rowsize!(fig.layout,1,Relative(0.02))
         rowsize!(fig.layout,2,Relative(0.8))
