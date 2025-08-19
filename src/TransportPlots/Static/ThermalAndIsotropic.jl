@@ -3,7 +3,7 @@
 
 Returns a plot of the sum of squared residuals between the distribution function for each species and an expected Maxwell-Juttner distribution based on the current distribution of that species as a function of time.  
 """
-function IsThermalPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::String="All",fig=nothing,theme=DiplodocusDark(),title=nothing)
+function IsThermalPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::String="All",fig=nothing,theme=DiplodocusDark(),title=nothing,TimeUnits::Function=CodeToCodeUnitsTime)
 
     CairoMakie.activate!(inline=true) # plot in vs code window
 
@@ -25,10 +25,12 @@ function IsThermalPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::S
 
     SumSquaredResiduals = zeros(Float64,length(sol.t))
 
+    t_unit_string = TimeUnits()
+
     if t_grid == "u"
-        xlab = L"Time"
+        xlab = L"$t %$t_unit_string$"
     elseif t_grid == "l"
-        xlab = L"\log_{10}(Time)"
+        xlab = L"\log_{10}($t %$t_unit_string$)"
     end
 
     if isnothing(fig)
@@ -67,11 +69,11 @@ function IsThermalPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::S
         end
 
         if t_grid == "u"
-            scatterlines!(ax,sol.t,SumSquaredResiduals,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j])
-            xlims!(ax,sol.t[1],sol.t[end])
+            scatterlines!(ax,TimeUnits.(sol.t),SumSquaredResiduals,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j])
+            xlims!(ax,TimeUnits(sol.t[1]),TimeUnits(sol.t[end]))
         elseif t_grid == "l"
-            scatterlines!(ax,log10.(sol.t),SumSquaredResiduals,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j])
-            xlims!(ax,log10(sol.t[1]),log10(sol.t[end]))
+            scatterlines!(ax,log10.(TimeUnits.(sol.t)),SumSquaredResiduals,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j])
+            xlims!(ax,log10(TimeUnits(sol.t[1])),log10(TimeUnits(sol.t[end])))
         end
 
     end
@@ -92,7 +94,7 @@ end
 
 Returns a plot of the sum of squared residuals between the distribution function for each species and an expected isotropic distribution based on the current distribution of that species as a function of time.  
 """
-function IsIsotropicPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::String="All",fig=nothing,theme=DiplodocusDark(),title=nothing)
+function IsIsotropicPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::String="All",fig=nothing,theme=DiplodocusDark(),title=nothing,TimeUnits::Function=CodeToCodeUnitsTime)
 
     CairoMakie.activate!(inline=true) # plot in vs code window
 
@@ -114,10 +116,12 @@ function IsIsotropicPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species:
 
     SumSquaredResiduals = zeros(Float64,length(sol.t))
 
+    t_unit_string = TimeUnits()
+
     if t_grid == "u"
-        xlab = L"Time"
+        xlab = L"$t %$t_unit_string$"
     elseif t_grid == "l"
-        xlab = L"\log_{10}(Time)"
+        xlab = L"\log_{10}($t %$t_unit_string$)"
     end
 
     if isnothing(fig)
@@ -148,11 +152,11 @@ function IsIsotropicPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species:
         end
 
         if t_grid == "u"
-            scatterlines!(ax,sol.t,SumSquaredResiduals,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j])
-            xlims!(ax,sol.t[1],sol.t[end])
+            scatterlines!(ax,TimeUnits.(sol.t),SumSquaredResiduals,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j])
+            xlims!(ax,TimeUnits(sol.t[1]),TimeUnits(sol.t[end]))
         elseif t_grid == "l"
-            scatterlines!(ax,log10.(sol.t),SumSquaredResiduals,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j])
-            xlims!(ax,log10(sol.t[1]),log10(sol.t[end]))
+            scatterlines!(ax,log10.(TimeUnits.(sol.t)),SumSquaredResiduals,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j])
+            xlims!(ax,log10(TimeUnits(sol.t[1])),log10(TimeUnits(sol.t[end])))
         end
 
     end
@@ -172,7 +176,7 @@ end
 
 Returns a plot of the sum of squared residuals between the distribution function for each species and an expected Maxwell-Juttner distribution and an isotropic distribution based on the current distribution of that species as a function of time.  
 """
-function IsThermalAndIsotropicPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::String="All",fig=nothing,theme=DiplodocusDark(),title=nothing)
+function IsThermalAndIsotropicPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::String="All",fig=nothing,theme=DiplodocusDark(),title=nothing,TimeUnits::Function=CodeToCodeUnitsTime)
 
     CairoMakie.activate!(inline=true) # plot in vs code window
 
@@ -194,10 +198,12 @@ function IsThermalAndIsotropicPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruc
 
     SumSquaredResiduals = zeros(Float64,length(sol.t))
 
+    t_unit_string = TimeUnits()
+
     if t_grid == "u"
-        xlab = L"Time"
+        xlab = L"$t %$t_unit_string$"
     elseif t_grid == "l"
-        xlab = L"\log_{10}(Time)"
+        xlab = L"\log_{10}($t %$t_unit_string$)"
     end
 
     if isnothing(fig)
@@ -237,11 +243,11 @@ function IsThermalAndIsotropicPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruc
         end
 
         if t_grid == "u"
-            scatterlines!(ax,sol.t,SumSquaredResiduals,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j]*" Thermal?")
-            xlims!(ax,sol.t[1],sol.t[end])
+            scatterlines!(ax,TimeUnits.(sol.t),SumSquaredResiduals,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j]*" Thermal?")
+            xlims!(ax,TimeUnits(sol.t[1]),TimeUnits(sol.t[end]))
         elseif t_grid == "l"
-            scatterlines!(ax,log10.(sol.t),SumSquaredResiduals,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j]*" Thermal?")
-            xlims!(ax,log10(sol.t[1]),log10(sol.t[end]))
+            scatterlines!(ax,log10.(TimeUnits.(sol.t)),SumSquaredResiduals,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j]*" Thermal?")
+            xlims!(ax,log10(TimeUnits(sol.t[1])),log10(TimeUnits(sol.t[end])))
         end
 
     end
@@ -264,11 +270,11 @@ function IsThermalAndIsotropicPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruc
         end
 
         if t_grid == "u"
-            scatterlines!(ax,sol.t,SumSquaredResiduals,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,linestyle=:dash,label=name_list[j]*" Isotropic?")
-            xlims!(ax,sol.t[1],sol.t[end])
+            scatterlines!(ax,TimeUnits.(sol.t),SumSquaredResiduals,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,linestyle=:dash,label=name_list[j]*" Isotropic?")
+            xlims!(ax,TimeUnits(sol.t[1]),TimeUnits(sol.t[end]))
         elseif t_grid == "l"
-            scatterlines!(ax,log10.(sol.t),SumSquaredResiduals,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,linestyle=:dash,label=name_list[j]*" Isotropic?")
-            xlims!(ax,log10(sol.t[1]),log10(sol.t[end]))
+            scatterlines!(ax,log10.(TimeUnits.(sol.t)),SumSquaredResiduals,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,linestyle=:dash,label=name_list[j]*" Isotropic?")
+            xlims!(ax,log10(TimeUnits(sol.t[1])),log10(TimeUnits(sol.t[end])))
         end
 
     end
