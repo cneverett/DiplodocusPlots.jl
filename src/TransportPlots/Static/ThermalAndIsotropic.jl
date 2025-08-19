@@ -46,7 +46,7 @@ function IsThermalPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::S
 
         for i in eachindex(sol.t)
 
-            f = sol.f[i].x[j]
+            f = copy(Location_Species_To_StateVector(sol.f[i],PhaseSpace,species_index=j))
             Nᵃ = DiplodocusTransport.FourFlow(f,p_num_list[j],u_num_list[j],pr_list[j],ur_list[j],mass_list[j])
             Uₐ = [-1.0,0.0,0.0,0.0] # static observer
             num = DiplodocusTransport.ScalarNumberDensity(Nᵃ,Uₐ)
@@ -135,7 +135,7 @@ function IsIsotropicPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species:
 
         for i in eachindex(sol.t)
 
-            f = sol.f[i].x[j]
+            f = copy(Location_Species_To_StateVector(sol.f[i],PhaseSpace,species_index=j))
             f2D = reshape(f,(p_num_list[j],u_num_list[j]))
             # sum over angles and divide by number of bins
             f_avg = dropdims(sum(f2D,dims=2),dims=2) / u_num_list[j]
@@ -216,7 +216,7 @@ function IsThermalAndIsotropicPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruc
 
         for i in eachindex(sol.t)
 
-            f = sol.f[i].x[j]
+            f = copy(Location_Species_To_StateVector(sol.f[i],PhaseSpace,species_index=j))
             Nᵃ = DiplodocusTransport.FourFlow(f,p_num_list[j],u_num_list[j],pr_list[j],ur_list[j],mass_list[j])
             Uₐ = [-1.0,0.0,0.0,0.0] # static observer
             num = DiplodocusTransport.ScalarNumberDensity(Nᵃ,Uₐ)
@@ -251,7 +251,7 @@ function IsThermalAndIsotropicPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruc
 
         for i in eachindex(sol.t)
 
-            f = sol.f[i].x[j]
+            f = copy(Location_Species_To_StateVector(sol.f[i],PhaseSpace,species_index=j))
             f2D = reshape(f,(p_num_list[j],u_num_list[j]))
             # sum over angles and divide by number of bins
             f_avg = dropdims(sum(f2D,dims=2),dims=2) / u_num_list[j]
