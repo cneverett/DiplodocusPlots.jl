@@ -475,6 +475,8 @@ function MomentumAndPolarAngleDistributionPlot(sol,species::String,PhaseSpace::P
         Colorbar(fig[1,1],hm1,label=L"$\log_{10}\left(p^{%$order}\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}u\mathrm{d}V}[\text{m}^{-3}\left(m_\text{Ele}c\right)^{%$(order-1)}]\right)$ $$",flipaxis=false,height=176,tellheight=false)
     end
 
+    t_unit_string = TimeUnits()
+
     pt = 4/3
     text!(ax1,L"$\log_{10}\left(p[m_\text{Ele}c]\right)$",position=(-3.05,log10(p_r[end])),rotation=pi/2,fontsize=9pt)
     text!(ax1,L"$t=%$(round(TimeUnits(t[1]),sigdigits=3))$ $%$t_unit_string$",position=(2.8,log10(p_r[end])+4.5),fontsize=10pt)
