@@ -187,7 +187,7 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
     t_unit_string = TimeUnits()
 
     if Time.t_grid == "u"
-        Colorbar(fig[1,2],colormap = theme.colormap,limits=(TimeUnits(sol.t[1]),TimeUnits(sol.t[end])),label=L"$t %$t_unit_string$")
+        Colorbar(fig[1,2],colormap = theme.colormap,limits=(TimeUnits(sol.t[1]),TimeUnits(sol.t[end])),label=L"$t$ $%$t_unit_string$")
     elseif Time.t_grid == "l"
         Colorbar(fig[1,2],colormap = theme.colormap,limits=(log10(TimeUnits(sol.t[1])),log10(TimeUnits(sol.t[end]))),label=L"$\log_{10}\left(t %$t_unit_string \right)$")
     end

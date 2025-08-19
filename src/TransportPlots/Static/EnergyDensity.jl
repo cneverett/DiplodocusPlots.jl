@@ -29,9 +29,9 @@ function EnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;specie
     t_unit_string = TimeUnits()
 
     if t_grid == "u"
-        xlab = L"$t %$t_unit_string$"
+        xlab = L"$t$ $%$t_unit_string$"
     elseif t_grid == "l"
-        xlab = L"\log_{10}($t %$t_unit_string$)"
+        xlab = L"\log_{10}($t$ $%$t_unit_string$)"
     end
 
     if isnothing(fig)
@@ -124,9 +124,9 @@ function FracEnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;sp
     t_unit_string = TimeUnits()
 
     if t_grid == "u"
-        xlab = L"$t %$t_unit_string$"
+        xlab = L"$t$ $%$t_unit_string$"
     elseif t_grid == "l"
-        xlab = L"\log_{10}($t %$t_unit_string$)"
+        xlab = L"\log_{10}($t$ $%$t_unit_string$)"
     end
 
     if isnothing(fig)
