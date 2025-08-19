@@ -8,7 +8,7 @@ module DiplodocusPlots
     export FracEnergyDensityPlot, EnergyDensityPlot
     export IsThermalPlot, IsIsotropicPlot, IsThermalAndIsotropicPlot
     export InteractiveEmissionGainLossPlot
-    export CodeToSIUnitsTime, CodeToCodeUnitsTime, SIToCodeUnitsTime
+    export CodeToSIUnitsTime, CodeToCodeUnitsTime, SIToCodeUnitsTime, SyncToCodeUnitsTime, CodeToSyncUnitsTime
     export ObserverFluxPlot
 
     using Makie
