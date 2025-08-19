@@ -561,7 +561,7 @@ function MomentumAndPolarAngleDistributionPlot(sol,species::Vector{String},Phase
     @. u_as_theta_grid = pi - pi * (u_r+1)/2 # convert u grid to a set of theta values such that u can be plotted as polar angle
     @. u_as_theta_grid_tick_locations = pi - pi * (u_as_theta_grid_tick_values+1)/2 # convert u grid ticks to a set of theta values such that u can be plotted as polar angle
 
-    hm = @lift(heatmap!(ax,u_as_theta_grid,log10.(p_r),dis,colormap=theme.colormap_var,colorrange=col_range,colorscale=x->asinh(x-$max_dis)))
+    hm = heatmap!(ax,u_as_theta_grid,log10.(p_r),dis,colormap=theme.colormap_var,colorrange=col_range,colorscale=@lift(x->asinh(x-$max_dis)))
 
     rlims!(ax,log10(p_r[1]),log10(p_r[end])+1.0)
     ax.thetaticks = (u_as_theta_grid_tick_locations,u_as_theta_grid_tick_values_string)
@@ -577,9 +577,9 @@ function MomentumAndPolarAngleDistributionPlot(sol,species::Vector{String},Phase
 
     if species_idx == length(species)
     if order == 1
-        @lift(Colorbar(fig[1,1],$hm,label=L"$\log_{10}\left(p\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V}[\text{m}^{-3}]\right)$",flipaxis=false,height=Relative(0.75),tellheight=false))
+        Colorbar(fig[1,1],hm,label=L"$\log_{10}\left(p\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V}[\text{m}^{-3}]\right)$",flipaxis=false,height=Relative(0.75),tellheight=false)
     elseif order != 1
-        @lift(Colorbar(fig[1,1],$hm,label=L"$\log_{10}\left(p^{%$order}\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V}[\text{m}^{-3}\left(m_\text{Ele}c\right)^{%$(order-1)}]\right)$ $$",flipaxis=false,height=Relative(0.75),tellheight=false))
+        Colorbar(fig[1,1],hm,label=L"$\log_{10}\left(p^{%$order}\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V}[\text{m}^{-3}\left(m_\text{Ele}c\right)^{%$(order-1)}]\right)$ $$",flipaxis=false,height=Relative(0.75),tellheight=false)
     end
     end
 
