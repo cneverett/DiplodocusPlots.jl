@@ -35,11 +35,11 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
     else
         fig = Figure() # default single column 4:3 aspect ratio
     end
-    xlab = L"$\log_{10}\left(p [m_\text{Ele}c]\right)$"
+    xlab = L"$\log_{10}\left(p [m_ec]\right)$"
     if order == 1
         ylab = L"$\log_{10}\left(p\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V} [\text{m}^{-3}]\right)$"
     elseif order != 1
-        ylab = L"$\log_{10}\left(p^{%$(order)}\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V} [\text{m}^{-3}\left(m_\text{Ele}c\right)^{%$(order-1)}]\right)$"
+        ylab = L"$\log_{10}\left(p^{%$(order)}\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V} [\text{m}^{-3}\left(m_ec\right)^{%$(order-1)}]\right)$"
     end
     ax = Axis(fig[1,1],xlabel=xlab,ylabel=ylab,aspect=DataAspect())
     ax.limits = plot_limits
@@ -215,11 +215,11 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
     CairoMakie.activate!(inline=true) # plot in vs code window
     with_theme(theme) do
 
-    xlab = L"$\log_{10}\left(p [m_\text{Ele}c]\right)$"
+    xlab = L"$\log_{10}\left(p [m_ec]\right)$"
     if order == 1
         ylab = L"$\log_{10}\left(p\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V} [\text{m}^{-3}]\right)$"
     elseif order != 1
-        ylab = L"$\log_{10}\left(p^{%$(order)}\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V} [\text{m}^{-3}\left(m_\text{Ele}c\right)^{%$(order-1)}]\right)$"
+        ylab = L"$\log_{10}\left(p^{%$(order)}\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V} [\text{m}^{-3}\left(m_ec\right)^{%$(order-1)}]\right)$"
     end
 
     if isnothing(figure)
@@ -520,13 +520,13 @@ function MomentumAndPolarAngleDistributionPlot(sol,species::String,PhaseSpace::P
     if order == 1
         Colorbar(fig[1,1],hm1,label=L"$\log_{10}\left(p\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}u\mathrm{d}V}[\text{m}^{-3}]\right)$",flipaxis=false,height=176,tellheight=false)
     elseif order != 1
-        Colorbar(fig[1,1],hm1,label=L"$\log_{10}\left(p^{%$order}\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}u\mathrm{d}V}[\text{m}^{-3}\left(m_\text{Ele}c\right)^{%$(order-1)}]\right)$ $$",flipaxis=false,height=176,tellheight=false)
+        Colorbar(fig[1,1],hm1,label=L"$\log_{10}\left(p^{%$order}\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}u\mathrm{d}V}[\text{m}^{-3}\left(m_ec\right)^{%$(order-1)}]\right)$ $$",flipaxis=false,height=176,tellheight=false)
     end
 
     t_unit_string = TimeUnits()
 
     pt = 4/3
-    text!(ax1,L"$\log_{10}\left(p[m_\text{Ele}c]\right)$",position=(-3.05,log10(p_r[end])),rotation=pi/2,fontsize=9pt)
+    text!(ax1,L"$\log_{10}\left(p[m_ec]\right)$",position=(-3.05,log10(p_r[end])),rotation=pi/2,fontsize=9pt)
     text!(ax1,L"$t=%$(round(TimeUnits(t[1]),sigdigits=3))$ $%$t_unit_string$",position=(2.8,log10(p_r[end])+4.5),fontsize=10pt)
     text!(ax2,L"$t=%$(round(TimeUnits(t[2]),sigdigits=3))$ $%$t_unit_string$",position=(2.8,log10(p_r[end])+4.5),fontsize=10pt)
     text!(ax3,L"$t=%$(round(TimeUnits(t[3]),sigdigits=3))$ $%$t_unit_string$",position=(2.8,log10(p_r[end])+4.5),fontsize=10pt)
@@ -620,7 +620,7 @@ function MomentumAndPolarAngleDistributionPlot(sol,species::Vector{String},Phase
     #hidethetadecorations!(ax3, grid=false)
 
     pt = 4/3
-    text!(ax,L"$\log_{10}\left(p[m_\text{Ele}c]\right)$",position=(-3.00,log10(p_r[end])+1.0),rotation=pi/2,fontsize=9pt)
+    text!(ax,L"$\log_{10}\left(p[m_ec]\right)$",position=(-3.00,log10(p_r[end])+1.0),rotation=pi/2,fontsize=9pt)
     if num_species != 1
         text!(ax,L"$species_name",position=(2.6,log10(p_r[end])+3.2),fontsize=10pt)
     end
@@ -629,7 +629,7 @@ function MomentumAndPolarAngleDistributionPlot(sol,species::Vector{String},Phase
     if order == 1
         Colorbar(fig[1,1],hm,label=L"$\log_{10}\left(p\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V}[\text{m}^{-3}]\right)$",flipaxis=false,height=Relative(0.75),tellheight=false)
     elseif order != 1
-        Colorbar(fig[1,1],hm,label=L"$\log_{10}\left(p^{%$order}\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V}[\text{m}^{-3}\left(m_\text{Ele}c\right)^{%$(order-1)}]\right)$ $$",flipaxis=false,height=Relative(0.75),tellheight=false)
+        Colorbar(fig[1,1],hm,label=L"$\log_{10}\left(p^{%$order}\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V}[\text{m}^{-3}\left(m_ec\right)^{%$(order-1)}]\right)$ $$",flipaxis=false,height=Relative(0.75),tellheight=false)
     end
     end
 
@@ -751,8 +751,8 @@ function AM3_MomentumDistributionPlot(filePath,t_max,t_min,t_grid;plot_limits=(n
     else
         fig = Figure() # default single column 4:3 aspect ratio
     end
-    xlab = L"$\log_{10}\left(p [m_\text{Ele}c]\right)$"
-    ylab = L"$\log_{10}\left(p^2\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V} [\text{m}^{-3}\left(m_\text{Ele}c\right)]\right)$"
+    xlab = L"$\log_{10}\left(p [m_ec]\right)$"
+    ylab = L"$\log_{10}\left(p^2\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V} [\text{m}^{-3}\left(m_ec\right)]\right)$"
     ax = Axis(fig[1,1],xlabel=xlab,ylabel=ylab,aspect=DataAspect())
     ax.limits = plot_limits
 
