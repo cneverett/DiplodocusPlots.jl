@@ -190,7 +190,7 @@ function ObserverFluxPlot(PhaseSpace::PhaseSpaceStruct,sol::OutputStruct,time_id
         ylims!(ax,(max_total-9.0,max_total+1.0)) 
     end
 
-    axislegend(ax)
+    axislegend(ax,location=:lt)
 
     return fig
 
