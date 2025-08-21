@@ -119,8 +119,8 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
                 max_f = maximum(x for x in pdNdp if !isnan(x))
                 max_total = max(max_f,max_total)
             elseif paraperp == true # assumes only a single particle species
-                pdNdp_para = dropdims(sum(f3D, dims=(3)),dims=(3))[:,1]
-                pdNdp_perp = dropdims(sum(f3D, dims=(3)),dims=(3))[:,round(Int64,u_num/2)]
+                pdNdp_para = dropdims(sum(f3D, dims=(3)),dims=(3))[:,end]
+                pdNdp_perp = dropdims(sum(f3D, dims=(3)),dims=(3))[:,ceil(Int64,u_num/2)]
 
                 if sum(@. !isnan(pdNdp_para) * !isinf(pdNdp_para) * !iszero(pdNdp_para)) == 1 # there is only one valid position so scatterlines doesn't work
                     idx = findfirst(!iszero,pdNdp_para)
