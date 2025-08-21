@@ -491,11 +491,11 @@ function AngleDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseSpac
         f3D[px,py,pz] = f3D[px,py,pz] * (meanp[px]^(order)) / dp[px]
     end
 
-    for i in round(Int64,u_num/2):angle_step:u_num
+    for i in ceil(Int64,u_num/2):angle_step:u_num
 
         u_val = meanu[i]
 
-        color = theme.colormap[][(u_val - u_r[round(Int64,u_num/2)]) / (u_r[end] - u_r[round(Int64,u_num/2)])]
+        color = theme.colormap[][(u_val - u_r[ciel(Int64,u_num/2)]) / (u_r[end] - u_r[ciel(Int64,u_num/2)])]
 
         pdNdp= dropdims(sum(f3D, dims=(3)),dims=(3))[:,i]
 
@@ -510,7 +510,7 @@ function AngleDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseSpac
 
         if legend==true && counter == 1 
         u_val = meanu[i]
-        color = theme.colormap[][(u_val - u_r[round(Int64,u_num/2)]) / (u_r[end] - u_r[round(Int64,u_num/2)])]
+        color = theme.colormap[][(u_val - u_r[ceil(Int64,u_num/2)]) / (u_r[end] - u_r[ceil(Int64,u_num/2)])]
         push!(legend_elements_angle,LineElement(color = color, linestyle = :solid,linewidth = 2.0))
         push!(line_labels_angle,L"$u=%$(round(u_val,sigdigits=2))$")
         end
@@ -597,10 +597,10 @@ function AngleDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseSpac
     u_r = Grids.pyr_list[species_index]
     mass = Grids.mass_list[species_index]
 
-    for i in round(Int64,u_num/2):angle_step:u_num
+    for i in ceil(Int64,u_num/2):angle_step:u_num
 
         u_val = meanu[i]
-        color = theme.colormap[][(u_val - u_r[round(Int64,u_num/2)]) / (u_r[end] - u_r[round(Int64,u_num/2)])]
+        color = theme.colormap[][(u_val - u_r[ceil(Int64,u_num/2)]) / (u_r[end] - u_r[ceil(Int64,u_num/2)])]
 
         pdNdp = @lift begin
         f1D = zeros(Float32,p_num*u_num*h_num)
@@ -621,7 +621,7 @@ function AngleDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseSpac
 
         if legend==true && counter == 1 
         u_val = meanu[i]
-        color = theme.colormap[][(u_val - u_r[round(Int64,u_num/2)]) / (u_r[end] - u_r[round(Int64,u_num/2)])]
+        color = theme.colormap[][(u_val - u_r[ceil(Int64,u_num/2)]) / (u_r[end] - u_r[ceil(Int64,u_num/2)])]
         push!(legend_elements_angle,LineElement(color = color, linestyle = :solid,linewidth = 2.0))
         push!(line_labels_angle,L"$u=%$(round(u_val,sigdigits=2))$")
         end
