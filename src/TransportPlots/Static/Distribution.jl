@@ -628,7 +628,7 @@ function AngleDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseSpac
         u_val = meanu[i]
         color = theme.colormap[][(u_val - u_r[ceil(Int64,u_num/2)]) / (u_r[end] - u_r[ceil(Int64,u_num/2)])]
         push!(legend_elements_angle,LineElement(color = color, linestyle = :solid,linewidth = 2.0))
-        push!(line_labels_angle,L"$\theta=%$(round(acos(u_val),sigdigits=2))$")
+        push!(line_labels_angle,L"$\theta=%$(round(acos(u_val)/pi,sigdigits=2)) \pi$")
         end
 
     end # angle loop 
