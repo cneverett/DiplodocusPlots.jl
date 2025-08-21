@@ -495,7 +495,7 @@ function AngleDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseSpac
 
         u_val = meanu[i]
 
-        color = theme.colormap[][(u_val - u_r[ciel(Int64,u_num/2)]) / (u_r[end] - u_r[ciel(Int64,u_num/2)])]
+        color = theme.colormap[][(u_val - u_r[ceil(Int64,u_num/2)]) / (u_r[end] - u_r[ceil(Int64,u_num/2)])]
 
         pdNdp= dropdims(sum(f3D, dims=(3)),dims=(3))[:,i]
 
