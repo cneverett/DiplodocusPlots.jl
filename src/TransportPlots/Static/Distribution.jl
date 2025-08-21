@@ -555,7 +555,7 @@ function AngleDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseSpac
 
     if isnothing(figure)
         time_idx = Observable(1) # index of the current time step
-        t = @lift(sol.t[$time_idx])
+        t = @lift(TimeUnits(sol.t[$time_idx]))
         if wide
             fig = Figure(size=(576,216)) # double column 8:3 aspect ratio
         else
@@ -569,6 +569,11 @@ function AngleDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseSpac
     end
 
     ax.limits = plot_limits
+
+    t_unit_string = TimeUnits()
+               
+    text!(ax,@lift("t=$(round($(t), sigdigits = 3))  "),fontsize=12pt,align=(:right,:center),space=:relative,offset=(375.0,135.0))
+    text!(ax,L"%$t_unit_string",fontsize=12pt,align=(:left,:center),space=:relative,offset=(375.0,135.0))
 
     linestyles = [:solid,(:dash,:dense),(:dot,:dense),(:dashdot,:dense),(:dashdotdot,:dense)]
     line_labels = []
@@ -639,7 +644,6 @@ function AngleDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseSpac
         axislegend(ax,legend_elements,line_labels,position = :lt)
         axislegend(ax,legend_elements_angle,line_labels_angle,position = :lb)
     end
-
     
     if !isnothing(filename)
         # recording the animation
