@@ -11,7 +11,7 @@ module DiplodocusPlots
     export CodeToSIUnitsTime, CodeToCodeUnitsTime, SIToCodeUnitsTime, SyncToCodeUnitsTime, CodeToSyncUnitsTime
     export ObserverFluxPlot
 
-    using Makie
+    #using Makie
     using CairoMakie
     using GLMakie
     #using Interpolations
