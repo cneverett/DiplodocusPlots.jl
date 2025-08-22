@@ -1078,3 +1078,125 @@ function AM3_MomentumDistributionPlot(filePath,t_max,t_min,t_grid;plot_limits=(n
     end # with_theme
 
 end
+
+
+function TwoSolAngleDistributionPlot(twosol::Tuple{OutputStruct,OutputStruct},species::Vector{String},PhaseSpace::PhaseSpaceStruct,type::Animated;theme=DiplodocusDark(),order::Int64=1,TimeUnits::Function=CodeToCodeUnitsTime,plot_limits=(nothing,nothing),wide=false,legend=true,framerate=12,filename="TwoSolAngleDistribution.mp4",figure=nothing)
+
+    CairoMakie.activate!(inline=true) # plot in vs code window
+    with_theme(theme) do
+
+    xlab = L"$\log_{10}\left(p [m_ec]\right)$"
+    if order == 1
+        ylab = L"$\log_{10}\left(p\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V} [\text{m}^{-3}]\right)$"
+    elseif order != 1
+        ylab = L"$\log_{10}\left(p^{%$(order)}\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V} [\text{m}^{-3}\left(m_ec\right)^{%$(order-1)}]\right)$"
+    end
+
+    if isnothing(figure)
+        time_idx = Observable(1) # index of the current time step
+        t = @lift(TimeUnits(twosol[1].t[$time_idx]))
+        if wide
+            fig = Figure(size=(576,216)) # double column 8:3 aspect ratio
+        else
+            fig = Figure() # default single column 4:3 aspect ratio
+        end
+        #fig = Figure(size =(3.25inch,3.25inch)) # 1:1 aspect ratio
+        ax = Axis(fig[1,1],xlabel=xlab,ylabel=ylab,aspect=DataAspect())
+    else
+        fig, time_idx = figure # use the provided figure and time index
+        ax = Axis(fig,xlabel=xlab,ylabel=ylab,aspect=DataAspect())
+    end
+
+    ax.limits = plot_limits
+
+    t_unit_string = TimeUnits()
+               
+    text!(ax,@lift("t=$(round($(t), sigdigits = 3))  "),fontsize=12pt,align=(:right,:center),space=:relative,offset=(375.0,135.0))
+    text!(ax,L"%$t_unit_string",fontsize=12pt,align=(:left,:center),space=:relative,offset=(375.0,135.0))
+
+    linestyles = [:solid,(:dash,:dense),(:dot,:dense),(:dashdot,:dense),(:dashdotdot,:dense)]
+    line_labels = []
+    legend_elements = []  
+    legend_elements_angle = []
+    line_labels_angle = []  
+
+    name_list = PhaseSpace.name_list
+    Momentum = PhaseSpace.Momentum
+    Grids = PhaseSpace.Grids
+    Time = PhaseSpace.Time
+
+    counter = 1;
+
+    for (species_idx, species_name) in enumerate(species) 
+
+        species_index = findfirst(x->x==species_name,name_list)
+
+        p_num = Momentum.px_num_list[species_index]  
+        u_num = Momentum.py_num_list[species_index]
+        h_num = Momentum.pz_num_list[species_index]
+        dp = Grids.dpx_list[species_index]
+        meanp = Grids.mpx_list[species_index]
+        meanu = Grids.mpy_list[species_index]
+        p_r = Grids.pxr_list[species_index]
+        u_r = Grids.pyr_list[species_index]
+        mass = Grids.mass_list[species_index]
+
+        for i in 1:2
+
+            color = theme.palette.color[][mod(2*i-1,7)+1]
+
+            sol = twosol[i]
+
+            pdNdp = @lift begin
+                f1D = zeros(Float32,p_num*u_num*h_num)
+                f1D .= copy(Location_Species_To_StateVector(sol.f[$time_idx],PhaseSpace,species_index=species_index))
+                f3D = zeros(Float32,p_num,u_num,h_num)
+                f3D .= reshape(f1D,(p_num,u_num,h_num))
+                @. f3D = f3D*(f3D!=Inf)
+                # scale by order
+                # f = dN/dpdudh * dpdudh therefore dN/dp = f / dp and p^order * dN/dp = f * mp^order / dp
+                for px in 1:p_num, py in 1:u_num, pz in 1:h_num
+                    f3D[px,py,pz] = f3D[px,py,pz] * (meanp[px]^(order)) / dp[px]
+                end
+                # sum along u and h directions
+                log10.(dropdims(sum(f3D, dims=(3)),dims=(3)))[:,2]
+            end
+
+            scatterlines!(ax,log10.(meanp),pdNdp,linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[species_idx])
+
+            if legend==true && counter == 1 
+                push!(legend_elements_angle,LineElement(color = color, linestyle = :solid,linewidth = 2.0))
+                if i == 1
+                    push!(line_labels_angle,L"\text{Iso}")
+                end
+                if i == 2 
+                    push!(line_labels_angle,L"\text{Ani}")
+                end
+            end
+
+        end # sol loop 
+
+        counter += 1
+
+        push!(legend_elements,LineElement(color = theme.textcolor[], linestyle = linestyles[species_idx],linewidth = 2.0))
+        push!(line_labels,species_name)
+
+    end # species loop 
+
+    if legend
+        axislegend(ax,legend_elements,line_labels,position = :lt)
+        axislegend(ax,legend_elements_angle,line_labels_angle,position = :lb)
+    end
+    
+    if !isnothing(filename)
+        # recording the animation
+        time_idxs = 1:length(twosol[1].t)
+        record(fig,filename,time_idxs,framerate=framerate,backend=CairoMakie) do frame
+            println("$frame")
+            time_idx[] = frame
+        end
+    end
+
+    end # with_theme
+
+end
