@@ -3,7 +3,7 @@
 
 Returns a plot of the number density of all species as a function of time.
 """
-function NumberDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::String="All",fig=nothing,theme=DiplodocusDark(),title=nothing)
+function NumberDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::String="All",fig=nothing,theme=DiplodocusDark(),title=nothing,TimeUnits::Function=CodeToCodeUnitsTime)
 
     CairoMakie.activate!(inline=true) # plot in vs code window
 
@@ -26,10 +26,12 @@ function NumberDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;specie
     num = zeros(Float64,length(sol.t))
     num_total = zeros(Float64,length(sol.t))
 
+    t_unit_string = TimeUnits()
+
     if t_grid == "u"
-        xlab = L"Time"
+        xlab = L"$t$ $%$t_unit_string$"
     elseif t_grid == "l"
-        xlab = L"\log_{10}(Time)"
+        xlab = L"\log_{10}($t$ $%$t_unit_string$)"
     end
 
     if isnothing(fig)
@@ -47,7 +49,9 @@ function NumberDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;specie
 
         for i in eachindex(sol.t)
 
-            Nᵃ = DiplodocusTransport.FourFlow(sol.f[i].x[j],p_num_list[j],u_num_list[j],pr_list[j],ur_list[j],mass_list[j])
+            f1D = copy(Location_Species_To_StateVector(sol.f[i],PhaseSpace,species_index=j))
+
+            Nᵃ = DiplodocusTransport.FourFlow(f1D,p_num_list[j],u_num_list[j],pr_list[j],ur_list[j],mass_list[j])
             #Ua = HydroFourVelocity(Na)
             Uₐ = [-1.0,0.0,0.0,0.0] # static observer
             num[i] = DiplodocusTransport.ScalarNumberDensity(Nᵃ,Uₐ)
@@ -59,20 +63,22 @@ function NumberDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;specie
         end
 
         if t_grid == "u"
-            scatterlines!(ax,sol.t,num,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j])
-            xlims!(ax,sol.t[1],sol.t[end])
+            scatterlines!(ax,TimeUnits.(sol.t),num,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j])
+            xlims!(ax,TimeUnits(sol.t[1]),TimeUnits(sol.t[end]))
         elseif t_grid == "l"
-            scatterlines!(ax,log10.(sol.t),num,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j])
-            xlims!(ax,log10(sol.t[1]),log10(sol.t[end]))
+            scatterlines!(ax,log10.(TimeUnits.(sol.t)),num,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j])
+            xlims!(ax,log10(TimeUnits(sol.t[1])),log10(TimeUnits(sol.t[end])))
         end
 
     end
 
     if species == "All"
         if t_grid == "u"
-            scatterlines!(ax,sol.t,num_total,linewidth=2.0,color = theme.textcolor[],markersize=0.0,linestyle=:dash,label="All")
+            scatterlines!(ax,TimeUnits.(sol.t),num_total,linewidth=2.0,color = theme.textcolor[],markersize=0.0,linestyle=:dash,label="All")
+            xlims!(ax,TimeUnits(sol.t[1]),TimeUnits(sol.t[end]))
         elseif t_grid == "l"
-            scatterlines!(ax,log10.(sol.t),num_total,linewidth=2.0,color = theme.textcolor[],markersize=0.0,linestyle=:dash,label="All")
+            scatterlines!(ax,log10.(TimeUnits.(sol.t)),num_total,linewidth=2.0,color = theme.textcolor[],markersize=0.0,linestyle=:dash,label="All")
+            xlims!(ax,log10(TimeUnits(sol.t[1])),log10(TimeUnits(sol.t[end])))
         end
     end
 
@@ -93,7 +99,7 @@ end
 
 Returns a plot of the fractional change in number density of all species between time setups as a function of time.
 """
-function FracNumberDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::String="All",fig=nothing,theme=DiplodocusDark(),title=nothing)
+function FracNumberDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::String="All",fig=nothing,theme=DiplodocusDark(),title=nothing,TimeUnits::Function=CodeToCodeUnitsTime)
 
     CairoMakie.activate!(inline=true) # plot in vs code window
 
@@ -113,10 +119,12 @@ function FracNumberDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;sp
 
     mass_list = Grids.mass_list
 
+    t_unit_string = TimeUnits()
+
     if t_grid == "u"
-        xlab = L"Time"
+        xlab = L"$t$ $%$t_unit_string$"
     elseif t_grid == "l"
-        xlab = L"\log_{10}(Time)"
+        xlab = L"\log_{10}($t$ $%$t_unit_string$)"
     end
 
     if isnothing(fig)
@@ -137,7 +145,9 @@ function FracNumberDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;sp
 
         for i in eachindex(sol.t)
 
-            Nᵃ = DiplodocusTransport.FourFlow(sol.f[i].x[j],p_num_list[j],u_num_list[j],pr_list[j],ur_list[j],mass_list[j])
+            f1D = copy(Location_Species_To_StateVector(sol.f[i],PhaseSpace,species_index=j))
+
+            Nᵃ = DiplodocusTransport.FourFlow(f1D,p_num_list[j],u_num_list[j],pr_list[j],ur_list[j],mass_list[j])
             Uₐ = [-1.0,0.0,0.0,0.0]
 
             if i == 1
@@ -151,11 +161,11 @@ function FracNumberDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;sp
         end
 
         if t_grid == "u"
-            scatterlines!(ax,sol.t,frac_num,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j])
-            xlims!(ax,sol.t[1],sol.t[end])
+            scatterlines!(ax,TimeUnits.(sol.t),frac_num,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j])
+            xlims!(ax,TimeUnits(sol.t[1]),TimeUnits(sol.t[end]))
         elseif t_grid == "l"
-            scatterlines!(ax,log10.(sol.t),frac_num,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j])
-            xlims!(ax,log10(sol.t[1]),log10(sol.t[end]))
+            scatterlines!(ax,log10.(TimeUnits.(sol.t)),frac_num,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j])
+            xlims!(ax,log10(TimeUnits(sol.t[1])),log10(TimeUnits(sol.t[end])))
         end
 
     end

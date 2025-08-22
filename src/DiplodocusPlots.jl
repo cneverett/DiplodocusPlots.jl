@@ -2,13 +2,13 @@ module DiplodocusPlots
 
     export DiplodocusDark, DiplodocusLight
     export Static, Animated, Interactive
-    export MomentumDistributionPlot, MomentumAndPolarAngleDistributionPlot, MomentumComboAnimation
+    export MomentumDistributionPlot, AngleDistributionPlot, MomentumAndPolarAngleDistributionPlot, MomentumComboAnimation
     export InteractiveBinaryGainLossPlot
     export FracNumberDensityPlot, NumberDensityPlot
     export FracEnergyDensityPlot, EnergyDensityPlot
     export IsThermalPlot, IsIsotropicPlot, IsThermalAndIsotropicPlot
     export InteractiveEmissionGainLossPlot
-    export CodeToSIUnitsTime, CodeToCodeUnitsTime, SIToCodeUnitsTime
+    export CodeToSIUnitsTime, CodeToCodeUnitsTime, SIToCodeUnitsTime, SyncToCodeUnitsTime, CodeToSyncUnitsTime
     export ObserverFluxPlot
 
     using Makie
@@ -29,7 +29,7 @@ module DiplodocusPlots
 
     # Transport Plots
     #Interactive Plots
-    include("TransportPlots/Interactive/ObserverFlux.jl")
+    #include("TransportPlots/Interactive/ObserverFlux.jl")
     # Static Plots
     include("TransportPlots/Static/Distribution.jl")
     include("TransportPlots/Static/NumberDensity.jl")

@@ -24,7 +24,7 @@ function CodeToCodeUnitsTime(t_code::T) where T <: AbstractFloat
     return t_code
 end
 function CodeToCodeUnitsTime()
-    return raw"$[\text{s} \times \sigma_{T}c]$"
+    return raw"$[\text{code units}]$"
 end
 
 """ 
@@ -46,7 +46,7 @@ end
 
 Returns the time in code units from the time in synchrotron units, requires the magnetic field `B` in Tesla to be defined
 """
-function SyncToCodeUnitsTime(t_sync::T,B::T) where T <: AbstractFloat
+function SyncToCodeUnitsTime(t_sync::T;B::T=1e-4) where T <: AbstractFloat
 
     μ0 = getfield(DC,Symbol("μ0"))
     c = getfield(DC,Symbol("c"))
@@ -62,13 +62,13 @@ end
 
 Returns the time in synchrotron units seconds from the time in code units, requires the magnetic field `B` in Tesla to be defined
 """
-function CodeToSyncUnitsTime(t_SI::T,B::T) where T <: AbstractFloat
+function CodeToSyncUnitsTime(t_code::T;B::T=1e-4) where T <: AbstractFloat
     # Convert time code to sync units
     μ0 = getfield(DC,Symbol("μ0"))
     c = getfield(DC,Symbol("c"))
     m = getfield(DC,Symbol("mEle"))
 
-    t_sync::T = t_sync / (μ0*m*c^2/B^2)
+    t_sync::T = t_code / (μ0*m*c^2/B^2)
     return t_sync
 end
 function CodeToSyncUnitsTime()
