@@ -936,7 +936,7 @@ Arguments:
 
 
 """
-function MomentumComboAnimation(sol,species::Vector{String},PhaseSpace::PhaseSpaceStruct;theme=DiplodocusDark(),order::Int64=1,thermal=false,paraperp=false,legend=false,initial=false,framerate=12,filename="MomentumComboAnimation.mp4",plot_limits_momentum=(nothing,nothing),TimeUnits::Function=CodeToCodeUnitsTime)
+function MomentumComboAnimation(sol,species::Vector{String},PhaseSpace::PhaseSpaceStruct;theme=DiplodocusDark(),order::Int64=1,thermal=false,paraperp=false,legend=false,initial=false,framerate=12,filename="MomentumComboAnimation.mp4",plot_limits_momentum=(nothing,nothing),TimeUnits::Function=CodeToCodeUnitsTime,tmax=Inf64)
 
     CairoMakie.activate!(inline=true) 
 
@@ -1026,7 +1026,7 @@ function AM3_MomentumDistributionPlot(filePath,t_max,t_min,t_grid;plot_limits=(n
 
         t = t_pho[i]
         println("t=$t")
-        if log10(t) % 1 == 0.0 # 10^n timesteps
+        if log10(t) % 1 == 0.0 && t <= tmax # 10^n timesteps
             if t_grid == "u"
                 color = theme.colormap[][(t - t_min) / (t_max - t_min)]
             elseif t_grid == "l"
@@ -1047,7 +1047,7 @@ function AM3_MomentumDistributionPlot(filePath,t_max,t_min,t_grid;plot_limits=(n
     for i in 1:length(t_ele)
 
             t = t_ele[i]
-            if log10(t) % 1 == 0.0 # 10^n timesteps
+            if log10(t) % 1 == 0.0 && t <= tmax # 10^n timesteps 
                 if t_grid == "u"
                     color = theme.colormap[][(t - t_min) / (t_max - t_min)]
                 elseif t_grid == "l"
