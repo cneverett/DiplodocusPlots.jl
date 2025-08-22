@@ -3,7 +3,7 @@
 
 Returns a plot of the energy density of all species as a function of time.
 """
-function EnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::String="All",fig=nothing,theme=DiplodocusDark(),title=nothing)
+function EnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::String="All",fig=nothing,theme=DiplodocusDark(),title=nothing,TimeUnits::Function=CodeToCodeUnitsTime)
 
     CairoMakie.activate!(inline=true) # plot in vs code window
 
@@ -26,10 +26,12 @@ function EnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;specie
     eng = zeros(Float64,length(sol.t))
     eng_total = zeros(Float64,length(sol.t))
 
+    t_unit_string = TimeUnits()
+
     if t_grid == "u"
-        xlab = L"Time"
+        xlab = L"$t$ $%$t_unit_string$"
     elseif t_grid == "l"
-        xlab = L"\log_{10}(Time)"
+        xlab = L"\log_{10}($t$ $%$t_unit_string$)"
     end
 
     if isnothing(fig)
@@ -47,11 +49,13 @@ function EnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;specie
 
         for i in eachindex(sol.t)
 
-            Nᵃ = DiplodocusTransport.FourFlow(sol.f[i].x[j],p_num_list[j],u_num_list[j],pr_list[j],ur_list[j],mass_list[j])
+            f1D = copy(Location_Species_To_StateVector(sol.f[i],PhaseSpace,species_index=j))
+
+            Nᵃ = DiplodocusTransport.FourFlow(f1D,p_num_list[j],u_num_list[j],pr_list[j],ur_list[j],mass_list[j])
             Uₐ = [-1.0,0.0,0.0,0.0] # static observer
             num = DiplodocusTransport.ScalarNumberDensity(Nᵃ,Uₐ)
 
-            Tᵃᵇ = DiplodocusTransport.StressEnergyTensor(sol.f[i].x[j],p_num_list[j],u_num_list[j],pr_list[j],ur_list[j],mass_list[j]) 
+            Tᵃᵇ = DiplodocusTransport.StressEnergyTensor(f1D,p_num_list[j],u_num_list[j],pr_list[j],ur_list[j],mass_list[j]) 
 
             eng[i] = DiplodocusTransport.ScalarEnergyDensity(Tᵃᵇ,Uₐ,num)
 
@@ -62,20 +66,22 @@ function EnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;specie
         end
 
         if t_grid == "u"
-            scatterlines!(ax,sol.t,eng,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j])
-            xlims!(ax,sol.t[1],sol.t[end])
+            scatterlines!(ax,TimeUnits.(sol.t),eng,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j])
+            xlims!(ax,TimeUnits(sol.t[1]),TimeUnits(sol.t[end]))
         elseif t_grid == "l"
-            scatterlines!(ax,log10.(sol.t),eng,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j])
-            xlims!(ax,log10(sol.t[1]),log10(sol.t[end]))
+            scatterlines!(ax,log10.(TimeUnits.(sol.t)),eng,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j])
+            xlims!(ax,log10(TimeUnits(sol.t[1])),log10(TimeUnits(sol.t[end])))
         end
 
     end
 
     if species == "All"
         if t_grid == "u"
-            scatterlines!(ax,sol.t,eng_total,linewidth=2.0,color = theme.textcolor[],markersize=0.0,linestyle=:dash,label="All")
+            scatterlines!(ax,TimeUnits.(sol.t),eng_total,linewidth=2.0,color = theme.textcolor[],markersize=0.0,linestyle=:dash,label="All")
+            xlims!(ax,TimeUnits(sol.t[1]),TimeUnits(sol.t[end]))
         elseif t_grid == "l"
-            scatterlines!(ax,log10.(sol.t),eng_total,linewidth=2.0,color = theme.textcolor[],markersize=0.0,linestyle=:dash,label="All")
+            scatterlines!(ax,log10.(TimeUnits.(sol.t)),eng_total,linewidth=2.0,color = theme.textcolor[],markersize=0.0,linestyle=:dash,label="All")
+            xlims!(ax,log10(TimeUnits(sol.t[1])),log10(TimeUnits(sol.t[end])))
         end
     end
 
@@ -95,7 +101,7 @@ end
 
 Returns a plot of the fractional change in energy density of all species between time setups as a function of time.
 """
-function FracEnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::String="All",fig=nothing,theme=DiplodocusDark(),title=nothing,only_all=false)
+function FracEnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::String="All",fig=nothing,theme=DiplodocusDark(),title=nothing,only_all=false,TimeUnits::Function=CodeToCodeUnitsTime)
 
     CairoMakie.activate!(inline=true) # plot in vs code window
 
@@ -115,10 +121,12 @@ function FracEnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;sp
 
     mass_list = Grids.mass_list
 
+    t_unit_string = TimeUnits()
+
     if t_grid == "u"
-        xlab = L"Time"
+        xlab = L"$t$ $%$t_unit_string$"
     elseif t_grid == "l"
-        xlab = L"\log_{10}(Time)"
+        xlab = L"\log_{10}($t$ $%$t_unit_string$)"
     end
 
     if isnothing(fig)
@@ -143,10 +151,12 @@ function FracEnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;sp
 
         for i in eachindex(sol.t)
 
-            Nᵃ = DiplodocusTransport.FourFlow(sol.f[i].x[j],p_num_list[j],u_num_list[j],pr_list[j],ur_list[j],mass_list[j])
+            f1D = copy(Location_Species_To_StateVector(sol.f[i],PhaseSpace,species_index=j))
+
+            Nᵃ = DiplodocusTransport.FourFlow(f1D,p_num_list[j],u_num_list[j],pr_list[j],ur_list[j],mass_list[j])
             Uₐ = [-1.0,0.0,0.0,0.0] # static observer
             num = DiplodocusTransport.ScalarNumberDensity(Nᵃ,Uₐ)
-            Tᵃᵇ = DiplodocusTransport.StressEnergyTensor(sol.f[i].x[j],p_num_list[j],u_num_list[j],pr_list[j],ur_list[j],mass_list[j]) 
+            Tᵃᵇ = DiplodocusTransport.StressEnergyTensor(f1D,p_num_list[j],u_num_list[j],pr_list[j],ur_list[j],mass_list[j]) 
 
             if i == 1
                 frac_eng[i] = 0.0 # initial value
@@ -164,11 +174,11 @@ function FracEnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;sp
 
         if !only_all
             if t_grid == "u"
-                scatterlines!(ax,sol.t,frac_eng,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j])
-                xlims!(ax,sol.t[1],sol.t[end])
+                scatterlines!(ax,TimeUnits.(sol.t),frac_eng,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j])
+                xlims!(ax,TimeUnits(sol.t[1]),TimeUnits(sol.t[end]))
             elseif t_grid == "l"
-                scatterlines!(ax,log10.(sol.t),frac_eng,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j])
-                xlims!(ax,log10(sol.t[1]),log10(sol.t[end]))
+                scatterlines!(ax,log10.(TimeUnits.(sol.t)),frac_eng,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j])
+                xlims!(ax,log10(TimeUnits(sol.t[1])),log10(TimeUnits(sol.t[end])))
             end
         end
 
@@ -183,9 +193,11 @@ function FracEnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;sp
             end
         end
         if t_grid == "u"
-            scatterlines!(ax,sol.t,frac_eng_total,linewidth=2.0,color = theme.textcolor[],markersize=0.0,linestyle=:dash,label="All")
+            scatterlines!(ax,TimeUnits.(sol.t),frac_eng_total,linewidth=2.0,color = theme.textcolor[],markersize=0.0,linestyle=:dash,label="All")
+            xlims!(ax,TimeUnits(sol.t[1]),TimeUnits(sol.t[end]))
         elseif t_grid == "l"
-            scatterlines!(ax,log10.(sol.t),frac_eng_total,linewidth=2.0,color = theme.textcolor[],markersize=0.0,linestyle=:dash,label="All")
+            scatterlines!(ax,log10.(TimeUnits.(sol.t)),frac_eng_total,linewidth=2.0,color = theme.textcolor[],markersize=0.0,linestyle=:dash,label="All")
+            xlims!(ax,log10(TimeUnits(sol.t[1])),log10(TimeUnits(sol.t[end])))
         end
     end
 

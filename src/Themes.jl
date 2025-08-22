@@ -19,7 +19,7 @@ function DiplodocusDark()
         fontsize = 9pt,
         palette = (color = Makie.ColorScheme(get(Makie.ColorSchemes.batlow10,range(0.9,0.1,length=7))),),
         colormap = Makie.ColorScheme(get(Makie.ColorSchemes.batlow,range(0.1,0.9,length=256))), # use a subset to avoid very dark or very light colors
-        colormap_var = Makie.ColorScheme(get(Makie.ColorSchemes.hawaii,range(0.1,0.9,length=256))), # use a subset to avoid very dark or very light colors
+        colormap_var = Makie.ColorScheme(get(Makie.ColorSchemes.davos,range(0.05,0.95,length=256))), # use a subset to avoid very dark or very light colors
         fonts = Attributes(
             :bold => Makie.texfont(:bold),
             :bolditalic => Makie.texfont(:bolditalic),
@@ -131,7 +131,7 @@ function DiplodocusLight()
         fontsize = 9pt,
         palette = (color = Makie.ColorScheme(get(Makie.ColorSchemes.batlow10,range(0.1,0.9,length=7))),),
         colormap = Makie.ColorScheme(get(Makie.ColorSchemes.batlow,range(0.9,0.1,length=256))),
-        colormap_var = Makie.ColorScheme(get(Makie.ColorSchemes.hawaii,range(0.9,0.1,length=256))),
+        colormap_var = Makie.ColorScheme(get(Makie.ColorSchemes.davos,range(0.95,0.05,length=256))),
         fonts = Attributes(
             :bold => Makie.texfont(:bold),
             :bolditalic => Makie.texfont(:bolditalic),
