@@ -13,10 +13,10 @@ Revise = "295af30f-e4ad-537b-8983-00126c2a3abe"
 
 [compat]
 CairoMakie = "0.13.7, 0.15"
-DiplodocusCollisions = "0.0.1"
-DiplodocusTransport = "0.0.1"
-Makie = "0.22.10, 0.24"
+DiplodocusCollisions = "0.0.2"
+DiplodocusTransport = "0.0.2"
 GLMakie = "0.11.8, 0.13"
+Makie = "0.22.10, 0.24"
 Revise = "3.8.0"
 julia = "1.11.1"
 
