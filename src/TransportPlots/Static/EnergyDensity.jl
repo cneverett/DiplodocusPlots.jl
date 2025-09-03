@@ -18,8 +18,10 @@ function EnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;specie
 
     p_num_list = Momentum.px_num_list
     u_num_list = Momentum.py_num_list
+    h_num_list = Momentum.pz_num_list
     pr_list = Grids.pxr_list
     ur_list = Grids.pyr_list
+    hr_list = Grids.pzr_list
 
     mass_list = Grids.mass_list
 
@@ -51,11 +53,11 @@ function EnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;specie
 
             f1D = copy(Location_Species_To_StateVector(sol.f[i],PhaseSpace,species_index=j))
 
-            Nᵃ = DiplodocusTransport.FourFlow(f1D,p_num_list[j],u_num_list[j],pr_list[j],ur_list[j],mass_list[j])
+            Nᵃ = DiplodocusTransport.FourFlow(f1D,p_num_list[j],u_num_list[j],h_num_list[j],pr_list[j],ur_list[j],hr_list[j],mass_list[j])
             Uₐ = [-1.0,0.0,0.0,0.0] # static observer
             num = DiplodocusTransport.ScalarNumberDensity(Nᵃ,Uₐ)
 
-            Tᵃᵇ = DiplodocusTransport.StressEnergyTensor(f1D,p_num_list[j],u_num_list[j],pr_list[j],ur_list[j],mass_list[j]) 
+            Tᵃᵇ = DiplodocusTransport.StressEnergyTensor(f1D,p_num_list[j],u_num_list[j],h_num_list[j],pr_list[j],ur_list[j],hr_list[j],mass_list[j]) 
 
             eng[i] = DiplodocusTransport.ScalarEnergyDensity(Tᵃᵇ,Uₐ,num)
 
@@ -116,8 +118,10 @@ function FracEnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;sp
 
     p_num_list = Momentum.px_num_list
     u_num_list = Momentum.py_num_list
+    h_num_list = Momentum.pz_num_list
     pr_list = Grids.pxr_list
     ur_list = Grids.pyr_list
+    hr_list = Grids.pzr_list
 
     mass_list = Grids.mass_list
 
@@ -153,10 +157,10 @@ function FracEnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;sp
 
             f1D = copy(Location_Species_To_StateVector(sol.f[i],PhaseSpace,species_index=j))
 
-            Nᵃ = DiplodocusTransport.FourFlow(f1D,p_num_list[j],u_num_list[j],pr_list[j],ur_list[j],mass_list[j])
+            Nᵃ = DiplodocusTransport.FourFlow(f1D,p_num_list[j],u_num_list[j],h_num_list[j],pr_list[j],ur_list[j],hr_list[j],mass_list[j])
             Uₐ = [-1.0,0.0,0.0,0.0] # static observer
             num = DiplodocusTransport.ScalarNumberDensity(Nᵃ,Uₐ)
-            Tᵃᵇ = DiplodocusTransport.StressEnergyTensor(f1D,p_num_list[j],u_num_list[j],pr_list[j],ur_list[j],mass_list[j]) 
+            Tᵃᵇ = DiplodocusTransport.StressEnergyTensor(f1D,p_num_list[j],u_num_list[j],h_num_list[j],pr_list[j],ur_list[j],hr_list[j],mass_list[j]) 
 
             if i == 1
                 frac_eng[i] = 0.0 # initial value

@@ -78,6 +78,7 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
     meanh = Grids.mpz_list[species_index]
     p_r = Grids.pxr_list[species_index]
     u_r = Grids.pyr_list[species_index]
+    h_r = Grids.pzr_list[species_index]
     mass = Grids.mass_list[species_index]
 
     f3D = zeros(Float32,p_num,u_num,h_num)
@@ -156,11 +157,11 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
 
         # expected thermal spectrum based on final time step
         f = copy(Location_Species_To_StateVector(sol.f[end],PhaseSpace,species_index=species_index))
-        Nᵃ = DiplodocusTransport.FourFlow(f,p_num,u_num,p_r,u_r,mass)
+        Nᵃ = DiplodocusTransport.FourFlow(f,p_num,u_num,h_num,p_r,u_r,h_r,mass)
         Uₐ = [-1.0,0.0,0.0,0.0] # static observer
         num = DiplodocusTransport.ScalarNumberDensity(Nᵃ,Uₐ)
         Δab = DiplodocusTransport.ProjectionTensor(Uₐ)
-        Tᵃᵇ = DiplodocusTransport.StressEnergyTensor(f,p_num,u_num,p_r,u_r,mass)
+        Tᵃᵇ = DiplodocusTransport.StressEnergyTensor(f,p_num,u_num,h_num,p_r,u_r,h_r,mass)
         Pressure = DiplodocusTransport.ScalarPressure(Tᵃᵇ,Δab)
         Temperature = DiplodocusTransport.ScalarTemperature(Pressure,num)
 
@@ -269,6 +270,7 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
     meanp = Grids.mpx_list[species_index]
     p_r = Grids.pxr_list[species_index]
     u_r = Grids.pyr_list[species_index]
+    h_r = Grids.pzr_list[species_index]
     mass = Grids.mass_list[species_index]
 
     if paraperp == false 
@@ -356,11 +358,11 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
 
         # expected thermal spectrum based on final time step
         f = copy(Location_Species_To_StateVector(sol.f[end],PhaseSpace,species_index=species_index))
-        Nᵃ = DiplodocusTransport.FourFlow(f,p_num,u_num,p_r,u_r,mass)
+        Nᵃ = DiplodocusTransport.FourFlow(f,p_num,u_num,h_num,p_r,u_r,h_r,mass)
         Uₐ = [-1.0,0.0,0.0,0.0] # static observer
         num = DiplodocusTransport.ScalarNumberDensity(Nᵃ,Uₐ)
         Δab = DiplodocusTransport.ProjectionTensor(Uₐ)
-        Tᵃᵇ = DiplodocusTransport.StressEnergyTensor(f,p_num,u_num,p_r,u_r,mass)
+        Tᵃᵇ = DiplodocusTransport.StressEnergyTensor(f,p_num,u_num,h_num,p_r,u_r,h_r,mass)
         Pressure = DiplodocusTransport.ScalarPressure(Tᵃᵇ,Δab)
         Temperature = DiplodocusTransport.ScalarTemperature(Pressure,num)
 
@@ -475,6 +477,7 @@ function AngleDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseSpac
     meanh = Grids.mpz_list[species_index]
     p_r = Grids.pxr_list[species_index]
     u_r = Grids.pyr_list[species_index]
+    h_r = Grids.pzr_list[species_index]
     mass = Grids.mass_list[species_index]
 
     f3D = zeros(Float32,p_num,u_num,h_num)
