@@ -192,7 +192,7 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
     if Time.t_grid == "u"
         Colorbar(fig[1,2],colormap = theme.colormap,limits=(TimeUnits(sol.t[1]),TimeUnits(sol.t[end])),label=L"$t$ $%$t_unit_string$")
     elseif Time.t_grid == "l"
-        Colorbar(fig[1,2],colormap = theme.colormap,limits=(log10(TimeUnits(sol.t[1])),log10(TimeUnits(sol.t[end]))),label=L"$\log_{10}\left(t %$t_unit_string \right)$")
+        Colorbar(fig[1,2],colormap = theme.colormap,limits=(log10(round(TimeUnits(sol.t[1]),sigdigits=5)),log10(round(TimeUnits(sol.t[end]),sigdigits=5))),label=L"$\log_{10}\left(t %$t_unit_string \right)$")
     end
 
     if legend
@@ -1022,7 +1022,7 @@ function AM3_MomentumDistributionPlot(filePath,t_max,t_min,t_grid;plot_limits=(n
     ax = Axis(fig[1,1],xlabel=xlab,ylabel=ylab,aspect=DataAspect())
     ax.limits = plot_limits
 
-    linestyles = [:solid,:dash,:dot,:dashdot,:dashdotdot]
+    linestyles = [:solid,(:dash,:dense),(:dot,:dense),(:dashdot,:dense),(:dashdotdot,:dense)]
     legend_elements = []
     line_labels = []
     
@@ -1092,7 +1092,9 @@ function TwoSolAngleDistributionPlot(twosol::Tuple{OutputStruct,OutputStruct},sp
     xlab = L"$\log_{10}\left(p [m_ec]\right)$"
     if order == 1
         ylab = L"$\log_{10}\left(p\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V} [\text{m}^{-3}]\right)$"
-    elseif order != 1
+    elseif order == 2
+        ylab = L"$\log_{10}\left(p^{2}\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V} [\text{m}^{-3}\left(m_ec\right)]\right)$"
+    else 
         ylab = L"$\log_{10}\left(p^{%$(order)}\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V} [\text{m}^{-3}\left(m_ec\right)^{%$(order-1)}]\right)$"
     end
 
@@ -1100,7 +1102,7 @@ function TwoSolAngleDistributionPlot(twosol::Tuple{OutputStruct,OutputStruct},sp
         time_idx = Observable(1) # index of the current time step
         t = @lift(TimeUnits(twosol[1].t[$time_idx]))
         if wide
-            fig = Figure(size=(576,216)) # double column 8:3 aspect ratio
+            fig = Figure(size=(500,216)) # double column 8:3 aspect ratio
         else
             fig = Figure() # default single column 4:3 aspect ratio
         end
