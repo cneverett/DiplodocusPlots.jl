@@ -67,7 +67,7 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vec
         timescale3D = reshape(timescale1D,(p_num,u_num,h_num))
         @. timescale3D = timescale3D*(timescale3D!=Inf)
         @. timescale3D = timescale3D*(timescale3D!=-Inf)
-        @. timescale3D = timescale3D*(timescale3D<=0.0)
+        #@. timescale3D = timescale3D*(timescale3D<=0.0)
 
         timescale2D = dropdims(sum(timescale3D, dims=(3)),dims=(3))
 
