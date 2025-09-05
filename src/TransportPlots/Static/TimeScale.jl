@@ -42,8 +42,10 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vec
         fig = Figure() # default single column 4:3 aspect ratio
     end
 
+    t_unit_string = TimeUnits()
+
     xlab = L"$\log_{10}\left(p [m_ec]\right)$"
-    ylab = L"$\tau$"
+    ylab = L"$timescale$ $%$t_unit_string$"
 
     ax = Axis(fig[1,1],xlabel=xlab,ylabel=ylab,aspect=DataAspect())
     ax.limits = plot_limits
