@@ -12,8 +12,16 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vec
     Momentum = PhaseSpace.Momentum
     Grids = PhaseSpace.Grids
     tr = PhaseSpace.Grids.tr
+    p_num_list = Momentum.px_num_list 
+    u_num_list = Momentum.py_num_list
+    h_num_list = Momentum.pz_num_list
     mp_list = Grids.mpx_list
     name_list = PhaseSpace.name_list
+
+    # only works for a single particle
+    state = reshape(state,(p_num_list[1],u_num_list[1],h_num_list[1]))
+    state = mp .* state
+    state = reshape(state,p_num_list[1]*u_num_list[1]*h_num_list[1])
 
     dstate = zeros(eltype(state),size(state))
     timescale = zeros(eltype(state),size(state))
@@ -47,11 +55,11 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vec
     for species in eachindex(name_list)
 
         name = name_list[species]
-        p_num = Momentum.px_num_list[species]  
-        u_num = Momentum.py_num_list[species]
-        h_num = Momentum.pz_num_list[species]
-        meanp = Grids.mpx_list[species]
-        meanu = Grids.mpy_list[species]
+        p_num = p_num_list[species]
+        u_num = u_num_list[species]
+        h_num = h_num_list[species]
+        mp = meanp_list[species]
+        mu = Grids.mpy_list[species]
 
         timescale1D = copy(Location_Species_To_StateVector(timescale,PhaseSpace,species_index=species))
         timescale3D = reshape(timescale1D,(p_num,u_num,h_num))
@@ -65,7 +73,7 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vec
 
             if u == 1 || u==u_num-1 || u==ceil(Int64,u_num/2)
                 println(timescale2D[:,u])
-                scatterlines!(ax,log10.(meanp),log10.(timescale2D[:,u]),linewidth=2.0,color = color=theme.palette.color[][mod(u-1,7)+1],markersize=0.0,linestyle=linestyles[species])
+                scatterlines!(ax,log10.(mp),log10.(timescale2D[:,u]),linewidth=2.0,color = color=theme.palette.color[][mod(u-1,7)+1],markersize=0.0,linestyle=linestyles[species])
             end
 
             if species == 1
