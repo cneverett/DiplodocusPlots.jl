@@ -65,7 +65,7 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vec
 
             #println(timescale2D[:,u])
         
-            if u == 1 || u_num || ceil(Int64,u_num/2)
+            if u == 1 || u==u_num || u==ceil(Int64,u_num/2)
             scatterlines!(ax,log10.(meanp),log10.(timescale2D[:,u]),linewidth=2.0,color = color=theme.palette.color[][mod(u-1,7)+1],markersize=0.0,linestyle=linestyles[species])
             end
 
