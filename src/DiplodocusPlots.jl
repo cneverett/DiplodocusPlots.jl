@@ -36,6 +36,7 @@ module DiplodocusPlots
     include("TransportPlots/Static/EnergyDensity.jl")
     include("TransportPlots/Static/ThermalAndIsotropic.jl")
     include("TransportPlots/Static/ObserverFlux.jl")
+    include("TransportPlots/Static/TimeScale.jl")
     
 
 end
