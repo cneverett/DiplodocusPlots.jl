@@ -12,7 +12,7 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vec
     Momentum = PhaseSpace.Momentum
     Grids = PhaseSpace.Grids
     tr = PhaseSpace.Grids.tr
-    mp_list = PhaseSpace.Grids.mpx_list
+    mp_list = Grids.mpx_list
     name_list = PhaseSpace.name_list
 
     dstate = zeros(eltype(state),size(state))
@@ -60,6 +60,8 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vec
         timescale2D = dropdims(sum(timescale3D, dims=(3)),dims=(3))
 
         for u in 1:u_num
+
+            println(timescale2D[:,u])
         
             scatterlines!(ax,log10.(meanp),log10.(timescale2D[:,u]),linewidth=2.0,color = color=theme.palette.color[][mod(u,7)],markersize=0.0,linestyle=linestyles[species])
 
