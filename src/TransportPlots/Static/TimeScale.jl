@@ -58,7 +58,7 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vec
         p_num = p_num_list[species]
         u_num = u_num_list[species]
         h_num = h_num_list[species]
-        mp = meanp_list[species]
+        mp = mp_list[species]
         mu = Grids.mpy_list[species]
 
         timescale1D = copy(Location_Species_To_StateVector(timescale,PhaseSpace,species_index=species))
