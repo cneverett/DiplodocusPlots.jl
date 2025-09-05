@@ -10,8 +10,8 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vec
     mp_list = PhaseSpace.Grids.mpx_list
     name_list = PhaseSpace.name_list
 
-    dstate = zeros(similar(state))
-    timescale = zeros(similar(state))
+    dstate = similar(state)
+    timescale = similar(state)
 
     dt0 = tr[2] - tr[1]
     dt = tr[t_idx+1] - tr[t_idx]
