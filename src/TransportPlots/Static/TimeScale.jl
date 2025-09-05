@@ -77,6 +77,8 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vec
 
     end # species loop
 
+    return fig
+
     end # with theme
 
 end
