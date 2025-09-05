@@ -3,7 +3,7 @@
 
 Function plots the time scales of a simulation given the system `state` at a time index `t_idx`.
 """
-function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vector{F},t_idx::Int64;wide=false,plot_limits=(nothing,nothing),theme=DiplodocusDark()) where F<:AbstractFloat
+function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vector{F},t_idx::Int64;wide=false,plot_limits=(nothing,nothing),theme=DiplodocusDark(),TimeUnits::Function=CodeToCodeUnitsTime) where F<:AbstractFloat
 
     CairoMakie.activate!(inline=true) # plot in vs code window
     with_theme(theme) do
@@ -75,7 +75,7 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vec
 
             if u == 1 || u==u_num-1 || u==ceil(Int64,u_num/2)
                 println(timescale2D[:,u])
-                scatterlines!(ax,log10.(mp),log10.(abs.(timescale2D[:,u])),linewidth=2.0,color = color=theme.palette.color[][mod(u-1,7)+1],markersize=0.0,linestyle=linestyles[species])
+                scatterlines!(ax,log10.(mp),log10.(TimeUnits.(abs.(timescale2D[:,u]))),linewidth=2.0,color = color=theme.palette.color[][mod(u-1,7)+1],markersize=0.0,linestyle=linestyles[species])
             end
 
             if species == 1
