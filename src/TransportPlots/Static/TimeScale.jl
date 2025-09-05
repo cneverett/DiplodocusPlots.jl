@@ -24,7 +24,7 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vec
 
     method(dstate,state,dt0,dt,t)
 
-    @. timescale = dstate / state / dt
+    @. timescale =  dt * state / dstate
 
     if wide
         fig = Figure(size=(576,216)) # double column 8:3 aspect ratio
