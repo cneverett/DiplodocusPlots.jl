@@ -66,7 +66,7 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vec
             scatterlines!(ax,log10.(meanp),log10.(abs.(timescale2D[:,u])),linewidth=2.0,color = color=theme.palette.color[][mod(u-1,7)+1],markersize=0.0,linestyle=linestyles[species])
 
             if species == 1
-                push!(legend_elements_angle,LineElement(color = theme.palette.color[][mod(u,7)], linestyle = :solid,linewidth = 2.0))
+                push!(legend_elements_angle,LineElement(color = theme.palette.color[][mod(u-1,7)+1], linestyle = :solid,linewidth = 2.0))
                 push!(line_labels_angle,L"%$(meanu[u])")
             end
 
