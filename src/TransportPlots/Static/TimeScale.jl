@@ -3,7 +3,7 @@
 
 Function plots the time scales of a simulation given the system `state` at a time index `t_idx`.
 """
-function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vector{F},t_idx::Int64;wide=false,plot_limits=(nothing,nothing)) where F<:AbstractFloat
+function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vector{F},t_idx::Int64;wide=false,plot_limits=(nothing,nothing),theme=DiplodocusDark()) where F<:AbstractFloat
 
     CairoMakie.activate!(inline=true) # plot in vs code window
     with_theme(theme) do
