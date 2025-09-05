@@ -20,7 +20,7 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vec
 
     # only works for a single particle
     state = reshape(state,(p_num_list[1],u_num_list[1],h_num_list[1]))
-    state = mp .* state
+    state = mp_list[1] .* state
     state = reshape(state,p_num_list[1]*u_num_list[1]*h_num_list[1])
 
     dstate = zeros(eltype(state),size(state))
