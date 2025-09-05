@@ -57,6 +57,7 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vec
         timescale3D = reshape(timescale1D,(p_num,u_num,h_num))
         @. timescale3D = timescale3D*(timescale3D!=Inf)
         @. timescale3D = timescale3D*(timescale3D!=-Inf)
+        @. timescale3D = timescale3D*(timescale3D>=0.0)
 
         timescale2D = dropdims(sum(timescale3D, dims=(3)),dims=(3))
 
@@ -64,7 +65,9 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vec
 
             #println(timescale2D[:,u])
         
-            scatterlines!(ax,log10.(meanp),log10.(abs.(timescale2D[:,u])),linewidth=2.0,color = color=theme.palette.color[][mod(u-1,7)+1],markersize=0.0,linestyle=linestyles[species])
+            if u == 1 || u_num || ceil(Int64,u_num/2)
+            scatterlines!(ax,log10.(meanp),log10.(timescale2D[:,u]),linewidth=2.0,color = color=theme.palette.color[][mod(u-1,7)+1],markersize=0.0,linestyle=linestyles[species])
+            end
 
             if species == 1
                 push!(legend_elements_angle,LineElement(color = theme.palette.color[][mod(u-1,7)+1], linestyle = :solid,linewidth = 2.0))
