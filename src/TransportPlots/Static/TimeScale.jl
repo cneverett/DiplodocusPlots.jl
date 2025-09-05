@@ -71,24 +71,39 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vec
 
         timescale2D = dropdims(sum(timescale3D, dims=(3)),dims=(3))
 
-        for u in 1:u_num
+#=         for u in 1:u_num
 
-            if u == 1 || u==u_num-1 || u==ceil(Int64,u_num/2)
+            if u == 1 || u==ceil(Int64,u_num/2)
                 println(timescale2D[:,u])
-                scatterlines!(ax,log10.(mp),log10.(TimeUnits.(Float64.(abs.(timescale2D[:,u])))),linewidth=2.0,color = color=theme.palette.color[][mod(u-1,7)+1],markersize=0.0,linestyle=linestyles[species])
+                scatterlines!(ax,log10.(mp),log10.(TimeUnits.(Float64.(abs.(timescale2D[:,u])))),linewidth=2.0,color = color=theme.textcolor[],markersize=0.0,linestyle=linestyles[species])
             end
 
             if species == 1
-                push!(legend_elements_angle,LineElement(color = theme.palette.color[][mod(u-1,7)+1], linestyle = :solid,linewidth = 2.0))
+                push!(legend_elements_angle,LineElement(color = theme.textcolor[], linestyle = :solid,linewidth = 2.0))
                 push!(line_labels_angle,L"%$(mu[u])")
             end
 
-        end
+        end =#
 
-        push!(legend_elements_species,LineElement(color = theme.textcolor[], linestyle = linestyles[species],linewidth = 2.0))
-        push!(line_labels_species,name)
+
+
+        scatterlines!(ax,log10.(mp),log10.(TimeUnits.(Float64.(abs.(timescale2D[:,ceil(Int64,u_num/2)])))),linewidth=2.0,color = color=theme.textcolor[],markersize=0.0,linestyle=linestyles[1])
+        scatterlines!(ax,log10.(mp),log10.(TimeUnits.(Float64.(abs.(timescale2D[:,end])))),linewidth=2.0,color = color=theme.textcolor[],markersize=0.0,linestyle=linestyles[2])
+
+        push!(legend_elements_angle,LineElement(color = theme.textcolor[], linestyle = linestyles[1],linewidth = 2.0))
+        push!(legend_elements_angle,LineElement(color = theme.textcolor[], linestyle = linestyles[2],linewidth = 2.0))
+        push!(line_labels_angle,L"\parallel")
+        push!(line_labels_angle,L"\perp")
+
+        #push!(legend_elements_angle,LineElement(color = theme.textcolor[], linestyle = :solid,linewidth = 2.0))
+        #push!(line_labels_angle,L"%$(mu[u])")
+
+        #push!(legend_elements_species,LineElement(color = theme.textcolor[], linestyle = linestyles[species],linewidth = 2.0))
+        #push!(line_labels_species,name)
 
     end # species loop
+
+        axislegend(ax,legend_elements_angle,line_labels_angle,position = :lb)
 
     return fig
 
