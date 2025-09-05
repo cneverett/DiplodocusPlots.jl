@@ -61,7 +61,7 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vec
 
         for u in 1:u_num
 
-            println(timescale2D[:,u])
+            #println(timescale2D[:,u])
         
             scatterlines!(ax,log10.(meanp),log10.(abs.(timescale2D[:,u])),linewidth=2.0,color = color=theme.palette.color[][mod(u-1,7)+1],markersize=0.0,linestyle=linestyles[species])
 
