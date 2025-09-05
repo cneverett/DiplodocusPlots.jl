@@ -78,7 +78,7 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vec
 
             if species == 1
                 push!(legend_elements_angle,LineElement(color = theme.palette.color[][mod(u-1,7)+1], linestyle = :solid,linewidth = 2.0))
-                push!(line_labels_angle,L"%$(meanu[u])")
+                push!(line_labels_angle,L"%$(mu[u])")
             end
 
         end
