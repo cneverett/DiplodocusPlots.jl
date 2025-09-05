@@ -19,9 +19,9 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vec
     name_list = PhaseSpace.name_list
 
     # only works for a single particle
-    state = reshape(state,(p_num_list[1],u_num_list[1],h_num_list[1]))
-    state = mp_list[1] .* state
-    state = reshape(state,p_num_list[1]*u_num_list[1]*h_num_list[1])
+    #state = reshape(state,(p_num_list[1],u_num_list[1],h_num_list[1]))
+    #state = mp_list[1] .* state
+    #state = reshape(state,p_num_list[1]*u_num_list[1]*h_num_list[1])
 
     dstate = zeros(eltype(state),size(state))
     timescale = zeros(eltype(state),size(state))
@@ -30,7 +30,9 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vec
     dt = tr[t_idx+1] - tr[t_idx]
     t = tr[t_idx]
 
-    method(dstate,state,dt0,dt,t)
+    #method(dstate,state,dt0,dt,t)
+
+    dstate = method.FluxM.Ap_Flux \ method.FluxM.I_Flux * state
 
     @. timescale =  dt * state / dstate
 
