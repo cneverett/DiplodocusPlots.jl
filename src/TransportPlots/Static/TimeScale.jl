@@ -91,7 +91,7 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vec
 
         # timescale is timescale for particle losses not particle energy losses, to get that we need to scale by dp/mp (i.e. dp/p)
 
-        timescale2D = dp ./ mp .* timescale2D
+        timescale2D = mp ./ dp .* timescale2D
 
         println(TimeUnits.(Float64.(abs.(timescale2D[10,ceil(Int64,u_num/2)]))))
 
