@@ -15,6 +15,7 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vec
     p_num_list = Momentum.px_num_list 
     u_num_list = Momentum.py_num_list
     h_num_list = Momentum.pz_num_list
+    dp_list = Grids.dpx_list
     mp_list = Grids.mpx_list
     name_list = PhaseSpace.name_list
 
@@ -62,6 +63,7 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vec
         p_num = p_num_list[species]
         u_num = u_num_list[species]
         h_num = h_num_list[species]
+        dp = dp_list[species]
         mp = mp_list[species]
         mu = Grids.mpy_list[species]
 
