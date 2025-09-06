@@ -87,7 +87,7 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vec
 
         end =#
 
-        println(TimeUnits.(Float64.(abs.(timescale2D[1,ceil(Int64,u_num/2)]))))
+        println(TimeUnits.(Float64.(abs.(timescale2D[10,ceil(Int64,u_num/2)]))))
 
         scatterlines!(ax,log10.(mp),log10.(TimeUnits.(Float64.(abs.(timescale2D[:,ceil(Int64,u_num/2)])))),linewidth=2.0,color = color=theme.textcolor[],markersize=0.0,linestyle=linestyles[1])
         scatterlines!(ax,log10.(mp),log10.(TimeUnits.(Float64.(abs.(timescale2D[:,end])))),linewidth=2.0,color = color=theme.textcolor[],markersize=0.0,linestyle=linestyles[2])
