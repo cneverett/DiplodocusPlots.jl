@@ -45,7 +45,7 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vec
     t_unit_string = TimeUnits()
 
     xlab = L"$\log_{10}\left(p [m_ec]\right)$"
-    ylab = L"\log_{10}\left(Timescale %$t_unit_string\right) $"
+    ylab = L"\log_{10}\left(Timescale %$t_unit_string\right)"
 
     ax = Axis(fig[1,1],xlabel=xlab,ylabel=ylab,aspect=DataAspect())
     ax.limits = plot_limits
