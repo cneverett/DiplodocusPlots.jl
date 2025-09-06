@@ -31,9 +31,11 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vec
     dt = tr[t_idx+1] - tr[t_idx]
     t = tr[t_idx]
 
-    #method(dstate,state,dt0,dt,t)
+    method(dstate,state,dt0,dt,t)
 
-    dstate = method.FluxM.Ap_Flux \ (DiplodocusTransport.diag(method.FluxM.I_Flux .+ method.FluxM.J_Flux) .* (dt / dt0)) .* state
+    dstate = DiplodocusTransport.diag(method.temp) .* state
+
+    #dstate = method.FluxM.Ap_Flux \ (DiplodocusTransport.diag(method.FluxM.I_Flux .+ method.FluxM.J_Flux) .* (dt / dt0)) .* state
 
     @. timescale =  dt * state / dstate
 
