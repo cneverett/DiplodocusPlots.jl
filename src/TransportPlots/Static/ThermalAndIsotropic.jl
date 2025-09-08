@@ -61,7 +61,7 @@ function IsThermalPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::S
 
             MJ = DiplodocusTransport.MaxwellJuttner_Distribution(PhaseSpace,"Sph",Temperature;n=num)
 
-            f1D = dropdims(sum(reshape(f,(p_num_list[j],u_num_list[j])),dims=2),dims=2)
+            f1D = dropdims(sum(reshape(f,(p_num_list[j],u_num_list[j],h_num_list[j])),dims=(2,3)),dims=(2,3))
 
             residuals = (f1D .- MJ).^2
             residuals = residuals[isfinite.(residuals)]
@@ -144,11 +144,11 @@ function IsIsotropicPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species:
         for i in eachindex(sol.t)
 
             f = copy(Location_Species_To_StateVector(sol.f[i],PhaseSpace,species_index=j))
-            f2D = reshape(f,(p_num_list[j],u_num_list[j]))
+            f3D = reshape(f,(p_num_list[j],u_num_list[j],h_num_list[j]))
             # sum over angles and divide by number of bins
-            f_avg = dropdims(sum(f2D,dims=2),dims=2) / u_num_list[j]
+            f_avg = dropdims(sum(f3D,dims=(2,3)),dims=(2,3)) / (u_num_list[j]*h_num_list[j])
  
-            residuals = (f2D .- f_avg).^2
+            residuals = (f3D .- f_avg).^2
             residuals = residuals[isfinite.(residuals)]
 
             SumSquaredResiduals[i] = sum(residuals)
@@ -239,7 +239,7 @@ function IsThermalAndIsotropicPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruc
 
             MJ = DiplodocusTransport.MaxwellJuttner_Distribution(PhaseSpace,"Sph",Temperature;n=num)
 
-            f1D = dropdims(sum(reshape(f,(p_num_list[j],u_num_list[j])),dims=2),dims=2)
+            f1D = dropdims(sum(reshape(f,(p_num_list[j],u_num_list[j],h_num_list[j])),dims=(2,3)),dims=(2,3))
 
             residuals = (f1D .- MJ).^2
             residuals = residuals[isfinite.(residuals)]
@@ -264,11 +264,11 @@ function IsThermalAndIsotropicPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruc
         for i in eachindex(sol.t)
 
             f = copy(Location_Species_To_StateVector(sol.f[i],PhaseSpace,species_index=j))
-            f2D = reshape(f,(p_num_list[j],u_num_list[j]))
+            f3D = reshape(f,(p_num_list[j],u_num_list[j],h_num_list[j]))
             # sum over angles and divide by number of bins
-            f_avg = dropdims(sum(f2D,dims=2),dims=2) / u_num_list[j]
+            f_avg = dropdims(sum(f3D,dims=(2,3)),dims=(2,3)) / (u_num_list[j]*h_num_list[j])
  
-            residuals = (f2D .- f_avg).^2
+            residuals = (f3D .- f_avg).^2
             residuals = residuals[isfinite.(residuals)]
 
             SumSquaredResiduals[i] = sum(residuals)
