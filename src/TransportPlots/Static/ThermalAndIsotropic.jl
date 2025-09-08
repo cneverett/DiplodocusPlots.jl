@@ -18,8 +18,10 @@ function IsThermalPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::S
 
     p_num_list = Momentum.px_num_list
     u_num_list = Momentum.py_num_list
+    h_num_list = Momentum.pz_num_list
     pr_list = Grids.pxr_list
     ur_list = Grids.pyr_list
+    hr_list = Grids.pzr_list
 
     mass_list = Grids.mass_list
 
@@ -109,8 +111,10 @@ function IsIsotropicPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species:
 
     p_num_list = Momentum.px_num_list
     u_num_list = Momentum.py_num_list
+    h_num_list = Momentum.pz_num_list
     pr_list = Grids.pxr_list
     ur_list = Grids.pyr_list
+    hr_list = Grids.pzr_list
 
     mass_list = Grids.mass_list
 
@@ -191,8 +195,10 @@ function IsThermalAndIsotropicPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruc
 
     p_num_list = Momentum.px_num_list
     u_num_list = Momentum.py_num_list
+    h_num_list = Momentum.pz_num_list
     pr_list = Grids.pxr_list
     ur_list = Grids.pyr_list
+    hr_list = Grids.pzr_list
 
     mass_list = Grids.mass_list
 
