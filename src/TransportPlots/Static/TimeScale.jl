@@ -76,12 +76,13 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vec
         #@. timescale3D = timescale3D*(timescale3D<=0.0)
 
         timescale2D = dropdims(sum(timescale3D, dims=(3)),dims=(3))
+        timescale2D = mp ./ dp .* timescale2D
 
         for u in 1:u_num
 
             if u == 1 || u==ceil(Int64,u_num/2)
                 println(timescale2D[:,u])
-                scatterlines!(ax,log10.(mp),log10.(TimeUnits.(Float64.(abs.(timescale2D[:,u])))),linewidth=2.0,color = color=theme.textcolor[],markersize=0.0,linestyle=linestyles[species])
+                scatterlines!(ax,log10.(mp),log10.(TimeUnits.(Float64.(abs.(timescale2D[:,u])))),linewidth=2.0,color = theme.palette.color[][mod(2*species-1,7)+1],markersize=0.0,linestyle=linestyles[species])
             end
 
             if species == 1
@@ -93,7 +94,7 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vec
 
         # timescale is timescale for particle losses not particle energy losses, to get that we need to scale by dp/mp (i.e. dp/p)
 
-        timescale2D = mp ./ dp .* timescale2D
+        #timescale2D = mp ./ dp .* timescale2D
 
         println(TimeUnits.(Float64.(abs.(timescale2D[10,ceil(Int64,u_num/2)]))))
 
