@@ -77,7 +77,7 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vec
 
         timescale2D = dropdims(sum(timescale3D, dims=(3)),dims=(3))
 
-#=         for u in 1:u_num
+        for u in 1:u_num
 
             if u == 1 || u==ceil(Int64,u_num/2)
                 println(timescale2D[:,u])
@@ -89,7 +89,7 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vec
                 push!(line_labels_angle,L"%$(mu[u])")
             end
 
-        end =#
+        end 
 
         # timescale is timescale for particle losses not particle energy losses, to get that we need to scale by dp/mp (i.e. dp/p)
 
