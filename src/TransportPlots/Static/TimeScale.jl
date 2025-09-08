@@ -109,12 +109,13 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vec
         #push!(legend_elements_angle,LineElement(color = theme.textcolor[], linestyle = :solid,linewidth = 2.0))
         #push!(line_labels_angle,L"%$(mu[u])")
 
-        #push!(legend_elements_species,LineElement(color = theme.textcolor[], linestyle = linestyles[species],linewidth = 2.0))
-        #push!(line_labels_species,name)
+        push!(legend_elements_species,LineElement(color = theme.textcolor[], linestyle = linestyles[species],linewidth = 2.0))
+        push!(line_labels_species,name)
 
     end # species loop
 
         axislegend(ax,legend_elements_angle,line_labels_angle,position = :lb)
+        axislegend(ax,legend_elements_species,line_labels_species,position = :rt)
 
     return fig
 
