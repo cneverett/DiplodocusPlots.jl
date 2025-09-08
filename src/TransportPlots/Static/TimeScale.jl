@@ -37,7 +37,7 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vec
 
     #dstate = method.FluxM.Ap_Flux \ (DiplodocusTransport.diag(method.FluxM.I_Flux .+ method.FluxM.J_Flux) .* (dt / dt0)) .* state
 
-    @. timescale =  dt * state / dstate
+    @. timescale =  -dt * state / dstate
 
     if wide
         fig = Figure(size=(576,216)) # double column 8:3 aspect ratio
@@ -83,7 +83,7 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vec
 
             if u == 1 || u==ceil(Int64,u_num/2)
                 #println(timescale2D[:,u])
-                scatterlines!(ax,log10.(mp),log10.(TimeUnits.(Float64.(abs.(timescale2D[:,u])))),linewidth=2.0,color = theme.palette.color[][mod(2*u-1,7)+1],markersize=0.0,linestyle=linestyles[species])
+                scatterlines!(ax,log10.(mp),log10.(TimeUnits.(Float64.(timescale2D[:,u]))),linewidth=2.0,color = theme.palette.color[][mod(2*u-1,7)+1],markersize=0.0,linestyle=linestyles[species])
             end
 
             if species == 1
