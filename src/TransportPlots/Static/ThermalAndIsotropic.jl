@@ -49,11 +49,11 @@ function IsThermalPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::S
         for i in eachindex(sol.t)
 
             f = copy(Location_Species_To_StateVector(sol.f[i],PhaseSpace,species_index=j))
-            Nᵃ = DiplodocusTransport.FourFlow(f,p_num_list[j],u_num_list[j],pr_list[j],ur_list[j],mass_list[j])
+            Nᵃ = DiplodocusTransport.FourFlow(f,p_num_list[j],u_num_list[j],h_num_list[j],pr_list[j],ur_list[j],hr_list[j],mass_list[j])
             Uₐ = [-1.0,0.0,0.0,0.0] # static observer
             num = DiplodocusTransport.ScalarNumberDensity(Nᵃ,Uₐ)
             Δab = DiplodocusTransport.ProjectionTensor(Uₐ)
-            Tᵃᵇ = DiplodocusTransport.StressEnergyTensor(f,p_num_list[j],u_num_list[j],pr_list[j],ur_list[j],mass_list[j])
+            Tᵃᵇ = DiplodocusTransport.StressEnergyTensor(f,p_num_list[j],u_num_list[j],h_num_list[j],pr_list[j],ur_list[j],hr_list[j],mass_list[j])
             Pressure = DiplodocusTransport.ScalarPressure(Tᵃᵇ,Δab)
             Temperature = DiplodocusTransport.ScalarTemperature(Pressure,num)
 
@@ -223,11 +223,11 @@ function IsThermalAndIsotropicPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruc
         for i in eachindex(sol.t)
 
             f = copy(Location_Species_To_StateVector(sol.f[i],PhaseSpace,species_index=j))
-            Nᵃ = DiplodocusTransport.FourFlow(f,p_num_list[j],u_num_list[j],pr_list[j],ur_list[j],mass_list[j])
+            Nᵃ = DiplodocusTransport.FourFlow(f,p_num_list[j],u_num_list[j],h_num_list[j],pr_list[j],ur_list[j],hr_list[j],mass_list[j])
             Uₐ = [-1.0,0.0,0.0,0.0] # static observer
             num = DiplodocusTransport.ScalarNumberDensity(Nᵃ,Uₐ)
             Δab = DiplodocusTransport.ProjectionTensor(Uₐ)
-            Tᵃᵇ = DiplodocusTransport.StressEnergyTensor(f,p_num_list[j],u_num_list[j],pr_list[j],ur_list[j],mass_list[j])
+            Tᵃᵇ = DiplodocusTransport.StressEnergyTensor(f,p_num_list[j],u_num_list[j],h_num_list[j],pr_list[j],ur_list[j],hr_list[j],mass_list[j])
             Pressure = DiplodocusTransport.ScalarPressure(Tᵃᵇ,Δab)
             Temperature = DiplodocusTransport.ScalarTemperature(Pressure,num)
 
