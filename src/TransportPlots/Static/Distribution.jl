@@ -896,9 +896,276 @@ function MomentumAndPolarAngleDistributionPlot(sol,species::Vector{String},Phase
 
     if species_idx == length(species)
     if order == 1
-        Colorbar(fig[1,1],hm,label=L"$\log_{10}\left(p\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V}[\text{m}^{-3}]\right)$",flipaxis=false,height=Relative(0.75),tellheight=false)
+        Colorbar(fig[1,1],hm,label=L"$\log_{10}\left(p\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}u\mathrm{d}V}[\text{m}^{-3}]\right)$",flipaxis=false,height=Relative(0.75),tellheight=false)
     elseif order != 1
-        Colorbar(fig[1,1],hm,label=L"$\log_{10}\left(p^{%$order}\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V}[\text{m}^{-3}\left(m_ec\right)^{%$(order-1)}]\right)$ $$",flipaxis=false,height=Relative(0.75),tellheight=false)
+        Colorbar(fig[1,1],hm,label=L"$\log_{10}\left(p^{%$order}\frac{\mathrm{d}N}{\mathrm{d}p\mathrmd{d}u\mathrm{d}V}[\text{m}^{-3}\left(m_ec\right)^{%$(order-1)}]\right)$ $$",flipaxis=false,height=Relative(0.75),tellheight=false)
+    end
+    end
+
+    end # species loop
+
+    colsize!(fig.layout,1,Relative(0.1))
+    colsize!(fig.layout,2,Relative(0.9))
+    #colgap!(fig.layout,1,Relative(-0.1))
+    #colsize!(fig.layout,3,Relative(0.3))
+    #colsize!(fig.layout,4,Relative(0.3))
+
+    
+    if !isnothing(filename)
+        # recording the animation
+        time_idxs = 1:length(sol.t)
+        record(fig,filename,time_idxs,framerate=framerate,backend=CairoMakie) do frame
+            println("$frame")
+            time_idx[] = frame
+        end
+    end
+
+    end # with_theme
+
+end
+
+"""
+    MomentumAndAzimuthalAngleDistributionPlot(sol,species::String,PhaseSpace::PhaseSpaceStruct,type::PlotType)
+
+Plots the distribution function of of a given particle `species` as a function of momentum ``p`` and azimuthal angle ``h`` as a function of time given by the `sol` based on the conditions held in `PhaseSpace`. 
+
+The plot can be either static, animated or interactive depending on the `type` argument. `Static` and `Animated` plots are generated using CairoMakie and are best for publications and presentations, while `Interactive` plots are generated using GLMakie and allow for user interaction with the plot.
+
+Common arguments:
+- `theme`: the colour theme to use for the plot, default is `DiplodocusDark()`.
+- `order`: the order of p in p^order * dN/dp dV, default is 1, i.e. number density spectrum. 2 is "energy" density spectrum.
+
+Static arguments:
+- `timevalues`: a NOT OPTIONAL `tuple` of 3 either `Int64` or `Float64` time values to be plotted. `Int64` values are taken to be the time index in `sol.t`, whereas `Float64` values are taken to be actural time valus in code units that are then converted to the closest index in `sol.t`.
+
+Animated arguments:
+- `framerate`: the frame rate of the animation, default is 12 fps.
+- `filename`: the name of the file to save the animation to, default is "MomentumAndPolarAngleDistribution.mp4".
+
+"""
+function MomentumAndAzimuthalAngleDistributionPlot(sol,species::String,PhaseSpace::PhaseSpaceStruct,type::Static,timevalues::T;theme=DiplodocusDark(),order::Int64=1,TimeUnits::Function=CodeToCodeUnitsTime) where T <: Union{Tuple{Float64,Float64,Float64},Tuple{Int64,Int64,Int64}}
+
+    CairoMakie.activate!(inline=true) # plot in vs code window
+
+    with_theme(theme) do
+
+    name_list = PhaseSpace.name_list
+    Momentum = PhaseSpace.Momentum
+    Grids = PhaseSpace.Grids
+    Time = PhaseSpace.Time
+
+    species_index = findfirst(x->x==species,name_list)
+
+    p_num = Momentum.px_num_list[species_index]  
+    u_num = Momentum.py_num_list[species_index]
+    h_num = Momentum.pz_num_list[species_index]
+    dp = Grids.dpx_list[species_index]
+    du = Grids.dpy_list[species_index]
+    dh = Grids.dpz_list[species_index]
+    meanp = Grids.mpx_list[species_index]
+    meanu = Grids.mpy_list[species_index]
+    meanh = Grids.mpz_list[species_index]
+    p_r = Grids.pxr_list[species_index]
+    u_r = Grids.pyr_list[species_index]
+    h_r = Grids.pzr_list[species_index]
+    mass = Grids.mass_list[species_index]
+
+    t_idx = zeros(Int64,3)
+    t = zeros(Float64,3)
+
+    if typeof(timevalues) == Tuple{Int64,Int64,Int64}
+        for i in 1:3
+        t_idx[i] = timevalues[i]
+        t[i] = sol.t[t_idx[i]]
+        end
+    elseif typeof(timevalues) == Tuple{Float64,Float64,Float64}
+        for i in 1:3
+        t[i] = timevalues[i]
+        t_idx[i] = findmin(abs.(sol.t .- t[i]))[2] #findfirst(x->x==t[i],sol.t)
+        end
+    end
+
+    fig = Figure(size=(576,276)) # 8:3 aspect ratio
+
+    f1 = copy(Location_Species_To_StateVector(sol.f[t_idx[1]],PhaseSpace,species_index=species_index))
+    f2 = copy(Location_Species_To_StateVector(sol.f[t_idx[2]],PhaseSpace,species_index=species_index))
+    f3 = copy(Location_Species_To_StateVector(sol.f[t_idx[3]],PhaseSpace,species_index=species_index))
+
+    #dis1 = dropdims(sum(reshape(sol.f[t_idx[1]].x[species_index],(p_num,u_num,h_num)),dims=3),dims=3)
+    #dis2 = dropdims(sum(reshape(sol.f[t_idx[2]].x[species_index],(p_num,u_num,h_num)),dims=3),dims=3)
+    #dis3 = dropdims(sum(reshape(sol.f[t_idx[3]].x[species_index],(p_num,u_num,h_num)),dims=3),dims=3)
+
+    # sum over u angle
+    dis1 = dropdims(sum(reshape(f1,(p_num,u_num,h_num)),dims=2),dims=2)
+    dis2 = dropdims(sum(reshape(f2,(p_num,u_num,h_num)),dims=2),dims=2)
+    dis3 = dropdims(sum(reshape(f3,(p_num,u_num,h_num)),dims=2),dims=2)
+
+    # scale by order
+    # f = dN/dpdudh * dpdudh therefore dN/dpdu = f / dpdu and p^order * dN/dpdu = f * mp^order / dpdu
+    for px in 1:p_num, pz in 1:h_num
+        dis1[px,pz] *= (meanp[px]^(order)) / dp[px] / dh[pz]
+        dis2[px,pz] *= (meanp[px]^(order)) / dp[px] / dh[pz]
+        dis3[px,pz] *= (meanp[px]^(order)) / dp[px] / dh[pz]
+    end
+    replace!(dis1,0.0 => NaN) # replace Inf with NaN for plotting
+    replace!(dis2,0.0 => NaN) # replace Inf with NaN for plotting
+    replace!(dis3,0.0 => NaN) # replace Inf with NaN for plotting
+
+    max_dis = maximum(x for x in [dis1; dis2; dis3] if !isnan(x))
+    min_dis = minimum(x for x in [dis1; dis2; dis3] if !isnan(x))
+    col_range = (log10(max_dis)-24.0,log10(max_dis))
+
+    ax1 = PolarAxis(fig[1,1+1],theta_0=-pi/2,direction=-1,width=176)
+    ax1.radius_at_origin = log10(p_r[1])-1.0
+    thetalims!(ax1,0,2pi)
+
+    ax2 = PolarAxis(fig[1,2+1],theta_0=-pi/2,direction=-1,width=176)
+    ax2.radius_at_origin = log10(p_r[1])-1.0
+    thetalims!(ax2,0,2pi)
+
+    ax3 = PolarAxis(fig[1,3+1],theta_0=-pi/2,direction=-1,width=176)
+    ax3.radius_at_origin = log10(p_r[1])-1.0
+    thetalims!(ax3,0,2pi)
+
+    #u_as_theta_grid = zeros(Float64,length(u_r))
+    #u_as_theta_grid_tick_values = Vector{Float64}(-1:0.5:1)
+    #u_as_theta_grid_tick_values_string = string.(u_as_theta_grid_tick_values)
+    #u_as_theta_grid_tick_values_string[end] = "u=1.0" 
+    #u_as_theta_grid_tick_locations = zeros(Float64,length(u_as_theta_grid_tick_values))
+    #@. u_as_theta_grid = pi - pi * (u_r+1)/2 # convert u grid to a set of theta values such that u can be plotted as polar angle
+    #@. u_as_theta_grid_tick_locations = pi - pi * (u_as_theta_grid_tick_values+1)/2 # convert u grid ticks to a set of theta values such that u can be plotted as polar angle
+
+    hm1 = heatmap!(ax1,h_r,log10.(p_r),log10.(dis1'),colormap=theme.colormap_var,colorrange=col_range,colorscale=x->asinh(x-log10(max_dis)))
+    hm2 = heatmap!(ax2,h_r,log10.(p_r),log10.(dis2'),colormap=theme.colormap_var,colorrange=col_range,colorscale=x->asinh(x-log10(max_dis)))
+    hm3 = heatmap!(ax3,h_r,log10.(p_r),log10.(dis3'),colormap=theme.colormap_var,colorrange=col_range,colorscale=x->asinh(x-log10(max_dis)))
+
+    rlims!(ax1,log10(p_r[1]),log10(p_r[end])+1.0)
+    rlims!(ax2,log10(p_r[1]),log10(p_r[end])+1.0)
+    rlims!(ax3,log10(p_r[1]),log10(p_r[end])+1.0)
+    #ax1.thetaticks = (u_as_theta_grid_tick_locations,u_as_theta_grid_tick_values_string)
+    #ax2.thetaticks = (u_as_theta_grid_tick_locations,u_as_theta_grid_tick_values_string)
+    #ax3.thetaticks = (u_as_theta_grid_tick_locations,u_as_theta_grid_tick_values_string)
+    #hidethetadecorations!(ax1, grid=false)
+    #hidethetadecorations!(ax2, grid=false)
+    #hidethetadecorations!(ax3, grid=false)
+
+    if order == 1
+        Colorbar(fig[1,1],hm1,label=L"$\log_{10}\left(p\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}\phi\mathrm{d}V}[\text{m}^{-3}]\right)$",flipaxis=false,height=176,tellheight=false)
+    elseif order != 1
+        Colorbar(fig[1,1],hm1,label=L"$\log_{10}\left(p^{%$order}\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}\phi\mathrm{d}V}[\text{m}^{-3}\left(m_ec\right)^{%$(order-1)}]\right)$ $$",flipaxis=false,height=176,tellheight=false)
+    end
+
+    t_unit_string = TimeUnits()
+
+    pt = 4/3
+    text!(ax1,L"$\log_{10}\left(p[m_ec]\right)$",position=(-3.05,log10(p_r[end])),rotation=pi/2,fontsize=9pt)
+    text!(ax1,L"$t=%$(round(TimeUnits(t[1]),sigdigits=3))$ $%$t_unit_string$",position=(2.8,log10(p_r[end])+4.5),fontsize=10pt)
+    text!(ax2,L"$t=%$(round(TimeUnits(t[2]),sigdigits=3))$ $%$t_unit_string$",position=(2.8,log10(p_r[end])+4.5),fontsize=10pt)
+    text!(ax3,L"$t=%$(round(TimeUnits(t[3]),sigdigits=3))$ $%$t_unit_string$",position=(2.8,log10(p_r[end])+4.5),fontsize=10pt)
+
+    colsize!(fig.layout,1,Relative(0.1))
+    colsize!(fig.layout,2,Relative(0.3))
+    colsize!(fig.layout,3,Relative(0.3))
+    colsize!(fig.layout,4,Relative(0.3))
+    
+    return fig
+
+    end # with_theme
+
+end
+
+function MomentumAndAzimuthalAngleDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseSpaceStruct,type::Animated;theme=DiplodocusDark(),order::Int64=1,framerate=12,filename="MomentumAndPolarAngleDistribution.mp4",figure=nothing,TimeUnits::Function=CodeToCodeUnitsTime)
+
+    CairoMakie.activate!(inline=true) # plot in vs code window
+
+    with_theme(theme) do
+
+    if isnothing(figure)
+        time_idx = Observable(1) # index of the current time step
+        t = @lift(sol.t[$time_idx])
+        fig = Figure(size = (3.25inch,3.25inch)) # 1:1 aspect ratio
+    else
+        fig, time_idx = figure # use the provided figure and time index
+    end
+
+    num_species = length(species)
+
+    name_list = PhaseSpace.name_list
+    Momentum = PhaseSpace.Momentum
+    Grids = PhaseSpace.Grids
+    Time = PhaseSpace.Time
+
+    for (species_idx, species_name) in enumerate(species)
+
+    species_index = findfirst(x->x==species_name,name_list)
+
+    p_num = Momentum.px_num_list[species_index]  
+    u_num = Momentum.py_num_list[species_index]
+    h_num = Momentum.pz_num_list[species_index]
+    dp = Grids.dpx_list[species_index]
+    du = Grids.dpy_list[species_index]
+    dh = Grids.dpz_list[species_index]
+    meanp = Grids.mpx_list[species_index]
+    meanu = Grids.mpy_list[species_index]
+    meanh = Grids.mpz_list[species_index]
+    p_r = Grids.pxr_list[species_index]
+    u_r = Grids.pyr_list[species_index]
+    h_r = Grids.pzr_list[species_index]
+    mass = Grids.mass_list[species_index]
+
+
+    dis = @lift begin
+        f1D = copy(Location_Species_To_StateVector(sol.f[$time_idx],PhaseSpace,species_index=species_index))
+        # sum over u angles
+        f2D = dropdims(sum(reshape(f1D,(p_num,u_num,h_num)),dims=2),dims=2)
+        # scale by order
+        # f = dN/dpdudh * dpdudh therefore dN/dpdu = f / dpdu and p^order * dN/dpdu = f * mp^order / dpdu
+        for px in 1:p_num, pz in 1:h_num
+            f2D[px,pz] *= (meanp[px]^(order)) / dp[px] / dh[pz]
+        end
+        replace!(f2D,0.0 => NaN) # replace Inf with NaN for plotting
+        log10.(f2D)'
+    end
+
+    max_dis = @lift(maximum(x for x in $dis if !isnan(x)))
+    #min_dis = @lift(minimum(x for x in [dis] if !isnan(x)))
+    col_range = @lift(($max_dis-24.0,$max_dis))
+
+    ax = PolarAxis(fig[1,1+species_idx],theta_0=-pi/2,direction=-1,width=Relative(1.2))
+    ax.radius_at_origin = log10(p_r[1])-1.0
+    thetalims!(ax,0,2pi)
+
+    #hm1 = heatmap!(ax1,acos.(u_r),log10.(p_r),log10.(dis1'),colormap=theme.colormap,colorrange=col_range)
+    #hm2 = heatmap!(ax2,acos.(u_r),log10.(p_r),log10.(dis2'),colormap=theme.colormap,colorrange=col_range)
+    #hm3 = heatmap!(ax3,acos.(u_r),log10.(p_r),log10.(dis3'),colormap=theme.colormap,colorrange=col_range)
+
+    #u_as_theta_grid = zeros(Float64,length(u_r))
+    #u_as_theta_grid_tick_values = Vector{Float64}(-1:0.5:1)
+    #u_as_theta_grid_tick_values_string = string.(u_as_theta_grid_tick_values)
+    #u_as_theta_grid_tick_values_string[end] = "u=1.0" 
+    #u_as_theta_grid_tick_locations = zeros(Float64,length(u_as_theta_grid_tick_values))
+    #@. u_as_theta_grid = pi - pi * (u_r+1)/2 # convert u grid to a set of theta values such that u can be plotted as polar angle
+    #@. u_as_theta_grid_tick_locations = pi - pi * (u_as_theta_grid_tick_values+1)/2 # convert u grid ticks to a set of theta values such that u can be plotted as polar angle
+
+    hm = heatmap!(ax,h_r,log10.(p_r),dis,colormap=theme.colormap_var,colorrange=col_range,colorscale=@lift(x->asinh(x-$max_dis)))
+
+    rlims!(ax,log10(p_r[1]),log10(p_r[end])+1.0)
+    #ax.thetaticks = (u_as_theta_grid_tick_locations,u_as_theta_grid_tick_values_string)
+    #hidethetadecorations!(ax1, grid=false)
+    #hidethetadecorations!(ax2, grid=false)
+    #hidethetadecorations!(ax3, grid=false)
+
+    pt = 4/3
+    text!(ax,L"$\log_{10}\left(p[m_ec]\right)$",position=(-3.00,log10(p_r[end])+1.0),rotation=pi/2,fontsize=9pt)
+    if num_species != 1
+        text!(ax,L"$species_name",position=(2.6,log10(p_r[end])+3.2),fontsize=10pt)
+    end
+
+    if species_idx == length(species)
+    if order == 1
+        Colorbar(fig[1,1],hm,label=L"$\log_{10}\left(p\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}\phi\mathrm{d}V}[\text{m}^{-3}]\right)$",flipaxis=false,height=Relative(0.75),tellheight=false)
+    elseif order != 1
+        Colorbar(fig[1,1],hm,label=L"$\log_{10}\left(p^{%$order}\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}\phi\mathrm{d}V}[\text{m}^{-3}\left(m_ec\right)^{%$(order-1)}]\right)$ $$",flipaxis=false,height=Relative(0.75),tellheight=false)
     end
     end
 
