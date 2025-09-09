@@ -1015,15 +1015,15 @@ function MomentumAndAzimuthalAngleDistributionPlot(sol,species::String,PhaseSpac
     min_dis = minimum(x for x in [dis1; dis2; dis3] if !isnan(x))
     col_range = (log10(max_dis)-24.0,log10(max_dis))
 
-    ax1 = PolarAxis(fig[1,1+1],theta_0=-pi/2,direction=-1,width=176)
+    ax1 = PolarAxis(fig[1,1+1],width=176)
     ax1.radius_at_origin = log10(p_r[1])-1.0
     thetalims!(ax1,0,2pi)
 
-    ax2 = PolarAxis(fig[1,2+1],theta_0=-pi/2,direction=-1,width=176)
+    ax2 = PolarAxis(fig[1,2+1],width=176)
     ax2.radius_at_origin = log10(p_r[1])-1.0
     thetalims!(ax2,0,2pi)
 
-    ax3 = PolarAxis(fig[1,3+1],theta_0=-pi/2,direction=-1,width=176)
+    ax3 = PolarAxis(fig[1,3+1],width=176)
     ax3.radius_at_origin = log10(p_r[1])-1.0
     thetalims!(ax3,0,2pi)
 
@@ -1131,7 +1131,7 @@ function MomentumAndAzimuthalAngleDistributionPlot(sol,species::Vector{String},P
     #min_dis = @lift(minimum(x for x in [dis] if !isnan(x)))
     col_range = @lift(($max_dis-24.0,$max_dis))
 
-    ax = PolarAxis(fig[1,1+species_idx],theta_0=-pi/2,direction=-1,width=Relative(1.2))
+    ax = PolarAxis(fig[1,1+species_idx],width=Relative(1.2))
     ax.radius_at_origin = log10(p_r[1])-1.0
     thetalims!(ax,0,2pi)
 
