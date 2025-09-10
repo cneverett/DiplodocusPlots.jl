@@ -1357,10 +1357,10 @@ end
 
 function AM3_DIP_Combo_MomentumDistributionPlot(filePath_AM3,sol_DIP,PhaseSpace_DIP,t_max,t_min,t_grid;plot_limits=(nothing,nothing),theme=DiplodocusDark())
 
-    name_list = PhaseSpace.name_list
-    Momentum = PhaseSpace.Momentum
-    Grids = PhaseSpace.Grids
-    Time = PhaseSpace.Time
+    name_list = PhaseSpace_DIP.name_list
+    Momentum = PhaseSpace_DIP.Momentum
+    Grids = PhaseSpace_DIP.Grids
+    Time = PhaseSpace_DIP.Time
 
     # load AM3 Data
     fileExist = isfile(filePath_AM3)
@@ -1377,7 +1377,7 @@ function AM3_DIP_Combo_MomentumDistributionPlot(filePath_AM3,sol_DIP,PhaseSpace_
 
         DC.close(f)  
     else
-        error("no file at $filePath found")
+        error("no file at $filePath_AM3 found")
     end
 
     # unit conversion 
@@ -1388,16 +1388,29 @@ function AM3_DIP_Combo_MomentumDistributionPlot(filePath_AM3,sol_DIP,PhaseSpace_
 
     with_theme(theme) do
 
-    fig = Figure(size=(576,432)) # double column 8:6 aspect ratio
+    fig = Figure(size=(576,460)) # double column 8:6 aspect ratio
 
-    xlab = L"$\log_{10}\left(p [m_ec]\right)$"
-    ylab = L"$\log_{10}\left(p^2\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V} [\text{m}^{-3}\left(m_ec\right)]\right)$"
-    ax_DIP = Axis(fig[1,1],aspect=DataAspect())
-    ax_DIP.limits = plot_limits
-    ax_AM3 = Axis(fig[2,1],aspect=DataAspect())
-    ax_AM3.limits = plot_limits
+    #g1 = fig[1,1] = GridLayout()
+    g2 = fig[1,1]  = GridLayout()
+    #g3 = fig[1,3] = GridLayout()
 
-    linkxaxes!(ax_DIP,ax_AM3)
+    #colsize!(g2.layout,0,Relative(0.05))
+    #colsize!(g2.layout,1,Relative(0.9))
+    #colsize!(g2.layout,2,Relative(0.05))
+
+    xlab = L"$\log_{10}\left(p\,[m_ec]\right)$"
+    ylab = L"$\log_{10}\left(p^2\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V}\,[\text{m}^{-3}\left(m_ec\right)]\right)$"
+    ylab_err = L"$\text{Frac. Err.}$"
+    
+    ax_DIP = Axis(g2[1,1],aspect=DataAspect(),ylabel=ylab)
+    hidexdecorations!(ax_DIP)
+    ax_AM3 = Axis(g2[2,1],aspect=DataAspect())
+    hidexdecorations!(ax_AM3)
+    ax_err = Axis(g2[3,1],xlabel=xlab,aspect=DataAspect(),ylabel=ylab_err)
+
+    #pt = 4/3
+    #Label(g2[1:2,0],ylab,rotation = pi/2,fontsize=9pt)
+    #Label(g2[3,0],ylab_err,rotation = pi/2,fontsize=9pt)
 
     linestyles = [:solid,(:dash,:dense),(:dot,:dense),(:dashdot,:dense),(:dashdotdot,:dense)]
     legend_elements = []
@@ -1430,9 +1443,10 @@ function AM3_DIP_Combo_MomentumDistributionPlot(filePath_AM3,sol_DIP,PhaseSpace_
 
         # AM3
         t = t_pho[i]
-        println("t=$t")
+        #println("t=$t")
         if log10(t) % 1 == 0.0 && t <= t_max # 10^n timesteps
             t_plot = t
+            println("t=$t")
 
             if t_grid == "u"
                 color = theme.colormap[][(t - t_min) / (t_max - t_min)]
@@ -1440,28 +1454,46 @@ function AM3_DIP_Combo_MomentumDistributionPlot(filePath_AM3,sol_DIP,PhaseSpace_
                 color = theme.colormap[][(log10(t) - log10(t_min)) / (log10(t_max) - log10(t_min))]
             end
 
-            # sum along u and h directions
-            pdNdp = f_pho[i,:][1]
-            #println("$pdNdp")
-            scatterlines!(ax_AM3,log10.(meanp_pho .* eV_to_mElec2),log10.(meanp_pho .* pdNdp .* cm3_to_m3 .* eV_to_mElec2),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[1])
-        end
+            meanp_AM3 = meanp_pho .* eV_to_mElec2
 
-        # DIP
-        t_idx = findfirst(x->round(x,sigdigits=3)==t_plot,sol.t)
-        f1D .= copy(Location_Species_To_StateVector(sol_DIP.f[t_idx],PhaseSpace_DIP,species_index=species_index))
-        f3D .= reshape(f1D,(p_num,u_num,h_num))
-        @. f3D = f3D*(f3D!=Inf)
-        # scale by order
-        # f = dN/dpdudh * dpdudh therefore dN/dp = f / dp and p^order * dN/dp = f * mp^order / dp
-        for px in 1:p_num, py in 1:u_num, pz in 1:h_num
-            f3D[px,py,pz] = f3D[px,py,pz] * (meanp[px]^(order)) / dp[px]
-        end
-        pdNdp = dropdims(sum(f3D, dims=(2,3)),dims=(2,3))
-        if sum(@. !isnan(pdNdp) * !isinf(pdNdp) * !iszero(pdNdp)) == 1 # there is only one valid position so scatterlines doesn't work
-            idx = findfirst(!iszero,pdNdp)
-            lines!(ax,[log10(meanp[idx]), log10(meanp[idx])],[-20.0, log10(pdNdp[idx])],linewidth=2.0,color = color,linestyle=linestyles[1])
-        else
-            scatterlines!(ax,log10.(meanp),log10.(pdNdp),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[1])
+            # sum along u and h directions
+            pdNdp_AM3 = meanp_AM3 .* f_pho[i,:][1] .* cm3_to_m3
+            #println("$pdNdp")
+            scatterlines!(ax_AM3,log10.(meanp_AM3),log10.(pdNdp_AM3),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[1])
+
+            # DIP
+            t_idx = findfirst(x->round(CodeToSIUnitsTime(x),sigdigits=4)==t_plot,sol_DIP.t)
+            println(t_idx)
+            f1D .= copy(Location_Species_To_StateVector(sol_DIP.f[t_idx],PhaseSpace_DIP,species_index=species_index))
+            f3D .= reshape(f1D,(p_num,u_num,h_num))
+            @. f3D = f3D*(f3D!=Inf)
+            # scale by order
+            # f = dN/dpdudh * dpdudh therefore dN/dp = f / dp and p^order * dN/dp = f * mp^order / dp
+            for px in 1:p_num, py in 1:u_num, pz in 1:h_num
+                f3D[px,py,pz] = f3D[px,py,pz] * (meanp[px]^(order)) / dp[px]
+            end
+            pdNdp_DIP = dropdims(sum(f3D, dims=(2,3)),dims=(2,3))
+            if sum(@. !isnan(pdNdp_DIP) * !isinf(pdNdp_DIP) * !iszero(pdNdp_DIP)) == 1 # there is only one valid position so scatterlines doesn't work
+                idx = findfirst(!iszero,pdNdp)
+                lines!(ax,[log10(meanp[idx]), log10(meanp[idx])],[-20.0, log10(pdNdp_DIP[idx])],linewidth=2.0,color = color,linestyle=linestyles[1])
+            else
+                scatterlines!(ax_DIP,log10.(meanp),log10.(pdNdp_DIP),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[1])
+            end
+
+            # error plot
+            # regrid AM3 results (assuming it has finest grid) to grid size of DIP
+            pdNdp_AM3_DIP_Grid = zeros(Float64,size(meanp))
+            for p in eachindex(meanp)
+                p_idx = find_closest(meanp_AM3,meanp[p])
+                pdNdp_AM3_DIP_Grid[p] = pdNdp_AM3[p_idx]
+            end
+            err = (pdNdp_AM3_DIP_Grid.-pdNdp_DIP)./pdNdp_DIP
+            replace!(err,-1.0=>NaN) # remove values for which AM3 does not have values
+            replace!(err,Inf=>NaN) # remove values for which DIP does not have values
+
+            scatterlines!(ax_err,log10.(meanp),err,linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[1])
+
+
         end
 
     end
@@ -1501,28 +1533,43 @@ function AM3_DIP_Combo_MomentumDistributionPlot(filePath_AM3,sol_DIP,PhaseSpace_
             elseif t_grid == "l"
                 color = theme.colormap[][(log10(t) - log10(t_min)) / (log10(t_max) - log10(t_min))]
             end
+            meanp_AM3 = sqrt.((meanp_ele .* eV_to_mElec2).^2 .-1)
 
             # sum along u and h directions
-            pdNdp = f_ele[i,:][1]
-            scatterlines!(ax_AM3,log10.(sqrt.((meanp_ele .* eV_to_mElec2).^2 .-1)),log10.(sqrt.((meanp_ele .* eV_to_mElec2).^2 .-1) .* pdNdp .* cm3_to_m3),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[2])
-        end
+            pdNdp_AM3 = meanp_AM3 .* f_ele[i,:][1] .* cm3_to_m3
+            scatterlines!(ax_AM3,log10.(meanp_AM3),log10.(pdNdp_AM3),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[2])
 
-        # DIP
-        t_idx = findfirst(x->round(x,sigdigits=3)==t_plot,sol.t)
-        f1D .= copy(Location_Species_To_StateVector(sol_DIP.f[t_idx],PhaseSpace_DIP,species_index=species_index))
-        f3D .= reshape(f1D,(p_num,u_num,h_num))
-        @. f3D = f3D*(f3D!=Inf)
-        # scale by order
-        # f = dN/dpdudh * dpdudh therefore dN/dp = f / dp and p^order * dN/dp = f * mp^order / dp
-        for px in 1:p_num, py in 1:u_num, pz in 1:h_num
-            f3D[px,py,pz] = f3D[px,py,pz] * (meanp[px]^(order)) / dp[px]
-        end
-        pdNdp = dropdims(sum(f3D, dims=(2,3)),dims=(2,3))
-        if sum(@. !isnan(pdNdp) * !isinf(pdNdp) * !iszero(pdNdp)) == 1 # there is only one valid position so scatterlines doesn't work
-            idx = findfirst(!iszero,pdNdp)
-            lines!(ax,[log10(meanp[idx]), log10(meanp[idx])],[-20.0, log10(pdNdp[idx])],linewidth=2.0,color = color,linestyle=linestyles[2])
-        else
-            scatterlines!(ax,log10.(meanp),log10.(pdNdp),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[2])
+            # DIP
+            t_idx = findfirst(x->round(CodeToSIUnitsTime(x),sigdigits=3)==t_plot,sol_DIP.t)
+            f1D .= copy(Location_Species_To_StateVector(sol_DIP.f[t_idx],PhaseSpace_DIP,species_index=species_index))
+            f3D .= reshape(f1D,(p_num,u_num,h_num))
+            @. f3D = f3D*(f3D!=Inf)
+            # scale by order
+            # f = dN/dpdudh * dpdudh therefore dN/dp = f / dp and p^order * dN/dp = f * mp^order / dp
+            for px in 1:p_num, py in 1:u_num, pz in 1:h_num
+                f3D[px,py,pz] = f3D[px,py,pz] * (meanp[px]^(order)) / dp[px]
+            end
+            pdNdp_DIP = dropdims(sum(f3D, dims=(2,3)),dims=(2,3))
+            if sum(@. !isnan(pdNdp_DIP) * !isinf(pdNdp_DIP) * !iszero(pdNdp_DIP)) == 1 # there is only one valid position so scatterlines doesn't work
+                idx = findfirst(!iszero,pdNdp)
+                lines!(ax,[log10(meanp[idx]), log10(meanp[idx])],[-20.0, log10(pdNdp_DIP[idx])],linewidth=2.0,color = color,linestyle=linestyles[2])
+            else
+                scatterlines!(ax_DIP,log10.(meanp),log10.(pdNdp_DIP),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[2])
+            end
+
+            # error plot
+            # regrid AM3 results (assuming it has finest grid) to grid size of DIP
+            pdNdp_AM3_DIP_Grid = zeros(Float64,size(meanp))
+            for p in eachindex(meanp)
+                p_idx = find_closest(meanp_AM3,meanp[p])
+                pdNdp_AM3_DIP_Grid[p] = pdNdp_AM3[p_idx]
+            end
+            err = (pdNdp_AM3_DIP_Grid.-pdNdp_DIP)./pdNdp_DIP
+            replace!(err,-1.0=>NaN) # remove values for which AM3 does not have values
+            replace!(err,Inf=>NaN) # remove values for which DIP does not have values
+
+            scatterlines!(ax_err,log10.(meanp),err,linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[2])
+
         end
 
     end
@@ -1535,62 +1582,84 @@ function AM3_DIP_Combo_MomentumDistributionPlot(filePath_AM3,sol_DIP,PhaseSpace_
 
     species_name = "Pos"
     species_index = findfirst(x->x==species_name,name_list)
-    p_num = Momentum.px_num_list[species_index]  
-    u_num = Momentum.py_num_list[species_index]
-    h_num = Momentum.pz_num_list[species_index]
-    dp = Grids.dpx_list[species_index]
-    du = Grids.dpy_list[species_index]
-    meanp = Grids.mpx_list[species_index]
-    meanu = Grids.mpy_list[species_index]
-    meanh = Grids.mpz_list[species_index]
-    p_r = Grids.pxr_list[species_index]
-    u_r = Grids.pyr_list[species_index]
-    h_r = Grids.pzr_list[species_index]
-    mass = Grids.mass_list[species_index]
+    if species_index != nothing
+        p_num = Momentum.px_num_list[species_index]  
+        u_num = Momentum.py_num_list[species_index]
+        h_num = Momentum.pz_num_list[species_index]
+        dp = Grids.dpx_list[species_index]
+        du = Grids.dpy_list[species_index]
+        meanp = Grids.mpx_list[species_index]
+        meanu = Grids.mpy_list[species_index]
+        meanh = Grids.mpz_list[species_index]
+        p_r = Grids.pxr_list[species_index]
+        u_r = Grids.pyr_list[species_index]
+        h_r = Grids.pzr_list[species_index]
+        mass = Grids.mass_list[species_index]
 
-    f3D = zeros(Float32,p_num,u_num,h_num)
-    f1D = zeros(Float32,p_num*u_num*h_num)
+        f3D = zeros(Float32,p_num,u_num,h_num)
+        f1D = zeros(Float32,p_num*u_num*h_num)
 
-    for i in 1:length(t_ele)
+        for i in 1:length(t_ele)
 
-        # AM3
-        t = t_ele[i]
-        if log10(t) % 1 == 0.0 && t <= t_max # 10^n timesteps 
-            t_plot = t
-            if t_grid == "u"
-                color = theme.colormap[][(t - t_min) / (t_max - t_min)]
-            elseif t_grid == "l"
-                color = theme.colormap[][(log10(t) - log10(t_min)) / (log10(t_max) - log10(t_min))]
+            # AM3
+            t = t_ele[i]
+            if log10(t) % 1 == 0.0 && t <= t_max # 10^n timesteps 
+                t_plot = t
+                if t_grid == "u"
+                    color = theme.colormap[][(t - t_min) / (t_max - t_min)]
+                elseif t_grid == "l"
+                    color = theme.colormap[][(log10(t) - log10(t_min)) / (log10(t_max) - log10(t_min))]
+                end
+
+                # DIP
+                t_idx = findfirst(x->round(CodeToSIUnitsTime(x),sigdigits=3)==t_plot,sol_DIP.t)
+                f1D .= copy(Location_Species_To_StateVector(sol_DIP.f[t_idx],PhaseSpace_DIP,species_index=species_index))
+                f3D .= reshape(f1D,(p_num,u_num,h_num))
+                @. f3D = f3D*(f3D!=Inf)
+                # scale by order
+                # f = dN/dpdudh * dpdudh therefore dN/dp = f / dp and p^order * dN/dp = f * mp^order / dp
+                for px in 1:p_num, py in 1:u_num, pz in 1:h_num
+                    f3D[px,py,pz] = f3D[px,py,pz] * (meanp[px]^(order)) / dp[px]
+                end
+                pdNdp_DIP = dropdims(sum(f3D, dims=(2,3)),dims=(2,3))
+                if sum(@. !isnan(pdNdp_DIP) * !isinf(pdNdp_DIP) * !iszero(pdNdp_DIP)) == 1 # there is only one valid position so scatterlines doesn't work
+                    idx = findfirst(!iszero,pdNdp)
+                    lines!(ax,[log10(meanp[idx]), log10(meanp[idx])],[-20.0, log10(pdNdp_DIP[idx])],linewidth=2.0,color = color,linestyle=linestyles[3])
+                else
+                    scatterlines!(ax_DIP,log10.(meanp),log10.(pdNdp_DIP),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[3])
+                end
+
             end
         end
-
-        # DIP
-        t_idx = findfirst(x->round(x,sigdigits=3)==t_plot,sol.t)
-        f1D .= copy(Location_Species_To_StateVector(sol_DIP.f[t_idx],PhaseSpace_DIP,species_index=species_index))
-        f3D .= reshape(f1D,(p_num,u_num,h_num))
-        @. f3D = f3D*(f3D!=Inf)
-        # scale by order
-        # f = dN/dpdudh * dpdudh therefore dN/dp = f / dp and p^order * dN/dp = f * mp^order / dp
-        for px in 1:p_num, py in 1:u_num, pz in 1:h_num
-            f3D[px,py,pz] = f3D[px,py,pz] * (meanp[px]^(order)) / dp[px]
-        end
-        pdNdp = dropdims(sum(f3D, dims=(2,3)),dims=(2,3))
-        if sum(@. !isnan(pdNdp) * !isinf(pdNdp) * !iszero(pdNdp)) == 1 # there is only one valid position so scatterlines doesn't work
-            idx = findfirst(!iszero,pdNdp)
-            lines!(ax,[log10(meanp[idx]), log10(meanp[idx])],[-20.0, log10(pdNdp[idx])],linewidth=2.0,color = color,linestyle=linestyles[3])
-        else
-            scatterlines!(ax,log10.(meanp),log10.(pdNdp),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[3])
-        end
-
     end
 
     if t_grid == "u"
-        Colorbar(fig[1,2],colormap = theme.colormap,limits=(TimeUnits(t_min),TimeUnits(t_max)),label=L"$t$ $[\text{s} * \sigma_{T}c]$")
+        Colorbar(g2[1:2,2],colormap = theme.colormap,limits=(TimeUnits(t_min),TimeUnits(t_max)),label=L"$t\,$ $[\text{s} * \sigma_{T}c]$",height=Relative(0.66))
     elseif t_grid == "l"
-        Colorbar(fig[1,2],colormap = theme.colormap,limits=(log10(t_min),log10(t_max)),label=L"$\log_{10}\left(t [\text{s}]\right)$")
+        Colorbar(g2[1:2,2],colormap = theme.colormap,limits=(log10(t_min),log10(t_max)),label=L"$\log_{10}\left(t \,[\text{s}]\right)$",height=Relative(0.66))
     end
 
+
     axislegend(ax_DIP,legend_elements,line_labels,position = :lt)
+
+    linkxaxes!(ax_DIP,ax_err)
+    linkxaxes!(ax_DIP,ax_AM3)
+    #ax_DIP.limits = plot_limits
+    xlims!(ax_DIP,plot_limits[1][1],plot_limits[1][2]) 
+    ylims!(ax_DIP,plot_limits[2][1],plot_limits[2][2]) 
+    #ax_AM3.limits = plot_limits
+    xlims!(ax_AM3,plot_limits[1][1],plot_limits[1][2])
+    ylims!(ax_AM3,plot_limits[2][1],plot_limits[2][2]) 
+
+    xlims!(ax_err,plot_limits[1][1],plot_limits[1][2])
+    ylims!(ax_err,-1.0,1.0)
+    
+    rowsize!(g2,1,Relative(0.4))
+    rowsize!(g2,2,Relative(0.4))
+    rowsize!(g2,3,Relative(0.2))
+
+    rowgap!(g2,1,0.0)
+    rowgap!(g2,2,0.0)
    
     return fig
 
@@ -1792,4 +1861,28 @@ function BFieldObserverPlot(sols::Vector{OutputStruct},PhaseSpaces::Vector{Phase
 
     end # with theme
 
+end
+
+
+function find_closest(A::AbstractArray{T}, b::T) where {T<:Real}
+    if length(A) <= 1
+        return firstindex(A)
+    end
+
+    i = searchsortedfirst(A, b)
+
+    if i == firstindex(A)
+        return i
+    elseif i > lastindex(A)
+        return lastindex(A)
+    else
+        prev_dist = b - A[i-1]
+        next_dist = A[i] - b
+
+        if prev_dist < next_dist
+            return i - 1
+        else
+            return i
+        end
+    end
 end
