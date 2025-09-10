@@ -1,9 +1,13 @@
 """
     TimeScalePlot(PhaseSpace, scheme, state)
 
-Function plots the time scales of a simulation given the system `state` at a time index `t_idx`.
+Function plots the time scales for interaction loss rates of a simulation given the system `state` at a time index `t_idx`.
+
+Optional arguments:
+- `theme`: the colour theme to use for the plot, default is `DiplodocusDark()`.
+- `p_timescale`: whether to plot the timescale for momentum magnitude loss or state vector loss, default is `false` i.e. plot state vector losses to aid in assessing time step limits for stability.
 """
-function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vector{F},t_idx::Int64;wide=false,paraperp::Bool=false,plot_limits=(nothing,nothing),theme=DiplodocusDark(),TimeUnits::Function=CodeToCodeUnitsTime) where F<:AbstractFloat
+function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vector{F},t_idx::Int64;wide=false,paraperp::Bool=false,p_timescale=false,plot_limits=(nothing,nothing),theme=DiplodocusDark(),TimeUnits::Function=CodeToCodeUnitsTime) where F<:AbstractFloat
 
     CairoMakie.activate!(inline=true) # plot in vs code window
     with_theme(theme) do
@@ -77,7 +81,9 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vec
 
         timescale2D = dropdims(sum(timescale3D, dims=(3)),dims=(3))
         # timescale is timescale for particle losses not particle energy losses, to get that we need to scale by dp/mp (i.e. dp/p)
-        timescale2D = mp ./ dp .* timescale2D
+        if p_timescale
+            timescale2D = mp ./ dp .* timescale2D
+        end
 
         for u in 1:u_num
 
