@@ -1360,7 +1360,7 @@ function AM3_DIP_Combo_MomentumDistributionPlot(filePath_AM3,sol_DIP,PhaseSpace_
     # load AM3 Data
     fileExist = isfile(filePath_AM3)
     if fileExist
-        f = DC.jldopen(filePath,"r+");
+        f = DC.jldopen(filePath_AM3,"r+");
 
         meanp_ele = f["meanp_ele"];
         f_ele = f["f_ele"];
