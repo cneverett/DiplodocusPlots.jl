@@ -1355,6 +1355,244 @@ function AM3_MomentumDistributionPlot(filePath,t_max,t_min,t_grid;plot_limits=(n
 
 end
 
+function AM3_DIP_Combo_MomentumDistributionPlot(filePath_AM3,sol_DIP,PhaseSpace_DIP,t_max,t_min,t_grid;plot_limits=(nothing,nothing),theme=DiplodocusDark())
+
+    # load AM3 Data
+    fileExist = isfile(filePath_AM3)
+    if fileExist
+        f = DC.jldopen(filePath,"r+");
+
+        meanp_ele = f["meanp_ele"];
+        f_ele = f["f_ele"];
+        t_ele = f["t_ele"];
+
+        meanp_pho = f["meanp_pho"];
+        f_pho = f["f_pho"];
+        t_pho = f["t_pho"];
+
+        DC.close(f)  
+    else
+        error("no file at $filePath found")
+    end
+
+    # unit conversion 
+    eV_to_mElec2 = 1.60217e-19 / 9.109e-31 / 2.9979e8^2
+    cm3_to_m3 = 1e6 
+
+    CairoMakie.activate!(inline=true) # plot in vs code window
+
+    with_theme(theme) do
+
+    fig = Figure(size=(576,432)) # double column 8:6 aspect ratio
+
+    xlab = L"$\log_{10}\left(p [m_ec]\right)$"
+    ylab = L"$\log_{10}\left(p^2\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V} [\text{m}^{-3}\left(m_ec\right)]\right)$"
+    ax_DIP = Axis(fig[1,1],aspect=DataAspect())
+    ax_DIP.limits = plot_limits
+    ax_AM3 = Axis(fig[2,1],aspect=DataAspect())
+    ax_AM3.limits = plot_limits
+
+    linkxaxes!(ax_DIP,ax_AM3)
+
+    linestyles = [:solid,(:dash,:dense),(:dot,:dense),(:dashdot,:dense),(:dashdotdot,:dense)]
+    legend_elements = []
+    line_labels = []
+
+    order = 2
+
+    ######## Photon Lines ########
+    ##############################
+
+    species_name = "Pho"
+    species_index = findfirst(x->x==species_name,name_list)
+    p_num = Momentum.px_num_list[species_index]  
+    u_num = Momentum.py_num_list[species_index]
+    h_num = Momentum.pz_num_list[species_index]
+    dp = Grids.dpx_list[species_index]
+    du = Grids.dpy_list[species_index]
+    meanp = Grids.mpx_list[species_index]
+    meanu = Grids.mpy_list[species_index]
+    meanh = Grids.mpz_list[species_index]
+    p_r = Grids.pxr_list[species_index]
+    u_r = Grids.pyr_list[species_index]
+    h_r = Grids.pzr_list[species_index]
+    mass = Grids.mass_list[species_index]
+
+    f3D = zeros(Float32,p_num,u_num,h_num)
+    f1D = zeros(Float32,p_num*u_num*h_num)
+    
+    for i in 1:length(t_pho)
+
+        # AM3
+        t = t_pho[i]
+        println("t=$t")
+        if log10(t) % 1 == 0.0 && t <= t_max # 10^n timesteps
+            t_plot = t
+
+            if t_grid == "u"
+                color = theme.colormap[][(t - t_min) / (t_max - t_min)]
+            elseif t_grid == "l"
+                color = theme.colormap[][(log10(t) - log10(t_min)) / (log10(t_max) - log10(t_min))]
+            end
+
+            # sum along u and h directions
+            pdNdp = f_pho[i,:][1]
+            #println("$pdNdp")
+            scatterlines!(ax_AM3,log10.(meanp_pho .* eV_to_mElec2),log10.(meanp_pho .* pdNdp .* cm3_to_m3 .* eV_to_mElec2),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[1])
+        end
+
+        # DIP
+        t_idx = findfirst(x->round(x,sigdigits=3)==t_plot,sol.t)
+        f1D .= copy(Location_Species_To_StateVector(sol_DIP.f[t_idx],PhaseSpace_DIP,species_index=species_index))
+        f3D .= reshape(f1D,(p_num,u_num,h_num))
+        @. f3D = f3D*(f3D!=Inf)
+        # scale by order
+        # f = dN/dpdudh * dpdudh therefore dN/dp = f / dp and p^order * dN/dp = f * mp^order / dp
+        for px in 1:p_num, py in 1:u_num, pz in 1:h_num
+            f3D[px,py,pz] = f3D[px,py,pz] * (meanp[px]^(order)) / dp[px]
+        end
+        pdNdp = dropdims(sum(f3D, dims=(2,3)),dims=(2,3))
+        if sum(@. !isnan(pdNdp) * !isinf(pdNdp) * !iszero(pdNdp)) == 1 # there is only one valid position so scatterlines doesn't work
+            idx = findfirst(!iszero,pdNdp)
+            lines!(ax,[log10(meanp[idx]), log10(meanp[idx])],[-20.0, log10(pdNdp[idx])],linewidth=2.0,color = color,linestyle=linestyles[1])
+        else
+            scatterlines!(ax,log10.(meanp),log10.(pdNdp),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[1])
+        end
+
+    end
+
+    push!(legend_elements,LineElement(color = theme.textcolor[], linestyle = linestyles[1],linewidth = 2.0))
+    push!(line_labels,"Pho")
+
+    ######## Electron Lines ########
+    ################################
+
+    species_name = "Ele"
+    species_index = findfirst(x->x==species_name,name_list)
+    p_num = Momentum.px_num_list[species_index]  
+    u_num = Momentum.py_num_list[species_index]
+    h_num = Momentum.pz_num_list[species_index]
+    dp = Grids.dpx_list[species_index]
+    du = Grids.dpy_list[species_index]
+    meanp = Grids.mpx_list[species_index]
+    meanu = Grids.mpy_list[species_index]
+    meanh = Grids.mpz_list[species_index]
+    p_r = Grids.pxr_list[species_index]
+    u_r = Grids.pyr_list[species_index]
+    h_r = Grids.pzr_list[species_index]
+    mass = Grids.mass_list[species_index]
+
+    f3D = zeros(Float32,p_num,u_num,h_num)
+    f1D = zeros(Float32,p_num*u_num*h_num)
+
+    for i in 1:length(t_ele)
+
+        # AM3
+        t = t_ele[i]
+        if log10(t) % 1 == 0.0 && t <= t_max # 10^n timesteps 
+            t_plot = t
+            if t_grid == "u"
+                color = theme.colormap[][(t - t_min) / (t_max - t_min)]
+            elseif t_grid == "l"
+                color = theme.colormap[][(log10(t) - log10(t_min)) / (log10(t_max) - log10(t_min))]
+            end
+
+            # sum along u and h directions
+            pdNdp = f_ele[i,:][1]
+            scatterlines!(ax_AM3,log10.(sqrt.((meanp_ele .* eV_to_mElec2).^2 .-1)),log10.(sqrt.((meanp_ele .* eV_to_mElec2).^2 .-1) .* pdNdp .* cm3_to_m3),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[2])
+        end
+
+        # DIP
+        t_idx = findfirst(x->round(x,sigdigits=3)==t_plot,sol.t)
+        f1D .= copy(Location_Species_To_StateVector(sol_DIP.f[t_idx],PhaseSpace_DIP,species_index=species_index))
+        f3D .= reshape(f1D,(p_num,u_num,h_num))
+        @. f3D = f3D*(f3D!=Inf)
+        # scale by order
+        # f = dN/dpdudh * dpdudh therefore dN/dp = f / dp and p^order * dN/dp = f * mp^order / dp
+        for px in 1:p_num, py in 1:u_num, pz in 1:h_num
+            f3D[px,py,pz] = f3D[px,py,pz] * (meanp[px]^(order)) / dp[px]
+        end
+        pdNdp = dropdims(sum(f3D, dims=(2,3)),dims=(2,3))
+        if sum(@. !isnan(pdNdp) * !isinf(pdNdp) * !iszero(pdNdp)) == 1 # there is only one valid position so scatterlines doesn't work
+            idx = findfirst(!iszero,pdNdp)
+            lines!(ax,[log10(meanp[idx]), log10(meanp[idx])],[-20.0, log10(pdNdp[idx])],linewidth=2.0,color = color,linestyle=linestyles[2])
+        else
+            scatterlines!(ax,log10.(meanp),log10.(pdNdp),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[2])
+        end
+
+    end
+
+    push!(legend_elements,LineElement(color = theme.textcolor[], linestyle = linestyles[2],linewidth = 2.0))
+    push!(line_labels,"Ele")
+
+    ######## Positron Lines ########
+    ################################
+
+    species_name = "Pos"
+    species_index = findfirst(x->x==species_name,name_list)
+    p_num = Momentum.px_num_list[species_index]  
+    u_num = Momentum.py_num_list[species_index]
+    h_num = Momentum.pz_num_list[species_index]
+    dp = Grids.dpx_list[species_index]
+    du = Grids.dpy_list[species_index]
+    meanp = Grids.mpx_list[species_index]
+    meanu = Grids.mpy_list[species_index]
+    meanh = Grids.mpz_list[species_index]
+    p_r = Grids.pxr_list[species_index]
+    u_r = Grids.pyr_list[species_index]
+    h_r = Grids.pzr_list[species_index]
+    mass = Grids.mass_list[species_index]
+
+    f3D = zeros(Float32,p_num,u_num,h_num)
+    f1D = zeros(Float32,p_num*u_num*h_num)
+
+    for i in 1:length(t_ele)
+
+        # AM3
+        t = t_ele[i]
+        if log10(t) % 1 == 0.0 && t <= t_max # 10^n timesteps 
+            t_plot = t
+            if t_grid == "u"
+                color = theme.colormap[][(t - t_min) / (t_max - t_min)]
+            elseif t_grid == "l"
+                color = theme.colormap[][(log10(t) - log10(t_min)) / (log10(t_max) - log10(t_min))]
+            end
+        end
+
+        # DIP
+        t_idx = findfirst(x->round(x,sigdigits=3)==t_plot,sol.t)
+        f1D .= copy(Location_Species_To_StateVector(sol_DIP.f[t_idx],PhaseSpace_DIP,species_index=species_index))
+        f3D .= reshape(f1D,(p_num,u_num,h_num))
+        @. f3D = f3D*(f3D!=Inf)
+        # scale by order
+        # f = dN/dpdudh * dpdudh therefore dN/dp = f / dp and p^order * dN/dp = f * mp^order / dp
+        for px in 1:p_num, py in 1:u_num, pz in 1:h_num
+            f3D[px,py,pz] = f3D[px,py,pz] * (meanp[px]^(order)) / dp[px]
+        end
+        pdNdp = dropdims(sum(f3D, dims=(2,3)),dims=(2,3))
+        if sum(@. !isnan(pdNdp) * !isinf(pdNdp) * !iszero(pdNdp)) == 1 # there is only one valid position so scatterlines doesn't work
+            idx = findfirst(!iszero,pdNdp)
+            lines!(ax,[log10(meanp[idx]), log10(meanp[idx])],[-20.0, log10(pdNdp[idx])],linewidth=2.0,color = color,linestyle=linestyles[3])
+        else
+            scatterlines!(ax,log10.(meanp),log10.(pdNdp),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[3])
+        end
+
+    end
+
+    if t_grid == "u"
+        Colorbar(fig[1,2],colormap = theme.colormap,limits=(TimeUnits(t_min),TimeUnits(t_max)),label=L"$t$ $[\text{s} * \sigma_{T}c]$")
+    elseif t_grid == "l"
+        Colorbar(fig[1,2],colormap = theme.colormap,limits=(log10(t_min),log10(t_max)),label=L"$\log_{10}\left(t [\text{s}]\right)$")
+    end
+
+    axislegend(ax_DIP,legend_elements,line_labels,position = :lt)
+   
+    return fig
+
+    end # with_theme
+
+end
+
 
 function TwoSolAngleDistributionPlot(twosol::Tuple{OutputStruct,OutputStruct},species::Vector{String},PhaseSpace::PhaseSpaceStruct,type::Animated;theme=DiplodocusDark(),order::Int64=1,TimeUnits::Function=CodeToCodeUnitsTime,plot_limits=(nothing,nothing),wide=false,legend=true,framerate=12,filename="TwoSolAngleDistribution.mp4",figure=nothing)
 
