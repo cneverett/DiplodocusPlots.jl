@@ -1400,7 +1400,7 @@ function AM3_DIP_Combo_MomentumDistributionPlot(filePath_AM3,sol_DIP,PhaseSpace_
 
     xlab = L"$\log_{10}\left(p\,[m_ec]\right)$"
     ylab = L"$\log_{10}\left(p^2\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V}\,[\text{m}^{-3}\left(m_ec\right)]\right)$"
-    ylab_err = L"$\text{Frac. Err.}$"
+    ylab_err = L"$\text{Frac. Diff.}$"
     
     ax_DIP = Axis(g2[1,1],aspect=DataAspect(),ylabel=ylab)
     hidexdecorations!(ax_DIP)
