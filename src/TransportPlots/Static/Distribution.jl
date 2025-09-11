@@ -1355,7 +1355,7 @@ function AM3_MomentumDistributionPlot(filePath,t_max,t_min,t_grid;plot_limits=(n
 
 end
 
-function AM3_DIP_Combo_MomentumDistributionPlot(filePath_AM3,sol_DIP,PhaseSpace_DIP,t_max,t_min,t_grid;plot_limits=(nothing,nothing),theme=DiplodocusDark())
+function AM3_DIP_Combo_MomentumDistributionPlot(filePath_AM3,sol_DIP,PhaseSpace_DIP,t_max,t_min,t_grid;plot_limits=(nothing,nothing),theme=DiplodocusDark(),lepton_err=true)
 
     name_list = PhaseSpace_DIP.name_list
     Momentum = PhaseSpace_DIP.Momentum
@@ -1557,18 +1557,20 @@ function AM3_DIP_Combo_MomentumDistributionPlot(filePath_AM3,sol_DIP,PhaseSpace_
                 scatterlines!(ax_DIP,log10.(meanp),log10.(pdNdp_DIP),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[2])
             end
 
-            # error plot
-            # regrid AM3 results (assuming it has finest grid) to grid size of DIP
-            pdNdp_AM3_DIP_Grid = zeros(Float64,size(meanp))
-            for p in eachindex(meanp)
-                p_idx = find_closest(meanp_AM3,meanp[p])
-                pdNdp_AM3_DIP_Grid[p] = pdNdp_AM3[p_idx]
-            end
-            err = (pdNdp_AM3_DIP_Grid.-pdNdp_DIP)./pdNdp_DIP
-            replace!(err,-1.0=>NaN) # remove values for which AM3 does not have values
-            replace!(err,Inf=>NaN) # remove values for which DIP does not have values
+            if lepton_err
+                # error plot
+                # regrid AM3 results (assuming it has finest grid) to grid size of DIP
+                pdNdp_AM3_DIP_Grid = zeros(Float64,size(meanp))
+                for p in eachindex(meanp)
+                    p_idx = find_closest(meanp_AM3,meanp[p])
+                    pdNdp_AM3_DIP_Grid[p] = pdNdp_AM3[p_idx]
+                end
+                err = (pdNdp_AM3_DIP_Grid.-pdNdp_DIP)./pdNdp_DIP
+                replace!(err,-1.0=>NaN) # remove values for which AM3 does not have values
+                replace!(err,Inf=>NaN) # remove values for which DIP does not have values
 
-            scatterlines!(ax_err,log10.(meanp),err,linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[2])
+                scatterlines!(ax_err,log10.(meanp),err,linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[2])
+            end
 
         end
 
