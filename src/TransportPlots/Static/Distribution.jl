@@ -1855,9 +1855,9 @@ function BFieldObserverPlot(sols::Vector{OutputStruct},PhaseSpaces::Vector{Phase
             ylims!(ax,(max_total-9.0,max_total+1.0)) 
         end
 
-        line_labels=[L"\theta_\text{B}=0.0\pi",L"\theta_\text{B}=0.1\pi",L"\theta_\text{B}=0.2\pi",L"\theta_\text{B}=0.3\pi",L"\theta_\text{B}=0.4\pi",L"\theta_\text{B}=0.5\pi",L"\text{Iso}"]
+        #line_labels=[L"\theta_\text{B}=0.0\pi",L"\theta_\text{B}=0.1\pi",L"\theta_\text{B}=0.2\pi",L"\theta_\text{B}=0.3\pi",L"\theta_\text{B}=0.4\pi",L"\theta_\text{B}=0.5\pi",L"\text{Iso}"]
 
-        #line_labels=[L"\theta_B=0",L"\theta_B=\frac{\pi}{6}",L"\theta_B=\frac{\pi}{3}",L"\theta_B=\frac{\pi}{2}",L"\text{Iso}"]
+        line_labels=[L"\theta_B=0",L"\theta_B=\frac{\pi}{6}",L"\theta_B=\frac{\pi}{3}",L"\theta_B=\frac{\pi}{2}",L"\text{Iso}"]
 
         axislegend(ax,legend_elements,line_labels,position = :lt)
 
