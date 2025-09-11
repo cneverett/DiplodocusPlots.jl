@@ -1633,6 +1633,8 @@ function AM3_DIP_Combo_MomentumDistributionPlot(filePath_AM3,sol_DIP,PhaseSpace_
 
             end
         end
+        push!(legend_elements,LineElement(color = theme.textcolor[], linestyle = linestyles[3],linewidth = 2.0))
+        push!(line_labels,"Pos")
     end
 
     if t_grid == "u"
