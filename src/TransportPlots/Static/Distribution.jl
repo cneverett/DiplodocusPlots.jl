@@ -1803,12 +1803,12 @@ function BFieldObserverPlot(sols::Vector{OutputStruct},PhaseSpaces::Vector{Phase
         fig = Figure(size=(432,216)) # 6:3 ratio
         t = round(TimeUnits(sols[1].t[time_idx]),sigdigits=3)
         t_unit_string = TimeUnits()
-        xlab = L"$\log_{10}\left(p [m_ec]\right)$"
-        ylab = L"$\log_{10}\left(pF_{p} [\text{m}^{-3}m_ec]\right)$"
+        xlab = L"$\log_{10}\left(p\,[m_ec]\right)$"
+        ylab = L"$\log_{10}\left(pF_{p}\,[\text{m}^{-3}m_ec]\right)$"
         ax = Axis(fig[1,1],xlabel=xlab,ylabel=ylab,aspect=DataAspect())
 
         if !isnothing(title)
-            titlestr = L"t=%$(t) %$t_unit_string, \theta_\text{Obs}=%$ObserverAngle \pi"
+            titlestr = L"t=%$(t)\, %$t_unit_string, \theta_\text{Obs}=%$ObserverAngle \pi"
             ax.title = titlestr
         end
 
