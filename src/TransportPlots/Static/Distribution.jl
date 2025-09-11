@@ -1412,7 +1412,7 @@ function AM3_DIP_Combo_MomentumDistributionPlot(filePath_AM3,sol_DIP,PhaseSpace_
     #Label(g2[1:2,0],ylab,rotation = pi/2,fontsize=9pt)
     #Label(g2[3,0],ylab_err,rotation = pi/2,fontsize=9pt)
 
-    linestyles = [:solid,(:dash,:dense),(:dot,:dense),(:dashdot,:dense),(:dashdotdot,:dense)]
+    linestyles = [:solid,(:dash),(:dot),(:dashdot),(:dashdotdot)]
     legend_elements = []
     line_labels = []
 
