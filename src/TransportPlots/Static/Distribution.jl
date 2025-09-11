@@ -51,7 +51,7 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
     Grids = PhaseSpace.Grids
     Time = PhaseSpace.Time
 
-    linestyles = [:solid,(:dash),(:dot),(:dashdot),(:dashdotdot)]
+    linestyles = [:solid,(:dash,:dense),(:dot),(:dashdot),(:dashdotdot)]
     max_total = -Inf32
     p_min = Inf32
     p_max = -Inf32
@@ -244,7 +244,7 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
 
     ax.limits = plot_limits
 
-    linestyles = [:solid,(:dash,:dense),(:dot,:dense),(:dashdot,:dense),(:dashdotdot,:dense)]
+    linestyles = [:solid,(:dash,:dense),(:dot),(:dashdot,:dense),(:dashdotdot,:dense)]
     line_labels = []
     legend_elements = []    
 
@@ -451,7 +451,7 @@ function AngleDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseSpac
     Grids = PhaseSpace.Grids
     Time = PhaseSpace.Time
 
-    linestyles = [:solid,(:dash,:dense),(:dot,:dense),(:dashdot,:dense),(:dashdotdot,:dense)]
+    linestyles = [:solid,(:dash,:dense),(:dot),(:dashdot,:dense),(:dashdotdot,:dense)]
     max_total = -Inf32
     p_min = Inf32
     p_max = -Inf32
@@ -582,7 +582,7 @@ function AngleDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseSpac
     text!(ax,@lift("t=$(round($(t), sigdigits = 3))  "),fontsize=12pt,align=(:right,:center),space=:relative,offset=(375.0,135.0))
     text!(ax,L"%$t_unit_string",fontsize=12pt,align=(:left,:center),space=:relative,offset=(375.0,135.0))
 
-    linestyles = [:solid,(:dash,:dense),(:dot,:dense),(:dashdot,:dense),(:dashdotdot,:dense)]
+    linestyles = [:solid,(:dash,:dense),(:dot),(:dashdot,:dense),(:dashdotdot,:dense)]
     line_labels = []
     legend_elements = []  
     legend_elements_angle = []
@@ -1294,7 +1294,7 @@ function AM3_MomentumDistributionPlot(filePath,t_max,t_min,t_grid;plot_limits=(n
     ax = Axis(fig[1,1],xlabel=xlab,ylabel=ylab,aspect=DataAspect())
     ax.limits = plot_limits
 
-    linestyles = [:solid,(:dash,:dense),(:dot,:dense),(:dashdot,:dense),(:dashdotdot,:dense)]
+    linestyles = [:solid,(:dash,:dense),(:dot),(:dashdot,:dense),(:dashdotdot,:dense)]
     legend_elements = []
     line_labels = []
     
@@ -1412,7 +1412,7 @@ function AM3_DIP_Combo_MomentumDistributionPlot(filePath_AM3,sol_DIP,PhaseSpace_
     #Label(g2[1:2,0],ylab,rotation = pi/2,fontsize=9pt)
     #Label(g2[3,0],ylab_err,rotation = pi/2,fontsize=9pt)
 
-    linestyles = [:solid,(:dash),(:dot),(:dashdot),(:dashdotdot)]
+    linestyles = [:solid,(:dash,:dense),(:dot),(:dashdot),(:dashdotdot)]
     legend_elements = []
     line_labels = []
 
@@ -1708,7 +1708,7 @@ function TwoSolAngleDistributionPlot(twosol::Tuple{OutputStruct,OutputStruct},sp
     text!(ax,@lift("t=$(round($(t), sigdigits = 3))  "),fontsize=12pt,align=(:right,:center),space=:relative,offset=(375.0,135.0))
     text!(ax,L"%$t_unit_string",fontsize=12pt,align=(:left,:center),space=:relative,offset=(375.0,135.0))
 
-    linestyles = [:solid,(:dash,:dense),(:dot,:dense),(:dashdot,:dense),(:dashdotdot,:dense)]
+    linestyles = [:solid,(:dash,:dense),(:dot),(:dashdot,:dense),(:dashdotdot,:dense)]
     line_labels = []
     legend_elements = []  
     legend_elements_angle = []
