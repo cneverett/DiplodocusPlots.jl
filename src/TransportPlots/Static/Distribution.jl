@@ -1800,7 +1800,7 @@ function BFieldObserverPlot(sols::Vector{OutputStruct},PhaseSpaces::Vector{Phase
     CairoMakie.activate!(inline=true) # plot in vs code window
     with_theme(theme) do
 
-        fig = Figure(size=(500,216))
+        fig = Figure(size=(432,216)) # 6:3 ratio
         t = round(TimeUnits(sols[1].t[time_idx]),sigdigits=3)
         t_unit_string = TimeUnits()
         xlab = L"$\log_{10}\left(p [m_ec]\right)$"
