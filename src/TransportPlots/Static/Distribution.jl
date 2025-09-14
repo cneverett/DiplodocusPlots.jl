@@ -1016,15 +1016,12 @@ function MomentumAndAzimuthalAngleDistributionPlot(sol,species::String,PhaseSpac
     col_range = (log10(max_dis)-24.0,log10(max_dis))
 
     ax1 = PolarAxis(fig[1,1+1],width=176)
-    ax1.radius_at_origin = log10(p_r[1])-1.0
     thetalims!(ax1,0,2pi)
 
     ax2 = PolarAxis(fig[1,2+1],width=176)
-    ax2.radius_at_origin = log10(p_r[1])-1.0
     thetalims!(ax2,0,2pi)
 
     ax3 = PolarAxis(fig[1,3+1],width=176)
-    ax3.radius_at_origin = log10(p_r[1])-1.0
     thetalims!(ax3,0,2pi)
 
     #u_as_theta_grid = zeros(Float64,length(u_r))
@@ -1035,19 +1032,37 @@ function MomentumAndAzimuthalAngleDistributionPlot(sol,species::String,PhaseSpac
     #@. u_as_theta_grid = pi - pi * (u_r+1)/2 # convert u grid to a set of theta values such that u can be plotted as polar angle
     #@. u_as_theta_grid_tick_locations = pi - pi * (u_as_theta_grid_tick_values+1)/2 # convert u grid ticks to a set of theta values such that u can be plotted as polar angle
 
-    hm1 = heatmap!(ax1,h_r,log10.(p_r),log10.(dis1'),colormap=theme.colormap_var,colorrange=col_range,colorscale=x->asinh(x-log10(max_dis)))
-    hm2 = heatmap!(ax2,h_r,log10.(p_r),log10.(dis2'),colormap=theme.colormap_var,colorrange=col_range,colorscale=x->asinh(x-log10(max_dis)))
-    hm3 = heatmap!(ax3,h_r,log10.(p_r),log10.(dis3'),colormap=theme.colormap_var,colorrange=col_range,colorscale=x->asinh(x-log10(max_dis)))
-
-    rlims!(ax1,log10(p_r[1]),log10(p_r[end])+1.0)
-    rlims!(ax2,log10(p_r[1]),log10(p_r[end])+1.0)
-    rlims!(ax3,log10(p_r[1]),log10(p_r[end])+1.0)
+    if PhaseSpace.Momentum.px_grid_list[species_index] == "l"
+        hm1 = heatmap!(ax1,h_r,log10.(p_r),log10.(dis1'),colormap=theme.colormap_var,colorrange=col_range,colorscale=x->asinh(x-log10(max_dis)))
+        hm2 = heatmap!(ax2,h_r,log10.(p_r),log10.(dis2'),colormap=theme.colormap_var,colorrange=col_range,colorscale=x->asinh(x-log10(max_dis)))
+        hm3 = heatmap!(ax3,h_r,log10.(p_r),log10.(dis3'),colormap=theme.colormap_var,colorrange=col_range,colorscale=x->asinh(x-log10(max_dis)))
+        rlims!(ax1,log10(p_r[1]),log10(p_r[end])+1.0)
+        rlims!(ax2,log10(p_r[1]),log10(p_r[end])+1.0)
+        rlims!(ax3,log10(p_r[1]),log10(p_r[end])+1.0)
+        ax1.radius_at_origin = log10(p_r[1])-1.0
+        ax2.radius_at_origin = log10(p_r[1])-1.0
+        ax3.radius_at_origin = log10(p_r[1])-1.0
+    elseif PhaseSpace.Momentum.px_grid_list[species_index] == "u"
+        hm1 = heatmap!(ax1,h_r,p_r,log10.(dis1'),colormap=theme.colormap_var,colorrange=col_range,colorscale=x->asinh(x-log10(max_dis)))
+        hm2 = heatmap!(ax2,h_r,p_r,log10.(dis2'),colormap=theme.colormap_var,colorrange=col_range,colorscale=x->asinh(x-log10(max_dis)))
+        hm3 = heatmap!(ax3,h_r,p_r,log10.(dis3'),colormap=theme.colormap_var,colorrange=col_range,colorscale=x->asinh(x-log10(max_dis)))
+        rlims!(ax1,0.0,p_r[end])
+        rlims!(ax2,0.0,p_r[end])
+        rlims!(ax3,0.0,p_r[end])
+    end
     #ax1.thetaticks = (u_as_theta_grid_tick_locations,u_as_theta_grid_tick_values_string)
     #ax2.thetaticks = (u_as_theta_grid_tick_locations,u_as_theta_grid_tick_values_string)
     #ax3.thetaticks = (u_as_theta_grid_tick_locations,u_as_theta_grid_tick_values_string)
     #hidethetadecorations!(ax1, grid=false)
     #hidethetadecorations!(ax2, grid=false)
     #hidethetadecorations!(ax3, grid=false)
+    ax1.thetagridcolor=(:grey45,0.5)
+    ax1.rgridcolor=(:grey45,0.5)
+    ax2.thetagridcolor=(:grey45,0.5)
+    ax2.rgridcolor=(:grey45,0.5)
+    ax3.thetagridcolor=(:grey45,0.5)
+    ax3.rgridcolor=(:grey45,0.5)
+
 
     if order == 1
         Colorbar(fig[1,1],hm1,label=L"$\log_{10}\left(p\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}\phi\mathrm{d}V}[\text{m}^{-3}]\right)$",flipaxis=false,height=176,tellheight=false)
