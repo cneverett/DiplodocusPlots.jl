@@ -131,9 +131,9 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vec
             for i in eachindex(horz_lines)
 
                 if Time.t_grid == "u"
-                    color = theme.colormap[0.5]#,limits=(TimeUnits(sol.t[1]),TimeUnits(sol.t[end]))
+                    color = theme.colormap[][0.5]#,limits=(TimeUnits(sol.t[1]),TimeUnits(sol.t[end]))
                 elseif Time.t_grid == "l"
-                    color = theme.colormap[0.5]#,limits=(log10(round(TimeUnits(sol.t[1]),sigdigits=5)),log10(round(TimeUnits(sol.t[end]),sigdigits=5)))
+                    color = theme.colormap[][0.5]#,limits=(log10(round(TimeUnits(sol.t[1]),sigdigits=5)),log10(round(TimeUnits(sol.t[end]),sigdigits=5)))
                 end
 
                 hlines!(ax,horz_lines[i],color=color)
