@@ -40,7 +40,9 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
         ylab = L"$\log_{10}\left(p\,\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V}\,[\text{m}^{-3}]\right)$"
     elseif order == 2
         ylab = L"$\log_{10}\left(p^{2}\,\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V}\,[\text{m}^{-3}\left(m_ec\right)]\right)$"
-    else 
+    elseif order == -2
+        ylab=L"$\log_{10}\left(\frac{1}{p^2}\,\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}u\mathrm{d}V}\,[\text{m}^{-3}\left(m_ec\right)^{-3}]\right)$"
+    else
         ylab = L"$\log_{10}\left(p^{%$(order)}\,\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V}\,[\text{m}^{-3}\left(m_ec\right)^{%$(order-1)}]\right)$"
     end
     ax = Axis(fig[1,1],xlabel=xlab,ylabel=ylab,aspect=DataAspect())
@@ -223,6 +225,8 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
         ylab = L"$\log_{10}\left(p\,\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V}\,[\text{m}^{-3}]\right)$"
     elseif order == 2
         ylab = L"$\log_{10}\left(p^{2}\,\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V}\,[\text{m}^{-3}\left(m_ec\right)]\right)$"
+    elseif order == -2
+        ylab=L"$\log_{10}\left(\frac{1}{p^2}\,\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}u\mathrm{d}V}\,[\text{m}^{-3}\left(m_ec\right)^{-3}]\right)$"
     else 
         ylab = L"$\log_{10}\left(p^{%$(order)}\,\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V}\,[\text{m}^{-3}\left(m_ec\right)^{%$(order-1)}]\right)$"
     end
