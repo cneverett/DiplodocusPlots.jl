@@ -18,8 +18,8 @@ function DiplodocusDark()
         size=(3.25inch,2.4375inch),
         fontsize = 9pt,
         palette = (color = Makie.ColorScheme(get(Makie.ColorSchemes.batlow10,range(0.9,0.1,length=7))),),
-        colormap = Makie.ColorScheme(get(Makie.ColorSchemes.batlow,range(0.1,0.9,length=256))), # use a subset to avoid very dark or very light colors
-        colormap_var = Makie.ColorScheme(get(Makie.ColorSchemes.davos,range(0.05,0.95,length=256))), # use a subset to avoid very dark or very light colors
+        colormap = Makie.ColorScheme(get(Makie.ColorSchemes.batlow,range(0.1,0.9,length=512))), # use a subset to avoid very dark or very light colors
+        colormap_var = Makie.ColorScheme(get(Makie.ColorSchemes.devon,range(0.0,1.0,length=512))), # use a subset to avoid very dark or very light colors
         fonts = Attributes(
             :bold => Makie.texfont(:bold),
             :bolditalic => Makie.texfont(:bolditalic),
@@ -37,8 +37,8 @@ function DiplodocusDark()
             topspinecolor = :white,
             leftspinecolor = :white,
             rightspinecolor = :white,
-            xgridcolor = :transparent,#:grey45,
-            ygridcolor = :transparent,#:grey45,
+            xgridcolor = :grey45,
+            ygridcolor = :grey45,
             xtickcolor = :white,
             ytickcolor = :white,
             xtickwidth = 2.0,
@@ -130,8 +130,8 @@ function DiplodocusLight()
         size=(3.25inch,2.4375inch),
         fontsize = 9pt,
         palette = (color = Makie.ColorScheme(get(Makie.ColorSchemes.batlow10,range(0.1,0.9,length=7))),),
-        colormap = Makie.ColorScheme(get(Makie.ColorSchemes.batlow,range(0.9,0.1,length=256))),
-        colormap_var = Makie.ColorScheme(get(Makie.ColorSchemes.davos,range(0.95,0.05,length=256))),
+        colormap = Makie.ColorScheme(get(Makie.ColorSchemes.batlow,range(0.9,0.1,length=512))),
+        colormap_var = Makie.ColorScheme(get(Makie.ColorSchemes.devon,range(1.0,0.0,length=512))),
         fonts = Attributes(
             :bold => Makie.texfont(:bold),
             :bolditalic => Makie.texfont(:bolditalic),
@@ -154,8 +154,8 @@ function DiplodocusLight()
             spinewidth = 2.0,
             xgridwidth = 1.0,
             ygridwidth = 1.0,
-            xgridcolor = :transparent,#:grey45,
-            ygridcolor = :transparent,#:grey45,
+            xgridcolor = :grey45,
+            ygridcolor = :grey45,
             xminorgridcolor=:black,
             yminorgridcolor=:black,
             xminorgridwidth = 2.0,

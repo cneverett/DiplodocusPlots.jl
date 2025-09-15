@@ -776,6 +776,10 @@ function MomentumAndPolarAngleDistributionPlot(sol,species::String,PhaseSpace::P
     hm2 = heatmap!(ax2,u_as_theta_grid,log10.(p_r),log10.(dis2'),colormap=theme.colormap_var,colorrange=col_range,colorscale=x->asinh(x-log10(max_dis)))
     hm3 = heatmap!(ax3,u_as_theta_grid,log10.(p_r),log10.(dis3'),colormap=theme.colormap_var,colorrange=col_range,colorscale=x->asinh(x-log10(max_dis)))
 
+    translate!(hm1,0,0,-100)
+    translate!(hm2,0,0,-100)
+    translate!(hm3,0,0,-100)
+
     rlims!(ax1,log10(p_r[1]),log10(p_r[end])+1.0)
     rlims!(ax2,log10(p_r[1]),log10(p_r[end])+1.0)
     rlims!(ax3,log10(p_r[1]),log10(p_r[end])+1.0)
@@ -787,23 +791,34 @@ function MomentumAndPolarAngleDistributionPlot(sol,species::String,PhaseSpace::P
     #hidethetadecorations!(ax3, grid=false)
 
     if order == 1
-        Colorbar(fig[1,1],hm1,label=L"$\log_{10}\left(p\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}u\mathrm{d}V}[\text{m}^{-3}]\right)$",flipaxis=false,height=176,tellheight=false)
+        Colorbar(fig[1,1],hm1,label=L"$\log_{10}\left(p\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}u\mathrm{d}V}\,[\text{m}^{-3}]\right)$",flipaxis=false,height=176,tellheight=false)
     elseif order != 1
-        Colorbar(fig[1,1],hm1,label=L"$\log_{10}\left(p^{%$order}\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}u\mathrm{d}V}[\text{m}^{-3}\left(m_ec\right)^{%$(order-1)}]\right)$ $$",flipaxis=false,height=176,tellheight=false)
+        Colorbar(fig[1,1],hm1,label=L"$\log_{10}\left(p^{%$order}\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}u\mathrm{d}V}\,[\text{m}^{-3}\left(m_ec\right)^{%$(order-1)}]\right)$ $$",flipaxis=false,height=176,tellheight=false)
     end
 
     t_unit_string = TimeUnits()
 
     pt = 4/3
-    text!(ax1,L"$\log_{10}\left(p[m_ec]\right)$",position=(-3.05,log10(p_r[end])),rotation=pi/2,fontsize=9pt)
-    text!(ax1,L"$t=%$(round(TimeUnits(t[1]),sigdigits=3))$ $%$t_unit_string$",position=(2.8,log10(p_r[end])+4.5),fontsize=10pt)
-    text!(ax2,L"$t=%$(round(TimeUnits(t[2]),sigdigits=3))$ $%$t_unit_string$",position=(2.8,log10(p_r[end])+4.5),fontsize=10pt)
-    text!(ax3,L"$t=%$(round(TimeUnits(t[3]),sigdigits=3))$ $%$t_unit_string$",position=(2.8,log10(p_r[end])+4.5),fontsize=10pt)
+    text!(ax1,L"$\log_{10}\left(p\,[m_ec]\right)$",position=(-3.05,log10(p_r[end])),rotation=pi/2,fontsize=9pt)
+    ax1_label=Axis(fig[2,2])
+    ax2_label=Axis(fig[2,3])
+    ax3_label=Axis(fig[2,4])
+    hidedecorations!(ax1_label)
+    hidedecorations!(ax2_label)
+    hidedecorations!(ax3_label)
+    hidespines!(ax1_label)
+    hidespines!(ax2_label)
+    hidespines!(ax3_label)
+    text!(ax1_label,L"$t=%$(round(TimeUnits(t[1]),sigdigits=3))$ $%$t_unit_string$",space=:relative,position=(0.5,0.5),fontsize=10pt,align=(:center,:center))
+    text!(ax2_label,L"$t=%$(round(TimeUnits(t[2]),sigdigits=3))$ $%$t_unit_string$",space=:relative,position=(0.5,0.5),fontsize=10pt,align=(:center,:center))
+    text!(ax3_label,L"$t=%$(round(TimeUnits(t[3]),sigdigits=3))$ $%$t_unit_string$",space=:relative,position=(0.5,0.5),fontsize=10pt,align=(:center,:center))
 
     colsize!(fig.layout,1,Relative(0.1))
     colsize!(fig.layout,2,Relative(0.3))
     colsize!(fig.layout,3,Relative(0.3))
     colsize!(fig.layout,4,Relative(0.3))
+    rowsize!(fig.layout,2,Relative(0.06))
+    rowgap!(fig.layout,1,0.0)
     
     return fig
 
@@ -881,6 +896,8 @@ function MomentumAndPolarAngleDistributionPlot(sol,species::Vector{String},Phase
     @. u_as_theta_grid_tick_locations = pi - pi * (u_as_theta_grid_tick_values+1)/2 # convert u grid ticks to a set of theta values such that u can be plotted as polar angle
 
     hm = heatmap!(ax,u_as_theta_grid,log10.(p_r),dis,colormap=theme.colormap_var,colorrange=col_range,colorscale=@lift(x->asinh(x-$max_dis)))
+
+    translate!(hm1,0,0,-100)
 
     rlims!(ax,log10(p_r[1]),log10(p_r[end])+1.0)
     ax.thetaticks = (u_as_theta_grid_tick_locations,u_as_theta_grid_tick_values_string)
