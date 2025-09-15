@@ -62,7 +62,7 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vec
     ax = Axis(fig[1,1],xlabel=xlab,ylabel=ylab,aspect=DataAspect())
     ax.limits = plot_limits
 
-    linestyles = [:solid,(:dash),(:dot),(:dashdot),(:dashdotdot)]
+    linestyles = [:solid,(:dash,:dense),(:dot),(:dashdot),(:dashdotdot)]
     legend_elements_species = []
     line_labels_species = []
     legend_elements_angle = []
