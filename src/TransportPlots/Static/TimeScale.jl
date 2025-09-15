@@ -83,7 +83,7 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vec
                 color = theme.colormap[][color_val]
             end
 
-            hlines!(ax,log10.(horz_lines[i]),color=color)
+            hlines!(ax,log10.(horz_lines[i]),color=color,linewidth=1.5)
 
         end
 
