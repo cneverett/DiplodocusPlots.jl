@@ -75,7 +75,7 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vec
             if Time.t_grid == "u"
                 t_horz = horz_lines[i]
                 color_val = (t_horz - TimeUnits(tr[1]))/(TimeUnits(tr[end])-TimeUnits(tr[1]))
-                println(color_val)
+                println("colval=$color_val")
                 color = theme.colormap[][color_val]
             elseif Time.t_grid == "l"
                 t_horz = horz_lines[i]
@@ -115,7 +115,7 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vec
 
         if paraperp==true
 
-            println(log10.(TimeUnits.(Float64.(abs.(timescale2D[:,ceil(Int64,u_num/2)]))))[2])
+            println("tscale",log10.(TimeUnits.(Float64.(abs.(timescale2D[:,ceil(Int64,u_num/2)]))))[2])
 
             scatterlines!(ax,log10.(mp),log10.(TimeUnits.(Float64.(abs.(timescale2D[:,ceil(Int64,u_num/2)])))),linewidth=2.0,color = color=theme.textcolor[],markersize=0.0,linestyle=linestyles[1])
             scatterlines!(ax,log10.(mp),log10.(TimeUnits.(Float64.(abs.(timescale2D[:,end])))),linewidth=2.0,color = color=theme.textcolor[],markersize=0.0,linestyle=linestyles[2])
