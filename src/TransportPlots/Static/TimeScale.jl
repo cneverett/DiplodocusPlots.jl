@@ -42,7 +42,7 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vec
 
     #dstate = method.FluxM.Ap_Flux \ (DiplodocusTransport.diag(method.FluxM.I_Flux .+ method.FluxM.J_Flux) .* (dt / dt0)) .* state
 
-    @. timescale =  -dt * state / dstate
+    @. timescale =  -dt * state / dstate * 3/2
 
     if wide
         fig = Figure(size=(576,216)) # double column 8:3 aspect ratio
@@ -67,6 +67,26 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vec
     line_labels_species = []
     legend_elements_angle = []
     line_labels_angle = []
+
+    if !isnothing(horz_lines)
+
+        for i in eachindex(horz_lines)
+
+            if Time.t_grid == "u"
+                t_horz = horz_lines[i]
+                color_val = (t_horz - TimeUnits(tr[1]))/(TimeUnits(tr[end])-TimeUnits(tr[1]))
+                color = theme.colormap[][color_val]
+            elseif Time.t_grid == "l"
+                t_horz = horz_lines[i]
+                color_val = (t_horz - log10(TimeUnits(tr[1])))/(log10(TimeUnits(tr[end]))-log10(TimeUnits(tr[1])))
+                color = theme.colormap[][color_val]
+            end
+
+            hlines!(ax,horz_lines[i],color=color)
+
+        end
+
+    end
 
     for species in eachindex(name_list)
 
@@ -125,22 +145,6 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vec
         push!(line_labels_species,name)
 
     end # species loop
-
-        if !isnothing(horz_lines)
-
-            for i in eachindex(horz_lines)
-
-                if Time.t_grid == "u"
-                    color = theme.colormap[][0.5]#,limits=(TimeUnits(sol.t[1]),TimeUnits(sol.t[end]))
-                elseif Time.t_grid == "l"
-                    color = theme.colormap[][0.5]#,limits=(log10(round(TimeUnits(sol.t[1]),sigdigits=5)),log10(round(TimeUnits(sol.t[end]),sigdigits=5)))
-                end
-
-                hlines!(ax,horz_lines[i],color=color)
-
-            end
-
-        end
 
         if paraperp
             axislegend(ax,legend_elements_angle,line_labels_angle,position = :lb)
