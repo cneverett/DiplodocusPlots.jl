@@ -42,7 +42,7 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vec
 
     #dstate = method.FluxM.Ap_Flux \ (DiplodocusTransport.diag(method.FluxM.I_Flux .+ method.FluxM.J_Flux) .* (dt / dt0)) .* state
 
-    @. timescale =  -dt * state / dstate * 0.5868763104768393
+    @. timescale =  -dt * state / dstate * 0.5868763104768393 # REMOVE THIS LATER
 
     if wide
         fig = Figure(size=(576,216)) # double column 8:3 aspect ratio
