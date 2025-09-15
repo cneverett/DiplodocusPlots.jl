@@ -750,7 +750,7 @@ function MomentumAndPolarAngleDistributionPlot(sol,species::String,PhaseSpace::P
 
     max_dis = maximum(x for x in [dis1; dis2; dis3] if !isnan(x))
     min_dis = minimum(x for x in [dis1; dis2; dis3] if !isnan(x))
-    col_range = (log10(max_dis)-24.0,log10(max_dis))
+    col_range = (log10(max_dis)-16.0,log10(max_dis))
 
     ax1 = PolarAxis(fig[1,1+1],theta_0=-pi/2,direction=-1,width=176)
     ax1.radius_at_origin = log10(p_r[1])-1.0
@@ -877,7 +877,7 @@ function MomentumAndPolarAngleDistributionPlot(sol,species::Vector{String},Phase
 
     max_dis = @lift(maximum(x for x in $dis if !isnan(x)))
     #min_dis = @lift(minimum(x for x in [dis] if !isnan(x)))
-    col_range = @lift(($max_dis-24.0,$max_dis))
+    col_range = @lift(($max_dis-16.0,$max_dis))
 
     ax = PolarAxis(fig[1,1+species_idx],theta_0=-pi/2,direction=-1,width=Relative(1.2))
     ax.radius_at_origin = log10(p_r[1])-1.0
