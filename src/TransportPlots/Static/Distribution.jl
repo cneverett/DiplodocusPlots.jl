@@ -218,13 +218,13 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
     CairoMakie.activate!(inline=true) # plot in vs code window
     with_theme(theme) do
 
-    xlab = L"$\log_{10}\left(p [m_ec]\right)$"
+    xlab = L"$\log_{10}\left(p\,[m_ec]\right)$"
     if order == 1
-        ylab = L"$\log_{10}\left(p\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V} [\text{m}^{-3}]\right)$"
+        ylab = L"$\log_{10}\left(p\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V}\,[\text{m}^{-3}]\right)$"
     elseif order == 2
-        ylab = L"$\log_{10}\left(p^{2}\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V} [\text{m}^{-3}\left(m_ec\right)]\right)$"
+        ylab = L"$\log_{10}\left(p^{2}\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V}\,[\text{m}^{-3}\left(m_ec\right)]\right)$"
     else 
-        ylab = L"$\log_{10}\left(p^{%$(order)}\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V} [\text{m}^{-3}\left(m_ec\right)^{%$(order-1)}]\right)$"
+        ylab = L"$\log_{10}\left(p^{%$(order)}\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V}\,[\text{m}^{-3}\left(m_ec\right)^{%$(order-1)}]\right)$"
     end
 
     if isnothing(figure)
@@ -897,7 +897,7 @@ function MomentumAndPolarAngleDistributionPlot(sol,species::Vector{String},Phase
 
     hm = heatmap!(ax,u_as_theta_grid,log10.(p_r),dis,colormap=theme.colormap_var,colorrange=col_range,colorscale=@lift(x->asinh(x-$max_dis)))
 
-    translate!(hm1,0,0,-100)
+    translate!(hm,0,0,-100)
 
     rlims!(ax,log10(p_r[1]),log10(p_r[end])+1.0)
     ax.thetaticks = (u_as_theta_grid_tick_locations,u_as_theta_grid_tick_values_string)
