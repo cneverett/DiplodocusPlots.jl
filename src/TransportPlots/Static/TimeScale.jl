@@ -75,6 +75,7 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vec
             if Time.t_grid == "u"
                 t_horz = horz_lines[i]
                 color_val = (t_horz - TimeUnits(tr[1]))/(TimeUnits(tr[end])-TimeUnits(tr[1]))
+                println(color_val)
                 color = theme.colormap[][color_val]
             elseif Time.t_grid == "l"
                 t_horz = horz_lines[i]
