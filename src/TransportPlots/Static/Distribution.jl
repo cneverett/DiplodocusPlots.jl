@@ -906,16 +906,16 @@ function MomentumAndPolarAngleDistributionPlot(sol,species::Vector{String},Phase
     #hidethetadecorations!(ax3, grid=false)
 
     pt = 4/3
-    text!(ax,L"$\log_{10}\left(p[m_ec]\right)$",position=(-3.00,log10(p_r[end])+1.0),rotation=pi/2,fontsize=9pt)
+    text!(ax,L"$\log_{10}\left(p\,[m_ec]\right)$",position=(-3.00,log10(p_r[end])+1.0),rotation=pi/2,fontsize=9pt)
     if num_species != 1
         text!(ax,L"$species_name",position=(2.6,log10(p_r[end])+3.2),fontsize=10pt)
     end
 
     if species_idx == length(species)
     if order == 1
-        Colorbar(fig[1,1],hm,label=L"$\log_{10}\left(p\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}u\mathrm{d}V}[\text{m}^{-3}]\right)$",flipaxis=false,height=Relative(0.75),tellheight=false)
+        Colorbar(fig[1,1],hm,label=L"$\log_{10}\left(p\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}u\mathrm{d}V}\,[\text{m}^{-3}]\right)$",flipaxis=false,height=Relative(0.75),tellheight=false)
     elseif order != 1
-        Colorbar(fig[1,1],hm,label=L"$\log_{10}\left(p^{%$order}\frac{\mathrm{d}N}{\mathrm{d}p\mathrmd{d}u\mathrm{d}V}[\text{m}^{-3}\left(m_ec\right)^{%$(order-1)}]\right)$ $$",flipaxis=false,height=Relative(0.75),tellheight=false)
+        Colorbar(fig[1,1],hm,label=L"$\log_{10}\left(p^{%$order}\frac{\mathrm{d}N}{\mathrm{d}p\mathrmd{d}u\mathrm{d}V}\,[\text{m}^{-3}\left(m_ec\right)^{%$(order-1)}]\right)$ $$",flipaxis=false,height=Relative(0.75),tellheight=false)
     end
     end
 
