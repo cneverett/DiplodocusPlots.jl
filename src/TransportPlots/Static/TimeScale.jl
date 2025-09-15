@@ -42,7 +42,7 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vec
 
     #dstate = method.FluxM.Ap_Flux \ (DiplodocusTransport.diag(method.FluxM.I_Flux .+ method.FluxM.J_Flux) .* (dt / dt0)) .* state
 
-    @. timescale =  -dt * state / dstate * 4/3
+    @. timescale =  -dt * state / dstate
 
     if wide
         fig = Figure(size=(576,216)) # double column 8:3 aspect ratio
@@ -54,9 +54,9 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vec
 
     xlab = L"$\log_{10}\left(p\,[m_ec]\right)$"
     if p_timescale
-        ylab = L"\log_{10}\left(\frac{p}{\mathrm{d}p/\mathrm{d}t}\,%$t_unit_string\right)"
+        ylab = L"$\log_{10}\left(\frac{p}{\mathrm{d}p/\mathrm{d}t}\,%$t_unit_string \right)$"
     else
-        ylab = L"\log_{10}\left(Timescale\,%$t_unit_string\right)"
+        ylab = L"$\log_{10}\left(Timescale\,%$t_unit_string\right)$"
     end
 
     ax = Axis(fig[1,1],xlabel=xlab,ylabel=ylab,aspect=DataAspect())
