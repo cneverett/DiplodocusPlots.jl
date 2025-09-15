@@ -41,7 +41,7 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
     elseif order == 2
         ylab = L"$\log_{10}\left(p^{2}\,\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V}\,[\text{m}^{-3}\left(m_ec\right)]\right)$"
     elseif order == -2
-        ylab=L"$\log_{10}\left(\frac{1}{p^2}\,\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}u\mathrm{d}V}\,[\text{m}^{-3}\left(m_ec\right)^{-3}]\right)$"
+        ylab=L"$\log_{10}\left(\frac{\mathrm{d}N}{p^2\mathrm{d}p\mathrm{d}u\mathrm{d}V}\,[\text{m}^{-3}\left(m_ec\right)^{-3}]\right)$"
     else
         ylab = L"$\log_{10}\left(p^{%$(order)}\,\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V}\,[\text{m}^{-3}\left(m_ec\right)^{%$(order-1)}]\right)$"
     end
@@ -226,7 +226,7 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
     elseif order == 2
         ylab = L"$\log_{10}\left(p^{2}\,\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V}\,[\text{m}^{-3}\left(m_ec\right)]\right)$"
     elseif order == -2
-        ylab=L"$\log_{10}\left(\frac{1}{p^2}\,\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}u\mathrm{d}V}\,[\text{m}^{-3}\left(m_ec\right)^{-3}]\right)$"
+        ylab=L"$\log_{10}\left(\frac{\mathrm{d}N}{p^2\mathrm{d}p\mathrm{d}u\mathrm{d}V}\,[\text{m}^{-3}\left(m_ec\right)^{-3}]\right)$"
     else 
         ylab = L"$\log_{10}\left(p^{%$(order)}\,\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V}\,[\text{m}^{-3}\left(m_ec\right)^{%$(order-1)}]\right)$"
     end
@@ -561,7 +561,7 @@ function AngleDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseSpac
     if order == 1
         ylab = L"$\log_{10}\left(p\,\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V} [\text{m}^{-3}]\right)$"
     elseif order == -2
-        ylab=L"$\log_{10}\left(\frac{1}{p^2}\,\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}u\mathrm{d}V}\,[\text{m}^{-3}\left(m_ec\right)^{-3}]\right)$"
+        ylab=L"$\log_{10}\left(\frac{\mathrm{d}N}{p^2\mathrm{d}p\mathrm{d}u\mathrm{d}V}\,[\text{m}^{-3}\left(m_ec\right)^{-3}]\right)$"
     elseif order != 1
         ylab = L"$\log_{10}\left(p^{%$(order)}\,\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V} [\text{m}^{-3}\left(m_ec\right)^{%$(order-1)}]\right)$"
     end
@@ -799,7 +799,7 @@ function MomentumAndPolarAngleDistributionPlot(sol,species::String,PhaseSpace::P
     if order == 1
         Colorbar(fig[1,1],hm1,label=L"$\log_{10}\left(p\,\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}u\mathrm{d}V}\,[\text{m}^{-3}]\right)$",flipaxis=false,height=Relative(0.75),tellheight=false)
     elseif order == -2
-        Colorbar(fig[1,1],hm1,label=L"$\log_{10}\left(\frac{1}{p^2}\,\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}u\mathrm{d}V}\,[\text{m}^{-3}\left(m_ec\right)^{-3}]\right)$",flipaxis=false,height=Relative(0.75),tellheight=false)
+        Colorbar(fig[1,1],hm1,label=L"$\log_{10}\left(\frac{\mathrm{d}N}{p^2\mathrm{d}p\mathrm{d}u\mathrm{d}V}\,[\text{m}^{-3}\left(m_ec\right)^{-3}]\right)$",flipaxis=false,height=Relative(0.75),tellheight=false)
     elseif order != 1
         Colorbar(fig[1,1],hm1,label=L"$\log_{10}\left(p^{%$(order)}\,\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}u\mathrm{d}V}\,[\text{m}^{-3}\left(m_ec\right)^{%$(order-1)}]\right)$",flipaxis=false,height=Relative(0.75),tellheight=false)
     end
@@ -923,7 +923,7 @@ function MomentumAndPolarAngleDistributionPlot(sol,species::Vector{String},Phase
     if order == 1
         Colorbar(fig[1,1],hm,label=L"$\log_{10}\left(p\,\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}u\mathrm{d}V}\,[\text{m}^{-3}]\right)$",flipaxis=false,height=Relative(0.75),tellheight=false)
     elseif order == -2
-        Colorbar(fig[1,1],hm,label=L"$\log_{10}\left(\frac{1}{p^2}\,\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}u\mathrm{d}V}\,[\text{m}^{-3}\left(m_ec\right)^{-3}]\right)$",flipaxis=false,height=Relative(0.75),tellheight=false)
+        Colorbar(fig[1,1],hm,label=L"$\log_{10}\left(\frac{\mathrm{d}N}{p^2\mathrm{d}p\mathrm{d}u\mathrm{d}V}\,[\text{m}^{-3}\left(m_ec\right)^{-3}]\right)$",flipaxis=false,height=Relative(0.75),tellheight=false)
     elseif order != 1
         Colorbar(fig[1,1],hm,label=L"$\log_{10}\left(p^{%$(order)}\,\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}u\mathrm{d}V}\,[\text{m}^{-3}\left(m_ec\right)^{%$(order-1)}]\right)$",flipaxis=false,height=Relative(0.75),tellheight=false)
     end
