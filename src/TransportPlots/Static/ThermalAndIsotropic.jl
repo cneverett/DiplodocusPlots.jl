@@ -31,15 +31,17 @@ function IsThermalPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::S
 
     if t_grid == "u"
         xlab = L"$t$ $%$t_unit_string$"
+        ylab = L"SSR"
     elseif t_grid == "l"
         xlab = L"\log_{10}($t$ $%$t_unit_string$)"
+        ylab = L"\log_{10}(SSR)"
     end
 
     if isnothing(fig)
         fig = Figure()
-        ax = Axis(fig[1,1],xlabel=xlab,ylabel=L"SSR",xgridvisible=false,ygridvisible=false)
+        ax = Axis(fig[1,1],xlabel=xlab,ylabel=ylab,xgridvisible=false,ygridvisible=false)
     else
-        ax = Axis(fig,xlabel=xlab,ylabel=L"SSR",xgridvisible=false,ygridvisible=false)
+        ax = Axis(fig,xlabel=xlab,ylabel=ylab,xgridvisible=false,ygridvisible=false)
     end
 
     if !isnothing(title)
@@ -74,7 +76,7 @@ function IsThermalPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::S
             scatterlines!(ax,TimeUnits.(sol.t),SumSquaredResiduals,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j])
             xlims!(ax,TimeUnits(sol.t[1]),TimeUnits(sol.t[end]))
         elseif t_grid == "l"
-            scatterlines!(ax,log10.(TimeUnits.(sol.t)),SumSquaredResiduals,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j])
+            scatterlines!(ax,log10.(TimeUnits.(sol.t)),log10.(SumSquaredResiduals),marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j])
             xlims!(ax,log10(TimeUnits(sol.t[1])),log10(TimeUnits(sol.t[end])))
         end
 
@@ -121,18 +123,19 @@ function IsIsotropicPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species:
     SumSquaredResiduals = zeros(Float64,length(sol.t))
 
     t_unit_string = TimeUnits()
-
     if t_grid == "u"
         xlab = L"$t$ $%$t_unit_string$"
+        ylab = L"SSR"
     elseif t_grid == "l"
         xlab = L"\log_{10}($t$ $%$t_unit_string$)"
+        ylab = L"\log_{10}(SSR)"
     end
 
     if isnothing(fig)
         fig = Figure()
-        ax = Axis(fig[1,1],xlabel=xlab,ylabel=L"SSR",xgridvisible=false,ygridvisible=false)
+        ax = Axis(fig[1,1],xlabel=xlab,ylabel=ylab,xgridvisible=false,ygridvisible=false)
     else
-        ax = Axis(fig,xlabel=xlab,ylabel=L"SSR",xgridvisible=false,ygridvisible=false)
+        ax = Axis(fig,xlabel=xlab,ylabel=ylab,xgridvisible=false,ygridvisible=false)
     end
 
     if !isnothing(title)
@@ -159,7 +162,7 @@ function IsIsotropicPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species:
             scatterlines!(ax,TimeUnits.(sol.t),SumSquaredResiduals,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j])
             xlims!(ax,TimeUnits(sol.t[1]),TimeUnits(sol.t[end]))
         elseif t_grid == "l"
-            scatterlines!(ax,log10.(TimeUnits.(sol.t)),SumSquaredResiduals,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j])
+            scatterlines!(ax,log10.(TimeUnits.(sol.t)),log10.(SumSquaredResiduals),marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j])
             xlims!(ax,log10(TimeUnits(sol.t[1])),log10(TimeUnits(sol.t[end])))
         end
 
@@ -208,15 +211,17 @@ function IsThermalAndIsotropicPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruc
 
     if t_grid == "u"
         xlab = L"$t$ $%$t_unit_string$"
+        ylab = L"SSR"
     elseif t_grid == "l"
         xlab = L"\log_{10}($t$ $%$t_unit_string$)"
+        ylab = L"\log_{10}(SSR)"
     end
 
     if isnothing(fig)
         fig = Figure(size=(288,216))
-        ax = Axis(fig[1,1],xlabel=xlab,ylabel=L"SSR",xgridvisible=false,ygridvisible=false)
+        ax = Axis(fig[1,1],xlabel=xlab,ylabel=ylab,xgridvisible=false,ygridvisible=false)
     else
-        ax = Axis(fig,xlabel=xlab,ylabel=L"SSR",xgridvisible=false,ygridvisible=false)
+        ax = Axis(fig,xlabel=xlab,ylabel=ylab,xgridvisible=false,ygridvisible=false)
     end
 
     if !isnothing(title)
@@ -252,7 +257,7 @@ function IsThermalAndIsotropicPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruc
             scatterlines!(ax,TimeUnits.(sol.t),SumSquaredResiduals,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j]*" Thermal?")
             xlims!(ax,TimeUnits(sol.t[1]),TimeUnits(sol.t[end]))
         elseif t_grid == "l"
-            scatterlines!(ax,log10.(TimeUnits.(sol.t)),SumSquaredResiduals,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j]*" Thermal?")
+            scatterlines!(ax,log10.(TimeUnits.(sol.t)),log10.(SumSquaredResiduals),marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j]*" Thermal?")
             xlims!(ax,log10(TimeUnits(sol.t[1])),log10(TimeUnits(sol.t[end])))
         end
 
@@ -279,15 +284,15 @@ function IsThermalAndIsotropicPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruc
             scatterlines!(ax,TimeUnits.(sol.t),SumSquaredResiduals,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,linestyle=:dash,label=name_list[j]*" Isotropic?")
             xlims!(ax,TimeUnits(sol.t[1]),TimeUnits(sol.t[end]))
         elseif t_grid == "l"
-            scatterlines!(ax,log10.(TimeUnits.(sol.t)),SumSquaredResiduals,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,linestyle=:dash,label=name_list[j]*" Isotropic?")
+            scatterlines!(ax,log10.(TimeUnits.(sol.t)),log10.(SumSquaredResiduals),marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,linestyle=:dash,label=name_list[j]*" Isotropic?")
             xlims!(ax,log10(TimeUnits(sol.t[1])),log10(TimeUnits(sol.t[end])))
         end
 
     end
 
-    ylims!(ax,0.0,nothing)
+    #ylims!(ax,0.0,nothing)
     
-    axislegend(ax)
+    axislegend(ax,position=:lb)
 
     end # with_theme
 
