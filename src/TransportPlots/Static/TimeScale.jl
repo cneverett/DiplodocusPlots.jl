@@ -14,6 +14,7 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vec
 
     PhaseSpace=method.PhaseSpace
     Momentum = PhaseSpace.Momentum
+    Time = PhaseSpace.Time
     Grids = PhaseSpace.Grids
     tr = PhaseSpace.Grids.tr
     p_num_list = Momentum.px_num_list 
