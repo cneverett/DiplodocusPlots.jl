@@ -101,7 +101,7 @@ function DiplodocusDark()
             labelsize = 9pt,
             rticklabelsize = 8pt,
             thetaticklabelsize = 8pt,
-            backgroundcolor = (:black,0.0),
+            backgroundcolor = (:black),
             rticksvisible = true,
             rticksmirrored = true,
             thetaticksvisible = true,
@@ -179,7 +179,7 @@ function DiplodocusLight()
         Legend = (
             fontsize = 9pt,
             labelsize = 8pt,
-            backgroundcolor = (:white,0.0),
+            backgroundcolor = (:white),
             framecolor = :black,
             framewidth = 2.0,
             rowgap = -5,
