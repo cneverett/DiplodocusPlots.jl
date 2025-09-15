@@ -7,7 +7,7 @@ Optional arguments:
 - `theme`: the colour theme to use for the plot, default is `DiplodocusDark()`.
 - `p_timescale`: whether to plot the timescale for momentum magnitude loss or state vector loss, default is `false` i.e. plot state vector losses to aid in assessing time step limits for stability.
 """
-function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vector{F},t_idx::Int64;wide=false,paraperp::Bool=false,p_timescale=false,plot_limits=(nothing,nothing),theme=DiplodocusDark(),TimeUnits::Function=CodeToCodeUnitsTime) where F<:AbstractFloat
+function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vector{F},t_idx::Int64;wide=false,paraperp::Bool=false,p_timescale=false,legend=true,horz_lines=nothing,plot_limits=(nothing,nothing),theme=DiplodocusDark(),TimeUnits::Function=CodeToCodeUnitsTime) where F<:AbstractFloat
 
     CairoMakie.activate!(inline=true) # plot in vs code window
     with_theme(theme) do
@@ -51,8 +51,12 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vec
 
     t_unit_string = TimeUnits()
 
-    xlab = L"$\log_{10}\left(p [m_ec]\right)$"
-    ylab = L"\log_{10}\left(Timescale %$t_unit_string\right)"
+    xlab = L"$\log_{10}\left(p\,[m_ec]\right)$"
+    if p_timescale
+        ylab = L"\log_{10}\left(\frac{p}{\mathrm{d}p/\mathrm{d}t}\,%$t_unit_string\right)"
+    else
+        ylab = L"\log_{10}\left(Timescale\,%$t_unit_string\right)"
+    end
 
     ax = Axis(fig[1,1],xlabel=xlab,ylabel=ylab,aspect=DataAspect())
     ax.limits = plot_limits
@@ -84,21 +88,6 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vec
         if p_timescale
             timescale2D = mp ./ dp .* timescale2D
         end
-
-        for u in 1:u_num
-
-            if u == 1 || u==ceil(Int64,u_num/2)
-                #println(timescale2D[:,u])
-                scatterlines!(ax,log10.(mp),log10.(TimeUnits.(Float64.(timescale2D[:,u]))),linewidth=2.0,color = theme.palette.color[][mod(2*u-1,7)+1],markersize=0.0,linestyle=linestyles[species])
-            end
-
-            if species == 1
-                push!(legend_elements_angle,LineElement(color = theme.textcolor[], linestyle = :solid,linewidth = 2.0))
-                push!(line_labels_angle,L"%$(mu[u])")
-            end
-
-        end 
-
         
         println(TimeUnits.(Float64.(abs.(timescale2D[10,ceil(Int64,u_num/2)]))))
 
@@ -112,6 +101,20 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vec
             push!(line_labels_angle,L"\parallel")
             push!(line_labels_angle,L"\perp")
 
+        else
+            for u in 1:u_num
+
+                if u == 1 || meanu[u]==0.0
+                    #println(timescale2D[:,u])
+                    scatterlines!(ax,log10.(mp),log10.(TimeUnits.(Float64.(timescale2D[:,u]))),linewidth=2.0,color = theme.palette.color[][mod(2*u-1,7)+1],markersize=0.0,linestyle=linestyles[species])
+                end
+
+                if species == 1
+                    push!(legend_elements_angle,LineElement(color = theme.textcolor[], linestyle = :solid,linewidth = 2.0))
+                    push!(line_labels_angle,L"%$(mu[u])")
+                end
+
+            end 
         end
 
         #push!(legend_elements_angle,LineElement(color = theme.textcolor[], linestyle = :solid,linewidth = 2.0))
@@ -122,8 +125,28 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vec
 
     end # species loop
 
-        #axislegend(ax,legend_elements_angle,line_labels_angle,position = :lb)
-        axislegend(ax,legend_elements_species,line_labels_species,position = :lb)
+        if !isnothing(horz_lines)
+
+            for i in eachindex(horz_lines)
+
+                if Time.t_grid == "u"
+                    color = theme.colormap[0.5]#,limits=(TimeUnits(sol.t[1]),TimeUnits(sol.t[end]))
+                elseif Time.t_grid == "l"
+                    color = theme.colormap[0.5]#,limits=(log10(round(TimeUnits(sol.t[1]),sigdigits=5)),log10(round(TimeUnits(sol.t[end]),sigdigits=5)))
+                end
+
+                hlines!(ax,horz_lines[i],color=color)
+
+            end
+
+        end
+
+        if paraperp
+            axislegend(ax,legend_elements_angle,line_labels_angle,position = :lb)
+        end
+        if legend
+            axislegend(ax,legend_elements_species,line_labels_species,position = :lb)
+        end
 
     return fig
 
