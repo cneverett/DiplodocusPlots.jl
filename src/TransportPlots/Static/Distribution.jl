@@ -1979,7 +1979,7 @@ function AzimuthalAngleDistributionPlot(sol,species::Vector{String},PhaseSpace::
     elseif order == -2
         ylab=L"$\log_{10}\left(\frac{\mathrm{d}N}{p^2\mathrm{d}p\mathrm{d}\phi\mathrm{d}V}\,[\text{m}^{-3}\left(m_ec\right)^{-3}]\right)$"
     else
-        ylab = L"$\log_{10}\left(p^{%$(order)}\,\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V}\,[\text{m}^{-3}\left(m_ec\right)^{%$(order-1)}]\right)$"
+        ylab = L"$\log_{10}\left(p^{%$(order)}\,\frac{\mathrm{d}N}{\mathrm{d}\phi\mathrm{d}V}\,[\text{m}^{-3}\left(m_ec\right)^{%$(order-1)}]\right)$"
     end
     ax = Axis(fig[1,1],xlabel=xlab,ylabel=ylab,aspect=DataAspect())
     ax.limits = plot_limits
@@ -2011,14 +2011,14 @@ function AzimuthalAngleDistributionPlot(sol,species::Vector{String},PhaseSpace::
     h_num = Momentum.pz_num_list[species_index]
     dp = Grids.dpx_list[species_index]
     du = Grids.dpy_list[species_index]
-    meanp = Grids.mpx_list[species_index]
+    mp = Grids.mpx_list[species_index]
     if PhaseSpace.Momentum.px_grid_list[species_index] == "l"
         mp_plot = log10.(meanp)
     elseif  PhaseSpace.Momentum.px_grid_list[species_index] == "u"
         mp_plot = meanp
     end
-    meanu = Grids.mpy_list[species_index]
-    meanh = Grids.mpz_list[species_index]
+    mu = Grids.mpy_list[species_index]
+    mh = Grids.mpz_list[species_index]
     p_r = Grids.pxr_list[species_index]
     u_r = Grids.pyr_list[species_index]
     h_r = Grids.pzr_list[species_index]
@@ -2053,83 +2053,23 @@ function AzimuthalAngleDistributionPlot(sol,species::Vector{String},PhaseSpace::
                 f3D[px,py,pz] = f3D[px,py,pz] * (meanp[px]^(order)) / dp[px]
             end
 
-            if paraperp == false
-                # sum along u and h directions
-                pdNdp = dropdims(sum(f3D, dims=(2,3)),dims=(2,3))
-                if sum(@. !isnan(pdNdp) * !isinf(pdNdp) * !iszero(pdNdp)) == 1 # there is only one valid position so scatterlines doesn't work
-                    idx = findfirst(!iszero,pdNdp)
-                    lines!(ax,[mp_plot[idx], mp_plot[idx]],[-20.0, log10(pdNdp[idx])],linewidth=2.0,color = color,linestyle=linestyles[species_idx])
-                else
-                    scatterlines!(ax,mp_plot,log10.(pdNdp),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[species_idx])
-                end
-                max_f = maximum(x for x in pdNdp if !isnan(x))
-                max_total = max(max_f,max_total)
-            elseif paraperp == true # assumes only a single particle species
-                pdNdp_para = dropdims(sum(f3D, dims=(3)),dims=(3))[:,end]
-                pdNdp_perp = dropdims(sum(f3D, dims=(3)),dims=(3))[:,ceil(Int64,u_num/2)]
-
-                if sum(@. !isnan(pdNdp_para) * !isinf(pdNdp_para) * !iszero(pdNdp_para)) == 1 # there is only one valid position so scatterlines doesn't work
-                    idx = findfirst(!iszero,pdNdp_para)
-                    lines!(ax,[mp_plot[idx],mp_plot[idx]],[-20.0, log10(pdNdp_para[idx])],linewidth=2.0,color = color,linestyle=linestyles[1])
-                else
-                    scatterlines!(ax,mp_plot,log10.(pdNdp_para),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[1])
-                end
-
-                max_f = maximum(x for x in pdNdp_para if !isnan(x))
-                max_total = max(max_f,max_total)
-
-                if sum(@. !isnan(pdNdp_perp) * !isinf(pdNdp_perp) * !iszero(pdNdp_perp)) == 1 # there is only one valid position so scatterlines doesn't work
-                    idx = findfirst(!iszero,pdNdp_perp)
-                    lines!(ax,[mp_plot[idx], mp_plot[idx]],[-20.0, log10(pdNdp_perp[idx])],linewidth=2.0,color = color,linestyle=linestyles[2])
-                else
-                    scatterlines!(ax,mp_plot,log10.(pdNdp_perp),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[2])
-                end
-
-                max_f = maximum(x for x in pdNdp_perp if !isnan(x))
-                max_total = max(max_f,max_total)
-
+            # sum along p and u directions
+            pdNdp = dropdims(sum(f3D, dims=(1,2)),dims=(1,2))
+            if sum(@. !isnan(pdNdp) * !isinf(pdNdp) * !iszero(pdNdp)) == 1 # there is only one valid position so scatterlines doesn't work
+                idx = findfirst(!iszero,pdNdp)
+                lines!(ax,[mh[idx], mh[idx]],[-20.0, log10(pdNdp[idx])],linewidth=2.0,color = color,linestyle=linestyles[species_idx])
+            else
+                scatterlines!(ax,mh,log10.(pdNdp),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[species_idx])
             end
-
-            
-
+            max_f = maximum(x for x in pdNdp if !isnan(x))
+            max_total = max(max_f,max_total)
+           
         end
 
     end
 
-    if thermal
-
-        # expected thermal spectrum based on final time step
-        f = copy(Location_Species_To_StateVector(sol.f[end],PhaseSpace,species_index=species_index))
-        Nᵃ = DiplodocusTransport.FourFlow(f,p_num,u_num,h_num,p_r,u_r,h_r,mass)
-        Uₐ = [-1.0,0.0,0.0,0.0] # static observer
-        num = DiplodocusTransport.ScalarNumberDensity(Nᵃ,Uₐ)
-        Δab = DiplodocusTransport.ProjectionTensor(Uₐ)
-        Tᵃᵇ = DiplodocusTransport.StressEnergyTensor(f,p_num,u_num,h_num,p_r,u_r,h_r,mass)
-        Pressure = DiplodocusTransport.ScalarPressure(Tᵃᵇ,Δab)
-        Temperature = DiplodocusTransport.ScalarTemperature(Pressure,num)
-
-        MJ = DiplodocusTransport.MaxwellJuttner_Distribution(PhaseSpace,species[species_idx],Temperature;n=num)
-        # scale by order
-        # f = dN/dpdudh * dpdudh therefore dN/dp = f / dp and p^order * dN/dp = f * mp^order / dp
-        @. MJ *= (meanp^(order)) / dp
-
-        scatterlines!(ax,mp_plot,log10.(MJ),linewidth=1.0,color = theme.textcolor[],markersize=0.0,label="Maxwell-Juttner")
-
-    end
-
-    if paraperp == false
-        push!(legend_elements,LineElement(color = theme.textcolor[], linestyle = linestyles[species_idx],linewidth = 2.0))
-        push!(line_labels,species_name)
-    end
 
     end # species loop 
-
-    if paraperp == true
-        push!(legend_elements,LineElement(color = theme.textcolor[], linestyle = linestyles[1],linewidth = 2.0))
-        push!(legend_elements,LineElement(color = theme.textcolor[], linestyle = linestyles[2],linewidth = 2.0))
-        push!(line_labels,L"\parallel")
-        push!(line_labels,L"\perp")
-    end
 
     t_unit_string = TimeUnits()
 
