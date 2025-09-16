@@ -76,6 +76,11 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
     dp = Grids.dpx_list[species_index]
     du = Grids.dpy_list[species_index]
     meanp = Grids.mpx_list[species_index]
+    if PhaseSpace.Momentum.px_grid_list[species_index] == "l"
+        mp_plot = log10.(meanp)
+    elseif  PhaseSpace.Momentum.px_grid_list[species_index] == "u"
+        mp_plot = meanp
+    end
     meanu = Grids.mpy_list[species_index]
     meanh = Grids.mpz_list[species_index]
     p_r = Grids.pxr_list[species_index]
@@ -117,9 +122,9 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
                 pdNdp = dropdims(sum(f3D, dims=(2,3)),dims=(2,3))
                 if sum(@. !isnan(pdNdp) * !isinf(pdNdp) * !iszero(pdNdp)) == 1 # there is only one valid position so scatterlines doesn't work
                     idx = findfirst(!iszero,pdNdp)
-                    lines!(ax,[log10(meanp[idx]), log10(meanp[idx])],[-20.0, log10(pdNdp[idx])],linewidth=2.0,color = color,linestyle=linestyles[species_idx])
+                    lines!(ax,[mp_plot[idx], mp_plot[idx]],[-20.0, log10(pdNdp[idx])],linewidth=2.0,color = color,linestyle=linestyles[species_idx])
                 else
-                    scatterlines!(ax,log10.(meanp),log10.(pdNdp),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[species_idx])
+                    scatterlines!(ax,mp_plot,log10.(pdNdp),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[species_idx])
                 end
                 max_f = maximum(x for x in pdNdp if !isnan(x))
                 max_total = max(max_f,max_total)
@@ -129,9 +134,9 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
 
                 if sum(@. !isnan(pdNdp_para) * !isinf(pdNdp_para) * !iszero(pdNdp_para)) == 1 # there is only one valid position so scatterlines doesn't work
                     idx = findfirst(!iszero,pdNdp_para)
-                    lines!(ax,[log10(meanp[idx]), log10(meanp[idx])],[-20.0, log10(pdNdp_para[idx])],linewidth=2.0,color = color,linestyle=linestyles[1])
+                    lines!(ax,[mp_plot[idx],mp_plot[idx]],[-20.0, log10(pdNdp_para[idx])],linewidth=2.0,color = color,linestyle=linestyles[1])
                 else
-                    scatterlines!(ax,log10.(meanp),log10.(pdNdp_para),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[1])
+                    scatterlines!(ax,mp_plot,log10.(pdNdp_para),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[1])
                 end
 
                 max_f = maximum(x for x in pdNdp_para if !isnan(x))
@@ -139,9 +144,9 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
 
                 if sum(@. !isnan(pdNdp_perp) * !isinf(pdNdp_perp) * !iszero(pdNdp_perp)) == 1 # there is only one valid position so scatterlines doesn't work
                     idx = findfirst(!iszero,pdNdp_perp)
-                    lines!(ax,[log10(meanp[idx]), log10(meanp[idx])],[-20.0, log10(pdNdp_perp[idx])],linewidth=2.0,color = color,linestyle=linestyles[2])
+                    lines!(ax,[mp_plot[idx], mp_plot[idx]],[-20.0, log10(pdNdp_perp[idx])],linewidth=2.0,color = color,linestyle=linestyles[2])
                 else
-                    scatterlines!(ax,log10.(meanp),log10.(pdNdp_perp),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[2])
+                    scatterlines!(ax,mp_plot,log10.(pdNdp_perp),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[2])
                 end
 
                 max_f = maximum(x for x in pdNdp_perp if !isnan(x))
@@ -172,7 +177,7 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
         # f = dN/dpdudh * dpdudh therefore dN/dp = f / dp and p^order * dN/dp = f * mp^order / dp
         @. MJ *= (meanp^(order)) / dp
 
-        scatterlines!(ax,log10.(meanp),log10.(MJ),linewidth=1.0,color = theme.textcolor[],markersize=0.0,label="Maxwell-Juttner")
+        scatterlines!(ax,mp_plot,log10.(MJ),linewidth=1.0,color = theme.textcolor[],markersize=0.0,label="Maxwell-Juttner")
 
     end
 
