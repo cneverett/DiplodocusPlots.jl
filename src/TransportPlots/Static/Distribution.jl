@@ -1960,7 +1960,7 @@ function find_closest(A::AbstractArray{T}, b::T) where {T<:Real}
     end
 end
 
-function AzimuthalAngleDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseSpaceStruct,type::Static;theme=DiplodocusDark(),order::Int64=1,TimeUnits::Function=CodeToCodeUnitsTime,plot_limits=(nothing,nothing),wide=false,legend=true,step=1)
+function AzimuthalAngleDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseSpaceStruct,type::Static;theme=DiplodocusDark(),order::Int64=1,TimeUnits::Function=CodeToCodeUnitsTime,plot_limits=(0.0,2.0,nothing),wide=false,legend=true,step=1)
 
     CairoMakie.activate!(inline=true) # plot in vs code window
 
@@ -1971,7 +1971,7 @@ function AzimuthalAngleDistributionPlot(sol,species::Vector{String},PhaseSpace::
     else
         fig = Figure() # default single column 4:3 aspect ratio
     end
-    xlab = L"$\log_{10}\left(p\,[m_ec]\right)$"
+    xlab = L"$\phi\,[\pi]$"
     if order == 1
         ylab = L"$\log_{10}\left(p\,\frac{\mathrm{d}N}{\mathrm{d}\phi\mathrm{d}V}\,[\text{m}^{-3}]\right)$"
     elseif order == 2
@@ -2052,9 +2052,9 @@ function AzimuthalAngleDistributionPlot(sol,species::Vector{String},PhaseSpace::
             pdNdp = dropdims(sum(f3D, dims=(1,2)),dims=(1,2))
             if sum(@. !isnan(pdNdp) * !isinf(pdNdp) * !iszero(pdNdp)) == 1 # there is only one valid position so scatterlines doesn't work
                 idx = findfirst(!iszero,pdNdp)
-                lines!(ax,[mh[idx], mh[idx]],[-20.0, log10(pdNdp[idx])],linewidth=2.0,color = color,linestyle=linestyles[species_idx])
+                lines!(ax,[mh[idx]/pi, mh[idx]/pi],[-20.0, log10(pdNdp[idx])],linewidth=2.0,color = color,linestyle=linestyles[species_idx])
             else
-                scatterlines!(ax,mh,log10.(pdNdp),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[species_idx])
+                scatterlines!(ax,mh./pi,log10.(pdNdp),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[species_idx])
             end
             max_f = maximum(x for x in pdNdp if !isnan(x))
             max_total = max(max_f,max_total)
