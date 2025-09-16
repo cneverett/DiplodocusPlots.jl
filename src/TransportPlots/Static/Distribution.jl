@@ -1960,7 +1960,7 @@ function find_closest(A::AbstractArray{T}, b::T) where {T<:Real}
     end
 end
 
-function AzimuthalAngleDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseSpaceStruct,type::Static;theme=DiplodocusDark(),order::Int64=1,TimeUnits::Function=CodeToCodeUnitsTime,plot_limits=(0.0,2.0,nothing),wide=false,legend=true,step=1)
+function AzimuthalAngleDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseSpaceStruct,type::Static;theme=DiplodocusDark(),order::Int64=1,TimeUnits::Function=CodeToCodeUnitsTime,plot_limits=(nothing,nothing),wide=false,legend=true,step=1)
 
     CairoMakie.activate!(inline=true) # plot in vs code window
 
@@ -2079,11 +2079,9 @@ function AzimuthalAngleDistributionPlot(sol,species::Vector{String},PhaseSpace::
     end
 
     if plot_limits == (nothing,nothing)
-        xlims!(ax,(log10(p_min)-1.0,log10(p_max)+1.0))
+        xlims!(ax,(0.0,2.0))
         ylims!(ax,(log10(max_total)-9.0,log10(max_total)+1.0)) 
     end
-    #println("$((log10(p_min)-1.0,log10(p_max)+1.0))")
-    #println("$((log10(max_total)-9.0,log10(max_total)+1.0))")
 
     return fig
 
