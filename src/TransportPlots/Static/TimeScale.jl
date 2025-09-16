@@ -97,6 +97,11 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vec
         h_num = h_num_list[species]
         dp = dp_list[species]
         mp = mp_list[species]
+        if Momentum.px_grid_list[species_index] == "l"
+            mp_plot = log10.(mp)
+        elseif Momentum.px_grid_list[species_index] == "u"
+            mp_plot = mp
+        end
         mu = Grids.mpy_list[species]
 
         timescale1D = copy(Location_Species_To_StateVector(timescale,PhaseSpace,species_index=species))
@@ -115,8 +120,8 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vec
 
             println("tscale=$(TimeUnits.(Float64.(abs.(timescale2D[10,ceil(Int64,u_num/2)]))))")
 
-            scatterlines!(ax,log10.(mp),log10.(TimeUnits.(Float64.(abs.(timescale2D[:,ceil(Int64,u_num/2)])))),linewidth=2.0,color = color=theme.textcolor[],markersize=0.0,linestyle=linestyles[1])
-            scatterlines!(ax,log10.(mp),log10.(TimeUnits.(Float64.(abs.(timescale2D[:,end])))),linewidth=2.0,color = color=theme.textcolor[],markersize=0.0,linestyle=linestyles[2])
+            scatterlines!(ax,mp_plot,log10.(TimeUnits.(Float64.(abs.(timescale2D[:,ceil(Int64,u_num/2)])))),linewidth=2.0,color = color=theme.textcolor[],markersize=0.0,linestyle=linestyles[1])
+            scatterlines!(ax,mp_plot,log10.(TimeUnits.(Float64.(abs.(timescale2D[:,end])))),linewidth=2.0,color = color=theme.textcolor[],markersize=0.0,linestyle=linestyles[2])
 
             push!(legend_elements_angle,LineElement(color = theme.textcolor[], linestyle = linestyles[1],linewidth = 2.0))
             push!(legend_elements_angle,LineElement(color = theme.textcolor[], linestyle = linestyles[2],linewidth = 2.0))
@@ -127,7 +132,7 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vec
             for u in 1:u_num
 
                 if u == 1 || meanu[u]==0.0
-                    scatterlines!(ax,log10.(mp),log10.(TimeUnits.(Float64.(timescale2D[:,u]))),linewidth=2.0,color = theme.palette.color[][mod(2*u-1,7)+1],markersize=0.0,linestyle=linestyles[species])
+                    scatterlines!(ax,mp_plot,log10.(TimeUnits.(Float64.(timescale2D[:,u]))),linewidth=2.0,color = theme.palette.color[][mod(2*u-1,7)+1],markersize=0.0,linestyle=linestyles[species])
                 end
 
                 if species == 1
