@@ -41,7 +41,7 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
     elseif order == 2
         ylab = L"$\log_{10}\left(p^{2}\,\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V}\,[\text{m}^{-3}\left(m_ec\right)]\right)$"
     elseif order == -2
-        ylab=L"$\log_{10}\left(\frac{\mathrm{d}N}{p^2\mathrm{d}p\mathrm{d}u\mathrm{d}V}\,[\text{m}^{-3}\left(m_ec\right)^{-3}]\right)$"
+        ylab=L"$\log_{10}\left(\frac{\mathrm{d}N}{p^2\mathrm{d}p\mathrm{d}V}\,[\text{m}^{-3}\left(m_ec\right)^{-3}]\right)$"
     else
         ylab = L"$\log_{10}\left(p^{%$(order)}\,\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V}\,[\text{m}^{-3}\left(m_ec\right)^{%$(order-1)}]\right)$"
     end
@@ -231,7 +231,7 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
     elseif order == 2
         ylab = L"$\log_{10}\left(p^{2}\,\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V}\,[\text{m}^{-3}\left(m_ec\right)]\right)$"
     elseif order == -2
-        ylab=L"$\log_{10}\left(\frac{\mathrm{d}N}{p^2\mathrm{d}p\mathrm{d}u\mathrm{d}V}\,[\text{m}^{-3}\left(m_ec\right)^{-3}]\right)$"
+        ylab=L"$\log_{10}\left(\frac{\mathrm{d}N}{p^2\mathrm{d}p\mathrm{d}V}\,[\text{m}^{-3}\left(m_ec\right)^{-3}]\right)$"
     else 
         ylab = L"$\log_{10}\left(p^{%$(order)}\,\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V}\,[\text{m}^{-3}\left(m_ec\right)^{%$(order-1)}]\right)$"
     end
@@ -1958,4 +1958,200 @@ function find_closest(A::AbstractArray{T}, b::T) where {T<:Real}
             return i
         end
     end
+end
+
+function AzimuthalAngleDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseSpaceStruct,type::Static;theme=DiplodocusDark(),order::Int64=1,TimeUnits::Function=CodeToCodeUnitsTime,plot_limits=(nothing,nothing),wide=false,legend=true,step=1)
+
+    CairoMakie.activate!(inline=true) # plot in vs code window
+
+    with_theme(theme) do
+
+    if wide
+        fig = Figure(size=(576,216)) # double column 8:3 aspect ratio
+    else
+        fig = Figure() # default single column 4:3 aspect ratio
+    end
+    xlab = L"$\log_{10}\left(p\,[m_ec]\right)$"
+    if order == 1
+        ylab = L"$\log_{10}\left(p\,\frac{\mathrm{d}N}{\mathrm{d}\phi\mathrm{d}V}\,[\text{m}^{-3}]\right)$"
+    elseif order == 2
+        ylab = L"$\log_{10}\left(p^{2}\,\frac{\mathrm{d}N}{\mathrm{d}\phi\mathrm{d}V}\,[\text{m}^{-3}\left(m_ec\right)]\right)$"
+    elseif order == -2
+        ylab=L"$\log_{10}\left(\frac{\mathrm{d}N}{p^2\mathrm{d}p\mathrm{d}\phi\mathrm{d}V}\,[\text{m}^{-3}\left(m_ec\right)^{-3}]\right)$"
+    else
+        ylab = L"$\log_{10}\left(p^{%$(order)}\,\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V}\,[\text{m}^{-3}\left(m_ec\right)^{%$(order-1)}]\right)$"
+    end
+    ax = Axis(fig[1,1],xlabel=xlab,ylabel=ylab,aspect=DataAspect())
+    ax.limits = plot_limits
+
+    name_list = PhaseSpace.name_list
+    Momentum = PhaseSpace.Momentum
+    Grids = PhaseSpace.Grids
+    Time = PhaseSpace.Time
+
+    linestyles = [:solid,(:dash,:dense),(:dot),(:dashdot),(:dashdotdot)]
+    max_total = -Inf32
+    p_min = Inf32
+    p_max = -Inf32
+
+    legend_elements = []
+    line_labels = []
+
+    t_save = length(sol.t)
+    t_plot = ceil(Int64,t_save/step)
+
+    values = (1:t_save)*step .+ 2 # add 2 to skip initial and kernel steps
+
+    for (species_idx, species_name) in enumerate(species) 
+
+    species_index = findfirst(x->x==species_name,name_list)
+
+    p_num = Momentum.px_num_list[species_index]  
+    u_num = Momentum.py_num_list[species_index]
+    h_num = Momentum.pz_num_list[species_index]
+    dp = Grids.dpx_list[species_index]
+    du = Grids.dpy_list[species_index]
+    meanp = Grids.mpx_list[species_index]
+    if PhaseSpace.Momentum.px_grid_list[species_index] == "l"
+        mp_plot = log10.(meanp)
+    elseif  PhaseSpace.Momentum.px_grid_list[species_index] == "u"
+        mp_plot = meanp
+    end
+    meanu = Grids.mpy_list[species_index]
+    meanh = Grids.mpz_list[species_index]
+    p_r = Grids.pxr_list[species_index]
+    u_r = Grids.pyr_list[species_index]
+    h_r = Grids.pzr_list[species_index]
+    mass = Grids.mass_list[species_index]
+
+    f3D = zeros(Float32,p_num,u_num,h_num)
+    f1D = zeros(Float32,p_num*u_num*h_num)
+
+    p_min = min(p_min,p_r[1])
+    p_max = max(p_max,p_r[end])
+
+    for i in 1:t_save
+
+        if (i in values || i == 1 || i == 2) # plot first step for initial conds, second for kernel 
+
+            t = sol.t[i]
+            #println("t=$(CodeToSIUnitsTime(t))")
+            if Time.t_grid == "u"
+                color = theme.colormap[][(t - sol.t[1]) / (sol.t[end] - sol.t[1])]
+            elseif Time.t_grid == "l"
+                color = theme.colormap[][(log10(t) - log10(sol.t[1])) / (log10(sol.t[end]) - log10(sol.t[1]))]
+            end
+
+            f1D .= copy(Location_Species_To_StateVector(sol.f[i],PhaseSpace,species_index=species_index))
+
+            f3D .= reshape(f1D,(p_num,u_num,h_num))
+
+            @. f3D = f3D*(f3D!=Inf)
+            # scale by order
+            # f = dN/dpdudh * dpdudh therefore dN/dp = f / dp and p^order * dN/dp = f * mp^order / dp
+            for px in 1:p_num, py in 1:u_num, pz in 1:h_num
+                f3D[px,py,pz] = f3D[px,py,pz] * (meanp[px]^(order)) / dp[px]
+            end
+
+            if paraperp == false
+                # sum along u and h directions
+                pdNdp = dropdims(sum(f3D, dims=(2,3)),dims=(2,3))
+                if sum(@. !isnan(pdNdp) * !isinf(pdNdp) * !iszero(pdNdp)) == 1 # there is only one valid position so scatterlines doesn't work
+                    idx = findfirst(!iszero,pdNdp)
+                    lines!(ax,[mp_plot[idx], mp_plot[idx]],[-20.0, log10(pdNdp[idx])],linewidth=2.0,color = color,linestyle=linestyles[species_idx])
+                else
+                    scatterlines!(ax,mp_plot,log10.(pdNdp),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[species_idx])
+                end
+                max_f = maximum(x for x in pdNdp if !isnan(x))
+                max_total = max(max_f,max_total)
+            elseif paraperp == true # assumes only a single particle species
+                pdNdp_para = dropdims(sum(f3D, dims=(3)),dims=(3))[:,end]
+                pdNdp_perp = dropdims(sum(f3D, dims=(3)),dims=(3))[:,ceil(Int64,u_num/2)]
+
+                if sum(@. !isnan(pdNdp_para) * !isinf(pdNdp_para) * !iszero(pdNdp_para)) == 1 # there is only one valid position so scatterlines doesn't work
+                    idx = findfirst(!iszero,pdNdp_para)
+                    lines!(ax,[mp_plot[idx],mp_plot[idx]],[-20.0, log10(pdNdp_para[idx])],linewidth=2.0,color = color,linestyle=linestyles[1])
+                else
+                    scatterlines!(ax,mp_plot,log10.(pdNdp_para),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[1])
+                end
+
+                max_f = maximum(x for x in pdNdp_para if !isnan(x))
+                max_total = max(max_f,max_total)
+
+                if sum(@. !isnan(pdNdp_perp) * !isinf(pdNdp_perp) * !iszero(pdNdp_perp)) == 1 # there is only one valid position so scatterlines doesn't work
+                    idx = findfirst(!iszero,pdNdp_perp)
+                    lines!(ax,[mp_plot[idx], mp_plot[idx]],[-20.0, log10(pdNdp_perp[idx])],linewidth=2.0,color = color,linestyle=linestyles[2])
+                else
+                    scatterlines!(ax,mp_plot,log10.(pdNdp_perp),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[2])
+                end
+
+                max_f = maximum(x for x in pdNdp_perp if !isnan(x))
+                max_total = max(max_f,max_total)
+
+            end
+
+            
+
+        end
+
+    end
+
+    if thermal
+
+        # expected thermal spectrum based on final time step
+        f = copy(Location_Species_To_StateVector(sol.f[end],PhaseSpace,species_index=species_index))
+        Nᵃ = DiplodocusTransport.FourFlow(f,p_num,u_num,h_num,p_r,u_r,h_r,mass)
+        Uₐ = [-1.0,0.0,0.0,0.0] # static observer
+        num = DiplodocusTransport.ScalarNumberDensity(Nᵃ,Uₐ)
+        Δab = DiplodocusTransport.ProjectionTensor(Uₐ)
+        Tᵃᵇ = DiplodocusTransport.StressEnergyTensor(f,p_num,u_num,h_num,p_r,u_r,h_r,mass)
+        Pressure = DiplodocusTransport.ScalarPressure(Tᵃᵇ,Δab)
+        Temperature = DiplodocusTransport.ScalarTemperature(Pressure,num)
+
+        MJ = DiplodocusTransport.MaxwellJuttner_Distribution(PhaseSpace,species[species_idx],Temperature;n=num)
+        # scale by order
+        # f = dN/dpdudh * dpdudh therefore dN/dp = f / dp and p^order * dN/dp = f * mp^order / dp
+        @. MJ *= (meanp^(order)) / dp
+
+        scatterlines!(ax,mp_plot,log10.(MJ),linewidth=1.0,color = theme.textcolor[],markersize=0.0,label="Maxwell-Juttner")
+
+    end
+
+    if paraperp == false
+        push!(legend_elements,LineElement(color = theme.textcolor[], linestyle = linestyles[species_idx],linewidth = 2.0))
+        push!(line_labels,species_name)
+    end
+
+    end # species loop 
+
+    if paraperp == true
+        push!(legend_elements,LineElement(color = theme.textcolor[], linestyle = linestyles[1],linewidth = 2.0))
+        push!(legend_elements,LineElement(color = theme.textcolor[], linestyle = linestyles[2],linewidth = 2.0))
+        push!(line_labels,L"\parallel")
+        push!(line_labels,L"\perp")
+    end
+
+    t_unit_string = TimeUnits()
+
+    if Time.t_grid == "u"
+        Colorbar(fig[1,2],colormap = theme.colormap,limits=(TimeUnits(sol.t[1]),TimeUnits(sol.t[end])),label=L"$t\,$ $%$t_unit_string$")
+    elseif Time.t_grid == "l"
+        Colorbar(fig[1,2],colormap = theme.colormap,limits=(log10(round(TimeUnits(sol.t[1]),sigdigits=5)),log10(round(TimeUnits(sol.t[end]),sigdigits=5))),label=L"$\log_{10}\left(t\,%$t_unit_string \right)$")
+    end
+
+    if legend
+        axislegend(ax,legend_elements,line_labels,position = :lt)
+    end
+
+    if plot_limits == (nothing,nothing)
+        xlims!(ax,(log10(p_min)-1.0,log10(p_max)+1.0))
+        ylims!(ax,(log10(max_total)-9.0,log10(max_total)+1.0)) 
+    end
+    #println("$((log10(p_min)-1.0,log10(p_max)+1.0))")
+    #println("$((log10(max_total)-9.0,log10(max_total)+1.0))")
+
+    return fig
+
+    end # with_theme
+
 end
