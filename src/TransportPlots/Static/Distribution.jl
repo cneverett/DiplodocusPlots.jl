@@ -1981,7 +1981,7 @@ function AzimuthalAngleDistributionPlot(sol,species::Vector{String},PhaseSpace::
     else
         ylab = L"$\log_{10}\left(p^{%$(order)}\,\frac{\mathrm{d}N}{\mathrm{d}\phi\mathrm{d}V}\,[\text{m}^{-3}\left(m_ec\right)^{%$(order-1)}]\right)$"
     end
-    ax = Axis(fig[1,1],xlabel=xlab,ylabel=ylab,aspect=DataAspect())
+    ax = Axis(fig[1,1],xlabel=xlab,ylabel=ylab#= ,aspect=DataAspect() =#)
     ax.limits = plot_limits
 
     name_list = PhaseSpace.name_list
