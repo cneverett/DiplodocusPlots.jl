@@ -1445,9 +1445,9 @@ function AM3_DIP_Combo_MomentumDistributionPlot(filePath_AM3,sol_DIP,PhaseSpace_
     ylab_err = L"$\text{Frac. Diff.}$"
     
     ax_DIP = Axis(g2[1,1],aspect=DataAspect(),ylabel=ylab)
-    hidexdecorations!(ax_DIP)
+    hidexdecorations!(ax_DIP,grid=false)
     ax_AM3 = Axis(g2[2,1],aspect=DataAspect())
-    hidexdecorations!(ax_AM3)
+    hidexdecorations!(ax_AM3,grid=false)
     ax_err = Axis(g2[3,1],xlabel=xlab,aspect=DataAspect(),ylabel=ylab_err)
 
     #pt = 4/3
