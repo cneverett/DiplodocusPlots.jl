@@ -2012,11 +2012,6 @@ function AzimuthalAngleDistributionPlot(sol,species::Vector{String},PhaseSpace::
     dp = Grids.dpx_list[species_index]
     du = Grids.dpy_list[species_index]
     mp = Grids.mpx_list[species_index]
-    if PhaseSpace.Momentum.px_grid_list[species_index] == "l"
-        mp_plot = log10.(meanp)
-    elseif  PhaseSpace.Momentum.px_grid_list[species_index] == "u"
-        mp_plot = meanp
-    end
     mu = Grids.mpy_list[species_index]
     mh = Grids.mpz_list[species_index]
     p_r = Grids.pxr_list[species_index]
