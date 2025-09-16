@@ -1397,7 +1397,7 @@ function AM3_MomentumDistributionPlot(filePath,t_max,t_min,t_grid;plot_limits=(n
 
 end
 
-function AM3_DIP_Combo_MomentumDistributionPlot(filePath_AM3,sol_DIP,PhaseSpace_DIP,t_max,t_min,t_grid;plot_limits=(nothing,nothing),theme=DiplodocusDark(),lepton_err=true)
+function AM3_DIP_Combo_MomentumDistributionPlot(filePath_AM3,sol_DIP,PhaseSpace_DIP,t_max,t_min,t_grid;plot_limits=(nothing,nothing),theme=DiplodocusDark(),ele_err=true,pos_err=true)
 
     name_list = PhaseSpace_DIP.name_list
     Momentum = PhaseSpace_DIP.Momentum
@@ -1412,6 +1412,10 @@ function AM3_DIP_Combo_MomentumDistributionPlot(filePath_AM3,sol_DIP,PhaseSpace_
         meanp_ele = f["meanp_ele"];
         f_ele = f["f_ele"];
         t_ele = f["t_ele"];
+
+        meanp_pos = f["meanp_pos"];
+        f_pos = f["f_pos"];
+        t_pos = f["t_pos"];
 
         meanp_pho = f["meanp_pho"];
         f_pho = f["f_pho"];
@@ -1498,7 +1502,7 @@ function AM3_DIP_Combo_MomentumDistributionPlot(filePath_AM3,sol_DIP,PhaseSpace_
 
             meanp_AM3 = meanp_pho .* eV_to_mElec2
 
-            # sum along u and h directions
+            # AM3
             pdNdp_AM3 = meanp_AM3 .* f_pho[i,:][1] .* cm3_to_m3
             #println("$pdNdp")
             scatterlines!(ax_AM3,log10.(meanp_AM3),log10.(pdNdp_AM3),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[1])
@@ -1566,7 +1570,6 @@ function AM3_DIP_Combo_MomentumDistributionPlot(filePath_AM3,sol_DIP,PhaseSpace_
 
     for i in 1:length(t_ele)
 
-        # AM3
         t = t_ele[i]
         if log10(t) % 1 == 0.0 && t <= t_max # 10^n timesteps 
             t_plot = t
@@ -1577,7 +1580,7 @@ function AM3_DIP_Combo_MomentumDistributionPlot(filePath_AM3,sol_DIP,PhaseSpace_
             end
             meanp_AM3 = sqrt.((meanp_ele .* eV_to_mElec2).^2 .-1)
 
-            # sum along u and h directions
+            # AM3
             pdNdp_AM3 = meanp_AM3 .* f_ele[i,:][1] .* cm3_to_m3
             scatterlines!(ax_AM3,log10.(meanp_AM3),log10.(pdNdp_AM3),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[2])
 
@@ -1599,7 +1602,7 @@ function AM3_DIP_Combo_MomentumDistributionPlot(filePath_AM3,sol_DIP,PhaseSpace_
                 scatterlines!(ax_DIP,log10.(meanp),log10.(pdNdp_DIP),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[2])
             end
 
-            if lepton_err
+            if ele_err
                 # error plot
                 # regrid AM3 results (assuming it has finest grid) to grid size of DIP
                 pdNdp_AM3_DIP_Grid = zeros(Float64,size(meanp))
@@ -1643,10 +1646,9 @@ function AM3_DIP_Combo_MomentumDistributionPlot(filePath_AM3,sol_DIP,PhaseSpace_
         f3D = zeros(Float32,p_num,u_num,h_num)
         f1D = zeros(Float32,p_num*u_num*h_num)
 
-        for i in 1:length(t_ele)
+        for i in 1:length(t_pos)
 
-            # AM3
-            t = t_ele[i]
+            t = t_pos[i]
             if log10(t) % 1 == 0.0 && t <= t_max # 10^n timesteps 
                 t_plot = t
                 if t_grid == "u"
@@ -1654,6 +1656,11 @@ function AM3_DIP_Combo_MomentumDistributionPlot(filePath_AM3,sol_DIP,PhaseSpace_
                 elseif t_grid == "l"
                     color = theme.colormap[][(log10(t) - log10(t_min)) / (log10(t_max) - log10(t_min))]
                 end
+                meanp_AM3 = sqrt.((meanp_pos .* eV_to_mElec2).^2 .-1)
+
+                # AM3
+                pdNdp_AM3 = meanp_AM3 .* f_pos[i,:][1] .* cm3_to_m3
+                scatterlines!(ax_AM3,log10.(meanp_AM3),log10.(pdNdp_AM3),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[3])
 
                 # DIP
                 t_idx = findfirst(x->round(CodeToSIUnitsTime(x),sigdigits=3)==t_plot,sol_DIP.t)
@@ -1672,6 +1679,21 @@ function AM3_DIP_Combo_MomentumDistributionPlot(filePath_AM3,sol_DIP,PhaseSpace_
                 else
                     scatterlines!(ax_DIP,log10.(meanp),log10.(pdNdp_DIP),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[3])
                 end
+
+                if pos_err
+                # error plot
+                # regrid AM3 results (assuming it has finest grid) to grid size of DIP
+                pdNdp_AM3_DIP_Grid = zeros(Float64,size(meanp))
+                for p in eachindex(meanp)
+                    p_idx = find_closest(meanp_AM3,meanp[p])
+                    pdNdp_AM3_DIP_Grid[p] = pdNdp_AM3[p_idx]
+                end
+                err = (pdNdp_AM3_DIP_Grid.-pdNdp_DIP)./pdNdp_DIP
+                replace!(err,-1.0=>NaN) # remove values for which AM3 does not have values
+                replace!(err,Inf=>NaN) # remove values for which DIP does not have values
+
+                scatterlines!(ax_err,log10.(meanp),err,linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[3])
+            end
 
             end
         end
