@@ -2050,7 +2050,7 @@ function AzimuthalAngleDistributionPlot(sol,species::Vector{String},PhaseSpace::
             # scale by order
             # f = dN/dpdudh * dpdudh therefore dN/dp = f / dp and p^order * dN/dp = f * mp^order / dp
             for px in 1:p_num, py in 1:u_num, pz in 1:h_num
-                f3D[px,py,pz] = f3D[px,py,pz] * (meanp[px]^(order)) / dp[px]
+                f3D[px,py,pz] = f3D[px,py,pz] * (mp[px]^(order)) / dp[px]
             end
 
             # sum along p and u directions
