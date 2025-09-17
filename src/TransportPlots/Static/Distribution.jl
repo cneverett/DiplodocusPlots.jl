@@ -919,7 +919,7 @@ function AzimuthalAngleDistributionPlot(sol,species::Vector{String},PhaseSpace::
             log10.(dropdims(sum(f3D, dims=(1,2)),dims=(1,2)))
         end
         
-        if @lift(sum(@. !isnan($dNdphi) * !isinf($dNdphi) * !iszero($dNdphi)) == 1) # there is only one valid position so scatterlines doesn't work
+        if @lift(sum(@. !isnan($dNdphi) * !isinf($dNdphi) * !iszero($dNdphi)) == 1)[] # there is only one valid position so scatterlines doesn't work
             idx = @lift(findfirst(!iszero,$dNdphi))
             val = @lift($dNdphi[$idx])
             lines!(ax,[mh[idx]/pi, mh[idx]/pi],[-20.0, val],linewidth=2.0,color = color,linestyle=linestyles[species_idx])
