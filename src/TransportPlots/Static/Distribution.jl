@@ -831,7 +831,7 @@ function AzimuthalAngleDistributionPlot(sol,species::Vector{String},PhaseSpace::
 
 end
 
-function AzimuthalAngleDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseSpaceStruct,type::Static;theme=DiplodocusDark(),order::Int64=0,TimeUnits::Function=CodeToCodeUnitsTime,plot_limits=(nothing,nothing),wide=false,legend=true,framerate=12,filename="AzimuthalAngleDistribution.mp4",figure=nothing)
+function AzimuthalAngleDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseSpaceStruct,type::Animated;theme=DiplodocusDark(),order::Int64=0,TimeUnits::Function=CodeToCodeUnitsTime,plot_limits=(nothing,nothing),wide=false,legend=true,framerate=12,filename="AzimuthalAngleDistribution.mp4",figure=nothing)
 
     CairoMakie.activate!(inline=true) # plot in vs code window
 
