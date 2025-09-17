@@ -1483,7 +1483,7 @@ function MomentumAndAzimuthalAngleDistributionPlot(sol,species::String,PhaseSpac
 
     ax.thetagridcolor=(:grey45,0.5)
     ax.rgridcolor=(:grey45,0.5)
-    ax.thetaticks = ([0.0,pi/4,pi/2,3pi/4,pi,5pi/4,6pi/4,7pi/4],[L"0","",L"\pi/2","",L"\pi","",L"3\pi/4",""])
+    ax.thetaticks = ([0.0,pi/4,pi/2,3pi/4,pi,5pi/4,6pi/4,7pi/4],["0","","π/2","",L"π","",L"3π/4",""])
 
     t_unit_string = TimeUnits()
 
