@@ -1973,11 +1973,13 @@ function AzimuthalAngleDistributionPlot(sol,species::Vector{String},PhaseSpace::
     end
     xlab = L"$\phi\,[\pi]$"
     if order == 1
-        ylab = L"$\log_{10}\left(p\,\frac{\mathrm{d}N}{\mathrm{d}\phi\mathrm{d}V}\,[\text{m}^{-3}]\right)$"
+        ylab = L"$\log_{10}\left(p\,\frac{\mathrm{d}N}{\mathrm{d}\phi\mathrm{d}V}\,[\text{m}^{-3}m_ec\right]\right)$"
     elseif order == 2
-        ylab = L"$\log_{10}\left(p^{2}\,\frac{\mathrm{d}N}{\mathrm{d}\phi\mathrm{d}V}\,[\text{m}^{-3}\left(m_ec\right)]\right)$"
+        ylab = L"$\log_{10}\left(p^{2}\,\frac{\mathrm{d}N}{\mathrm{d}\phi\mathrm{d}V}\,[\text{m}^{-3}\left(m_ec\right)^{2}]\right)$"
+    elseif order == 0
+        ylab = L"$\log_{10}\left(\frac{\mathrm{d}N}{\mathrm{d}\phi\mathrm{d}V}\,[\text{m}^{-3}]\right)$"
     elseif order == -2
-        ylab=L"$\log_{10}\left(\frac{\mathrm{d}N}{p^2\mathrm{d}p\mathrm{d}\phi\mathrm{d}V}\,[\text{m}^{-3}\left(m_ec\right)^{-3}]\right)$"
+        ylab=L"$\log_{10}\left(\frac{\mathrm{d}N}{p^2\mathrm{d}p\mathrm{d}\phi\mathrm{d}V}\,[\text{m}^{-3}\left(m_ec\right)^{-2}]\right)$"
     else
         ylab = L"$\log_{10}\left(p^{%$(order)}\,\frac{\mathrm{d}N}{\mathrm{d}\phi\mathrm{d}V}\,[\text{m}^{-3}\left(m_ec\right)^{%$(order-1)}]\right)$"
     end
