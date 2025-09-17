@@ -1474,13 +1474,16 @@ function MomentumAndAzimuthalAngleDistributionPlot(sol,species::String,PhaseSpac
                 hm = heatmap!(ax,h_r,p_r,log10.(dis'),colormap=colormap,colorrange=col_range,colorscale=x->asinh(x-log10(max_dis)))
                 rlims!(ax,0.0,p_r[end])
             end
-            ax.thetagridcolor=(:grey45,0.5)
-            ax.rgridcolor=(:grey45,0.5)
+            
 
             translate!(hm,0.0,0.0,-100.0)
 
         end
     end # t loop
+
+    ax.thetagridcolor=(:grey45,0.5)
+    ax.rgridcolor=(:grey45,0.5)
+    ax1.thetaticks = ([0.0,45.0,90.0,135.0,180.0,225.0,270.0,315.0],[L"0",L"",L"\pi/2",L"",L"\pi",L"",L"3\pi/4",L""])
 
     t_unit_string = TimeUnits()
 
