@@ -916,21 +916,23 @@ function AzimuthalAngleDistributionPlot(sol,species::Vector{String},PhaseSpace::
                 f3D[px,py,pz] = f3D[px,py,pz] * (mp[px]^(order)) / dh[px]
             end
             # sum along p and u directions
-            log10.(dropdims(sum(f3D, dims=(1,2)),dims=(1,2)))
+            test = log10.(dropdims(sum(f3D, dims=(1,2)),dims=(1,2)))
+            replace!(test,-Inf=>NaN)
         end
+
+        println(dNdphi[])
         
         if @lift(sum(@. !isnan($dNdphi) * !isinf($dNdphi) * !iszero($dNdphi)) == 1)[] # there is only one valid position so scatterlines doesn't work
-            idx = @lift(findfirst(!iszero,$dNdphi))
-            val = @lift($dNdphi[$idx])
-            low = @lift(mh[$idx]/pi)
-            up = @lift(mh[$idx]/pi)
+            idx = @lift(findfirst(!isnan,$dNdphi))
+            val = @lift([-20.0, $dNdphi[$idx]])
+            low = @lift([mh[$idx]/pi, mh[$idx]/pi])
             println(low)
-            println(up)
+            println(dNdphi)
             println(val)
-            println(index)
-            lines!(ax,[low, up],[-20.0, val],linewidth=2.0,color = color,linestyle=linestyles[species_idx])
+            println(idx)
+            lines!(ax,low,val,linewidth=2.0,color = color,linestyle=linestyles[1])
         else
-            scatterlines!(ax,mh./pi,dNdphi,linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[species_idx])
+            scatterlines!(ax,mh./pi,dNdphi,linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[1])
         end
 
     end # species loop 
@@ -1244,7 +1246,7 @@ Common arguments:
 - `order`: the order of p in p^order * dN/dp dV, default is 1, i.e. number density spectrum. 2 is "energy" density spectrum.
 
 Static arguments:
-- `timevalues`: a NOT OPTIONAL `tuple` of 3 either `Int64` or `Float64` time values to be plotted. `Int64` values are taken to be the time index in `sol.t`, whereas `Float64` values are taken to be actural time valus in code units that are then converted to the closest index in `sol.t`.
+- `timevalues`: a NOT OPTIONAL `tuple` of 3 either `Int64` or `Float64` time values to be plotted. `Int64` values are taken to be the time index in `sol.t`, whereas `Float64` values are taken to be actural time values in code units that are then converted to the closest index in `sol.t`. Alternatively can be set to `nothing` in which case, a single plot will be generated with colour indicating time and alpha indicating distribution (this option also allows for a `step` argument for the jump in timesteps to be plotted).
 
 Animated arguments:
 - `framerate`: the frame rate of the animation, default is 12 fps.
@@ -1358,6 +1360,10 @@ function MomentumAndAzimuthalAngleDistributionPlot(sol,species::String,PhaseSpac
         rlims!(ax2,0.0,p_r[end])
         rlims!(ax3,0.0,p_r[end])
     end
+
+    translate!(hm1,0,0,-100)
+    translate!(hm2,0,0,-100)
+    translate!(hm3,0,0,-100)
     #ax1.thetaticks = (u_as_theta_grid_tick_locations,u_as_theta_grid_tick_values_string)
     #ax2.thetaticks = (u_as_theta_grid_tick_locations,u_as_theta_grid_tick_values_string)
     #ax3.thetaticks = (u_as_theta_grid_tick_locations,u_as_theta_grid_tick_values_string)
@@ -1396,6 +1402,105 @@ function MomentumAndAzimuthalAngleDistributionPlot(sol,species::String,PhaseSpac
     end # with_theme
 
 end
+
+function MomentumAndAzimuthalAngleDistributionPlot(sol,species::String,PhaseSpace::PhaseSpaceStruct,type::Static,timevalues::T;theme=DiplodocusDark(),order::Int64=1,TimeUnits::Function=CodeToCodeUnitsTime,step=1) where T <: Nothing
+
+    CairoMakie.activate!(inline=true) # plot in vs code window
+
+    with_theme(theme) do
+
+    fig = Figure(size=(288,276))
+
+    ax = PolarAxis(fig[1,1],width=Relative(1.2))
+    thetalims!(ax,0,2pi)
+
+    name_list = PhaseSpace.name_list
+    Momentum = PhaseSpace.Momentum
+    Grids = PhaseSpace.Grids
+    Time = PhaseSpace.Time
+
+    species_index = findfirst(x->x==species,name_list)
+
+    p_num = Momentum.px_num_list[species_index]  
+    u_num = Momentum.py_num_list[species_index]
+    h_num = Momentum.pz_num_list[species_index]
+    dp = Grids.dpx_list[species_index]
+    du = Grids.dpy_list[species_index]
+    dh = Grids.dpz_list[species_index]
+    meanp = Grids.mpx_list[species_index]
+    meanu = Grids.mpy_list[species_index]
+    meanh = Grids.mpz_list[species_index]
+    p_r = Grids.pxr_list[species_index]
+    u_r = Grids.pyr_list[species_index]
+    h_r = Grids.pzr_list[species_index]
+    mass = Grids.mass_list[species_index]
+
+    t_save = length(sol.t)
+    t_plot = ceil(Int64,t_save/step)
+
+    values = (1:t_save)*step .+ 1 # add 1 to skip initial
+
+    for i in 1:t_save
+        if (i in values || i == 1) # plot first step for initial conds 
+
+            t = sol.t[i]
+            if Time.t_grid == "u"
+                color = theme.colormap[][(t - sol.t[1]) / (sol.t[end] - sol.t[1])]
+            elseif Time.t_grid == "l"
+                color = theme.colormap[][(log10(t) - log10(sol.t[1])) / (log10(sol.t[end]) - log10(sol.t[1]))]
+            end
+
+            println(color)
+            colormap = Makie.ColorScheme(range(Makie.alphacolor(color,0.0),Makie.alphacolor(color,1.0),length=256))
+
+            f = copy(Location_Species_To_StateVector(sol.f[i],PhaseSpace,species_index=species_index))
+
+            # sum over u angle
+            dis = dropdims(sum(reshape(f,(p_num,u_num,h_num)),dims=2),dims=2)
+
+            # scale by order
+            # f = dN/dpdudh * dpdudh therefore dN/dpdh = f / dpdh and p^order * dN/dpdh = f * mp^order / dpdh
+            for px in 1:p_num, pz in 1:h_num
+                dis[px,pz] *= (meanp[px]^(order)) / dp[px] / dh[pz]
+            end
+            replace!(dis,0.0 => NaN) # replace Inf with NaN for plotting
+            max_dis = maximum(x for x in dis if !isnan(x))
+            col_range = (log10(max_dis)-16.0,log10(max_dis))
+
+            if PhaseSpace.Momentum.px_grid_list[species_index] == "l"
+                hm = heatmap!(ax,h_r,log10.(p_r),log10.(dis'),colormap=colormap,colorrange=col_range,colorscale=x->asinh(x-log10(max_dis)))
+                rlims!(ax,log10(p_r[1]),log10(p_r[end])+1.0)
+                ax.radius_at_origin = log10(p_r[1])-1.0
+            elseif PhaseSpace.Momentum.px_grid_list[species_index] == "u"
+                hm = heatmap!(ax,h_r,p_r,log10.(dis'),colormap=colormap,colorrange=col_range,colorscale=x->asinh(x-log10(max_dis)))
+                rlims!(ax,0.0,p_r[end])
+            end
+            ax.thetagridcolor=(:grey45,0.5)
+            ax.rgridcolor=(:grey45,0.5)
+
+            translate!(hm,0.0,0.0,-100.0)
+
+        end
+    end # t loop
+
+    t_unit_string = TimeUnits()
+
+    if Time.t_grid == "u"
+        Colorbar(fig[1,2],colormap = theme.colormap,limits=(TimeUnits(sol.t[1]),TimeUnits(sol.t[end])),label=L"$t\,$ $%$t_unit_string$",height=176,tellheight=false)
+    elseif Time.t_grid == "l"
+        Colorbar(fig[1,2],colormap = theme.colormap,limits=(log10(round(TimeUnits(sol.t[1]),sigdigits=5)),log10(round(TimeUnits(sol.t[end]),sigdigits=5))),label=L"$\log_{10}\left(t\,%$t_unit_string \right)$",height=176,tellheight=false)
+    end
+
+    colsize!(fig.layout,1,Relative(0.9))
+    colsize!(fig.layout,2,Relative(0.1))
+    colgap!(fig.layout,1,0.0)
+    
+    return fig
+
+    end # with_theme
+
+end
+
 
 function MomentumAndAzimuthalAngleDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseSpaceStruct,type::Animated;theme=DiplodocusDark(),order::Int64=1,framerate=12,filename="MomentumAndAzimuthalAngleDistribution.mp4",figure=nothing,TimeUnits::Function=CodeToCodeUnitsTime)
 
