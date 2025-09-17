@@ -1450,7 +1450,6 @@ function MomentumAndAzimuthalAngleDistributionPlot(sol,species::String,PhaseSpac
                 color = theme.colormap[][(log10(t) - log10(sol.t[1])) / (log10(sol.t[end]) - log10(sol.t[1]))]
             end
 
-            println(color)
             colormap = Makie.ColorScheme(range(Makie.alphacolor(color,0.0),Makie.alphacolor(color,1.0),length=256))
 
             f = copy(Location_Species_To_StateVector(sol.f[i],PhaseSpace,species_index=species_index))
