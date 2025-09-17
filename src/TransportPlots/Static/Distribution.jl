@@ -924,6 +924,10 @@ function AzimuthalAngleDistributionPlot(sol,species::Vector{String},PhaseSpace::
             val = @lift($dNdphi[$idx])
             low = @lift(mh[$idx]/pi)
             up = @lift(mh[$idx]/pi)
+            println(low)
+            println(up)
+            println(val)
+            println(index)
             lines!(ax,[low, up],[-20.0, val],linewidth=2.0,color = color,linestyle=linestyles[species_idx])
         else
             scatterlines!(ax,mh./pi,dNdphi,linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[species_idx])
