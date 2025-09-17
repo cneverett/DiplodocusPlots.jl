@@ -922,7 +922,9 @@ function AzimuthalAngleDistributionPlot(sol,species::Vector{String},PhaseSpace::
         if @lift(sum(@. !isnan($dNdphi) * !isinf($dNdphi) * !iszero($dNdphi)) == 1)[] # there is only one valid position so scatterlines doesn't work
             idx = @lift(findfirst(!iszero,$dNdphi))
             val = @lift($dNdphi[$idx])
-            lines!(ax,[mh[idx]/pi, mh[idx]/pi],[-20.0, val],linewidth=2.0,color = color,linestyle=linestyles[species_idx])
+            low = @lift(mh[$idx]/pi)
+            up = @lift(mh[$idx]/pi)
+            lines!(ax,[low, up],[-20.0, val],linewidth=2.0,color = color,linestyle=linestyles[species_idx])
         else
             scatterlines!(ax,mh./pi,dNdphi,linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[species_idx])
         end
