@@ -1464,7 +1464,7 @@ function MomentumAndAzimuthalAngleDistributionPlot(sol,species::String,PhaseSpac
             end
             replace!(dis,0.0 => NaN) # replace Inf with NaN for plotting
             max_dis = maximum(x for x in dis if !isnan(x))
-            col_range = (log10(max_dis)-16.0,log10(max_dis))
+            col_range = (log10(max_dis)-8.0,log10(max_dis))
 
             if PhaseSpace.Momentum.px_grid_list[species_index] == "l"
                 hm = heatmap!(ax,h_r,log10.(p_r),log10.(dis'),colormap=colormap,colorrange=col_range,colorscale=x->asinh(x-log10(max_dis)))
