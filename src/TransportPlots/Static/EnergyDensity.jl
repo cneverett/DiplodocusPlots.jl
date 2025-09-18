@@ -65,7 +65,7 @@ function EnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;specie
 
             Tᵃᵇ = DiplodocusTransport.StressEnergyTensor(f1D,p_num_list[j],u_num_list[j],h_num_list[j],pr_list[j],ur_list[j],hr_list[j],mass_list[j]) 
 
-            eng[i] = DiplodocusTransport.ScalarEnergyDensity(Tᵃᵇ,Uₐ,num,perparticle)
+            eng[i] = DiplodocusTransport.ScalarEnergyDensity(Tᵃᵇ,Uₐ,num,perparticle=perparticle)
 
             if species== "All"
                 eng_total[i] += eng[i]
