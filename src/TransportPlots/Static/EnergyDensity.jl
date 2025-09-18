@@ -37,9 +37,9 @@ function EnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;specie
     end
 
     if perparticle
-        ylab = L"$\overline{p^0}$ $[\mathrm{J}/c]$"
+        ylab = L"$\overline{p^0}$ $[m_ec]$"
     else
-        ylab = L"$e/c$ $[\mathrm{J}\mathrm{m}^{-3}]$"
+        ylab = L"$e/c$ $[m_ec\mathrm{m}^{-3}]$"
     end
 
     if isnothing(fig)
