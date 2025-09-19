@@ -142,7 +142,7 @@ end
     ObserverFluxPlot(PhaseSpace,sol,time_idx,ObserverAngles,ObserverDistance;plot_limits=(nothing,nothing),theme=DiplodocusDark(),title=nothing)
 
 """
-function ObserverFluxPlot(PhaseSpace::PhaseSpaceStruct,sol::OutputStruct,time_idx::Int64,ObserverAngles::Vector{Float64},ObserverDistance::Float64;plot_limits=(nothing,nothing),theme=DiplodocusDark(),title=nothing,TimeUnits::Function=CodeToCodeUnitsTime;R=nothing,Z=nothing)
+function ObserverFluxPlot(PhaseSpace::PhaseSpaceStruct,sol::OutputStruct,time_idx::Int64,ObserverAngles::Vector{Float64},ObserverDistance::Float64;plot_limits=(nothing,nothing),theme=DiplodocusDark(),title=nothing,TimeUnits::Function=CodeToCodeUnitsTime,R=nothing,Z=nothing)
 
     CairoMakie.activate!(inline=true)
 
@@ -215,7 +215,7 @@ function ObserverFluxPlot(PhaseSpace::PhaseSpaceStruct,sol::OutputStruct,time_id
         ax.limits = plot_limits
         plot_limits_x = plot_limits[1]
         plot_limits_y = plot_limits[2]
-        ax_t.limits = (log10.(10^plot_limits_x .* mEle*c^2/h),plot_limits_y)
+        ax_t.xlimits = log10.(10^plot_limits_x .* mEle*c^2/h)
     end
 
     axislegend(ax,position=:lt)
