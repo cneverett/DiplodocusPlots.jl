@@ -1,10 +1,13 @@
-function ObserverFlux(PhaseSpace::PhaseSpaceStruct,sol::OutputStruct,ObserverAngles::Vector{Float64},ObserverDistance::Float64)
+function ObserverFlux(PhaseSpace::PhaseSpaceStruct,sol::OutputStruct,ObserverAngles::Vector{Float64},ObserverDistance::Float64;R=nothing,Z=nothing)
 
     Space = PhaseSpace.Space
     Time = PhaseSpace.Time
     Momentum = PhaseSpace.Momentum
     Grids = PhaseSpace.Grids
     name_list = PhaseSpace.name_list
+
+    c = getfield(DC,Symbol("c"))
+    mEle = getfield(DC,Symbol("mEle"))
 
     if typeof(Space.space_coordinates) != Cylindrical
         error("ObserverFlux is only implemented for cylindrical coordinates.")
@@ -18,15 +21,20 @@ function ObserverFlux(PhaseSpace::PhaseSpaceStruct,sol::OutputStruct,ObserverAng
     d = ObserverDistance
     to_r = ObserverAngles
 
-    dz = Grids.dz[1]
-    R = Grids.xr[2]
+    
+    if isnothing(R)
+        R = Grids.xr[2]
+    end 
+    if isnothing(Z)
+        Z = Grids.dz[1]
+    end 
 
     ur = Grids.pyr_list[photon_index]
     mp = Grids.mpx_list[photon_index]
     dp = Grids.dpx_list[photon_index]
     du = Grids.dpy_list[photon_index]
 
-    Fν = zeros(length(sol.t),length(ObserverAngles),Momentum.px_num_list[photon_index])
+    Fp = zeros(length(sol.t),length(ObserverAngles),Momentum.px_num_list[photon_index])
 
     for (θ_idx, θ) in enumerate(ObserverAngles)
 
@@ -116,8 +124,8 @@ function ObserverFlux(PhaseSpace::PhaseSpaceStruct,sol::OutputStruct,ObserverAng
 
                 end  
                 
-                Fν[t,θ_idx,px] = val_total
-                Fν[t,θ_idx,px] *= R*dz/(4*pi*d^2)
+                Fp[t,θ_idx,px] = val_total
+                Fp[t,θ_idx,px] *= R*Z/(4*pi*d^2) * c^2 * mEle * c
 
             end
 
@@ -125,7 +133,7 @@ function ObserverFlux(PhaseSpace::PhaseSpaceStruct,sol::OutputStruct,ObserverAng
 
     end
 
-    return Fν
+    return Fp
 
 end
 
@@ -155,7 +163,7 @@ function ObserverFluxPlot(PhaseSpace::PhaseSpaceStruct,sol::OutputStruct,time_id
     mp = Grids.mpx_list[photon_index]
     dp = Grids.dpx_list[photon_index]
 
-    Fν = ObserverFlux(PhaseSpace,sol,ObserverAngles,ObserverDistance)
+    Fp = ObserverFlux(PhaseSpace,sol,ObserverAngles,ObserverDistance)
 
     fig = Figure()
 
@@ -177,7 +185,7 @@ function ObserverFluxPlot(PhaseSpace::PhaseSpaceStruct,sol::OutputStruct,time_id
 
     for θ in 1:length(ObserverAngles)
 
-        flux_val = log10.(mp .* Fν[time_idx,θ,:])
+        flux_val = log10.(mp .* Fp[time_idx,θ,:])
         max_f = maximum(x for x in flux_val if !isnan(x))
         max_total = max(max_total,max_f)
 
