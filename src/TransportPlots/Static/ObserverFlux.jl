@@ -171,7 +171,7 @@ function ObserverFluxPlot(PhaseSpace::PhaseSpaceStruct,sol::OutputStruct,time_id
     t_unit_string = TimeUnits()
 
     xlab = L"$\log_{10}\left(p [m_ec]\right)$"
-    ylab = L"$\log_{10}\left(pF_{p}\right)$ $[\text{m}^{-3}m_ec]$"
+    ylab = L"$\log_{10}\left(pF_{p}\,[\text{J}\text{m}^{-2}\text{s}^{-1}]\right)$"
     ax = Axis(fig[1,1],xlabel=xlab,ylabel=ylab,aspect=DataAspect())
     
     ax.limits = plot_limits
