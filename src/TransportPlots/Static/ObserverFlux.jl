@@ -188,6 +188,7 @@ function ObserverFluxPlot(PhaseSpace::PhaseSpaceStruct,sol::OutputStruct,time_id
     ax = Axis(fig[1,1],xlabel=xlab,ylabel=ylab,aspect=DataAspect())
     ax_t = Axis(fig[1,1],xlabel=xlab_t,xaxisposition=:top)
     #hidespines!(ax_t)
+    linkyaxes!(ax,ax_t)
     #hidedecorations!(ax_t)
 
     if !isnothing(title)
