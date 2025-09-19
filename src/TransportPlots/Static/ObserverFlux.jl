@@ -154,6 +154,11 @@ function ObserverFluxPlot(PhaseSpace::PhaseSpaceStruct,sol::OutputStruct,time_id
     Grids = PhaseSpace.Grids
     Time = PhaseSpace.Time
 
+    c = getfield(DC,Symbol("c"))
+    mEle = getfield(DC,Symbol("mEle"))
+    ħ = getfield(DC,Symbol("ħ"))
+    h = ħ*2pi
+
     β = Space.space_coordinates.β # local frame angle
 
     photon_index = findfirst(x->x=="Pho",name_list)
@@ -170,11 +175,13 @@ function ObserverFluxPlot(PhaseSpace::PhaseSpaceStruct,sol::OutputStruct,time_id
     t = round(TimeUnits(sol.t[time_idx]),sigdigits=3)
     t_unit_string = TimeUnits()
 
-    xlab = L"$\log_{10}\left(p [m_ec]\right)$"
+    xlab_b = L"$\log_{10}\left(p [m_ec]\right)$"
+    xlab = L"$\log_{10}\left(\nu [\text{Hz}]\right)$"
     ylab = L"$\log_{10}\left(pF_{p}\,[\text{J}\text{m}^{-2}\text{s}^{-1}]\right)$"
     ax = Axis(fig[1,1],xlabel=xlab,ylabel=ylab,aspect=DataAspect())
-    
-    ax.limits = plot_limits
+    ax_t = Axis(fig[1,1],xlabel=xlab_t,aspect=DataAspect(),xaxisposition=:top)
+    hidespines!(ax_t)
+    hidedecorations!(ax_t)
 
     if !isnothing(title)
         titlestr = L" β =%$(β)\pi, t=%$(t) %$t_unit_string"
@@ -196,6 +203,12 @@ function ObserverFluxPlot(PhaseSpace::PhaseSpaceStruct,sol::OutputStruct,time_id
     if plot_limits == (nothing,nothing)
         xlims!(ax,(log10(pr[1]),log10(pr[end])))
         ylims!(ax,(max_total-9.0,max_total+1.0)) 
+        xlims!(ax_t,(log10(pr[1]*mEle*c^2/h),log10(pr[end]*mEle*c^2/h)))
+    else
+        ax.limits = plot_limits
+        plot_limits_x = plot_limits[1]
+        plot_limits_y = plot_limits[2]
+        ax_t.limits = (log10.(10^plot_limits_x .* mEle*c^2/h),plot_limits_y)
     end
 
     axislegend(ax,position=:lt)
