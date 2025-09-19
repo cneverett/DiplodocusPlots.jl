@@ -142,7 +142,7 @@ end
     ObserverFluxPlot(PhaseSpace,sol,time_idx,ObserverAngles,ObserverDistance;plot_limits=(nothing,nothing),theme=DiplodocusDark(),title=nothing)
 
 """
-function ObserverFluxPlot(PhaseSpace::PhaseSpaceStruct,sol::OutputStruct,time_idx::Int64,ObserverAngles::Vector{Float64},ObserverDistance::Float64;plot_limits=(nothing,nothing),theme=DiplodocusDark(),title=nothing,TimeUnits::Function=CodeToCodeUnitsTime)
+function ObserverFluxPlot(PhaseSpace::PhaseSpaceStruct,sol::OutputStruct,time_idx::Int64,ObserverAngles::Vector{Float64},ObserverDistance::Float64;plot_limits=(nothing,nothing),theme=DiplodocusDark(),title=nothing,TimeUnits::Function=CodeToCodeUnitsTime;R=nothing,Z=nothing)
 
     CairoMakie.activate!(inline=true)
 
@@ -168,7 +168,14 @@ function ObserverFluxPlot(PhaseSpace::PhaseSpaceStruct,sol::OutputStruct,time_id
     mp = Grids.mpx_list[photon_index]
     dp = Grids.dpx_list[photon_index]
 
-    Fp = ObserverFlux(PhaseSpace,sol,ObserverAngles,ObserverDistance)
+    if isnothing(R)
+        R = Grids.xr[2]
+    end 
+    if isnothing(Z)
+        Z = Grids.dz[1]
+    end 
+
+    Fp = ObserverFlux(PhaseSpace,sol,ObserverAngles,ObserverDistance;R=R,Z=Z)
 
     fig = Figure()
 
