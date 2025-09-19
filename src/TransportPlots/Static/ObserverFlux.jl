@@ -187,8 +187,8 @@ function ObserverFluxPlot(PhaseSpace::PhaseSpaceStruct,sol::OutputStruct,time_id
     ylab = L"$\log_{10}\left(pF_{p}\,[\text{J}\text{m}^{-2}\text{s}^{-1}]\right)$"
     ax = Axis(fig[1,1],xlabel=xlab,ylabel=ylab,aspect=DataAspect())
     ax_t = Axis(fig[1,1],xlabel=xlab_t,aspect=DataAspect(),xaxisposition=:top)
-    hidespines!(ax_t)
-    hidedecorations!(ax_t)
+    #hidespines!(ax_t)
+    #hidedecorations!(ax_t)
 
     if !isnothing(title)
         titlestr = L" β =%$(β)\pi, t=%$(t) %$t_unit_string"
