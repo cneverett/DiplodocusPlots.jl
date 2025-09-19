@@ -97,9 +97,9 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vec
         h_num = h_num_list[species]
         dp = dp_list[species]
         mp = mp_list[species]
-        if Momentum.px_grid_list[species_index] == "l"
+        if Momentum.px_grid_list[species] == "l"
             mp_plot = log10.(mp)
-        elseif Momentum.px_grid_list[species_index] == "u"
+        elseif Momentum.px_grid_list[species] == "u"
             mp_plot = mp
         end
         mu = Grids.mpy_list[species]
