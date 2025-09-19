@@ -3,6 +3,7 @@ module DiplodocusPlots
     export DiplodocusDark, DiplodocusLight
     export Static, Animated, Interactive
     export MomentumDistributionPlot, AngleDistributionPlot, MomentumAndPolarAngleDistributionPlot, MomentumComboAnimation, MomentumAndAzimuthalAngleDistributionPlot, AzimuthalAngleDistributionPlot
+    export TimeScalePlot
     export InteractiveBinaryGainLossPlot
     export FracNumberDensityPlot, NumberDensityPlot
     export FracEnergyDensityPlot, EnergyDensityPlot
