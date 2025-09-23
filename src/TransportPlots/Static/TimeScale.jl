@@ -134,14 +134,12 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vec
         else
             for u in 1:u_num
 
-                if u == 1 || meanu[u]==0.0
-                    scatterlines!(ax,mp_plot,log10.(TimeUnits.(Float64.(timescale2D[:,u]))),linewidth=2.0,color = theme.palette.color[][mod(2*u-1,7)+1],markersize=0.0,linestyle=linestyles[species])
-                end
+                scatterlines!(ax,mp_plot,log10.(TimeUnits.(Float64.(abs.(timescale2D[:,u])))),linewidth=2.0,color = theme.palette.color[][mod(2*u-1,7)+1],markersize=0.0,linestyle=linestyles[species])
 
-                if species == 1
+                #=if species == 1
                     push!(legend_elements_angle,LineElement(color = theme.textcolor[], linestyle = :solid,linewidth = 2.0))
                     push!(line_labels_angle,L"%$(mu[u])")
-                end
+                end=#
 
             end 
         end
