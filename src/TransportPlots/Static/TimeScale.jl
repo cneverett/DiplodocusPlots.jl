@@ -7,7 +7,7 @@ Optional arguments:
 - `theme`: the colour theme to use for the plot, default is `DiplodocusDark()`.
 - `p_timescale`: whether to plot the timescale for momentum magnitude loss or state vector loss, default is `false` i.e. plot state vector losses to aid in assessing time step limits for stability.
 """
-function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vector{F},t_idx::Int64;wide=false,paraperp::Bool=false,p_timescale=false,legend=true,horz_lines=nothing,plot_limits=(nothing,nothing),theme=DiplodocusDark(),TimeUnits::Function=CodeToCodeUnitsTime) where F<:AbstractFloat
+function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vector{F},t_idx::Int64;wide=false,paraperp::Bool=false,p_timescale=false,legend=true,horz_lines=nothing,plot_limits=(nothing,nothing),theme=DiplodocusDark(),TimeUnits::Function=CodeToCodeUnitsTime,direction::String="all") where F<:AbstractFloat
 
     CairoMakie.activate!(inline=true) # plot in vs code window
     with_theme(theme) do
@@ -38,9 +38,11 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vec
 
     method(dstate,state,dt0,dt,t)
 
-    dstate = DiplodocusTransport.diag(method.temp) .* state
-
-    #dstate = method.FluxM.Ap_Flux \ (DiplodocusTransport.diag(method.FluxM.I_Flux .+ method.FluxM.J_Flux) .* (dt / dt0)) .* state
+    if direction == "all"
+        dstate = DiplodocusTransport.diag(method.temp) .* state
+    elseif direction == "I"
+        dstate = method.FluxM.Ap_Flux \ (DiplodocusTransport.diag(method.FluxM.I_Flux) .* (dt / dt0)) .* state
+    end
 
     @. timescale =  -dt * state / dstate
 
@@ -120,13 +122,14 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vec
 
             println("tscale=$(TimeUnits.(Float64.(abs.(timescale2D[10,ceil(Int64,u_num/2)]))))")
 
-            scatterlines!(ax,mp_plot,log10.(TimeUnits.(Float64.(abs.(timescale2D[:,ceil(Int64,u_num/2)])))),linewidth=2.0,color = color=theme.textcolor[],markersize=0.0,linestyle=linestyles[1])
-            scatterlines!(ax,mp_plot,log10.(TimeUnits.(Float64.(abs.(timescale2D[:,end])))),linewidth=2.0,color = color=theme.textcolor[],markersize=0.0,linestyle=linestyles[2])
-
+            scatterlines!(ax,mp_plot,log10.(TimeUnits.(Float64.(abs.(timescale2D[:,end])))),linewidth=2.0,color = color=theme.textcolor[],markersize=0.0,linestyle=linestyles[1])
             push!(legend_elements_angle,LineElement(color = theme.textcolor[], linestyle = linestyles[1],linewidth = 2.0))
-            push!(legend_elements_angle,LineElement(color = theme.textcolor[], linestyle = linestyles[2],linewidth = 2.0))
             push!(line_labels_angle,L"\parallel")
+
+            scatterlines!(ax,mp_plot,log10.(TimeUnits.(Float64.(abs.(timescale2D[:,ceil(Int64,u_num/2)])))),linewidth=2.0,color = color=theme.textcolor[],markersize=0.0,linestyle=linestyles[2])
+            push!(legend_elements_angle,LineElement(color = theme.textcolor[], linestyle = linestyles[2],linewidth = 2.0))
             push!(line_labels_angle,L"\perp")
+            
 
         else
             for u in 1:u_num
