@@ -1916,7 +1916,9 @@ function AM3_DIP_Combo_MomentumDistributionPlot(filePath_AM3,sol_DIP,PhaseSpace_
                 idx = findfirst(!iszero,pdNdp)
                 lines!(ax,[log10(meanp[idx]), log10(meanp[idx])],[-20.0, log10(pdNdp_DIP[idx])],linewidth=2.0,color = color,linestyle=linestyles[1])
             else
-                scatterlines!(ax_DIP,log10.(meanp),log10.(pdNdp_DIP),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[1])
+                pdNdp_DIP=log10.(pdNdp_DIP)
+                replace!(pdNdp_DIP,-Inf=>-45.0)
+                scatterlines!(ax_DIP,log10.(meanp),pdNdp_DIP,linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[1])
             end
 
             # error plot
