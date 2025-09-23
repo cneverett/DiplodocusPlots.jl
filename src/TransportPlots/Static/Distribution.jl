@@ -1790,7 +1790,7 @@ function AM3_MomentumDistributionPlot(filePath,t_max,t_min,t_grid;plot_limits=(n
 
 end
 
-function AM3_DIP_Combo_MomentumDistributionPlot(filePath_AM3,sol_DIP,PhaseSpace_DIP,t_max,t_min,t_grid;plot_limits=(nothing,nothing),theme=DiplodocusDark(),ele_err=true,pos_err=true)
+function AM3_DIP_Combo_MomentumDistributionPlot(filePath_AM3,sol_DIP,PhaseSpace_DIP,t_max,t_min,t_grid;plot_limits=(nothing,nothing),theme=DiplodocusDark(),ele_err=true,pos_err=true,yticks=1:2:15)
 
     name_list = PhaseSpace_DIP.name_list
     Momentum = PhaseSpace_DIP.Momentum
@@ -1841,11 +1841,13 @@ function AM3_DIP_Combo_MomentumDistributionPlot(filePath_AM3,sol_DIP,PhaseSpace_
     ylab = L"$\log_{10}\left(p^2\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V}\,[\text{m}^{-3}\left(m_ec\right)]\right)$"
     ylab_err = L"$\text{Frac. Diff.}$"
     
-    ax_DIP = Axis(g2[1,1],aspect=DataAspect(),ylabel=ylab,xminorticks=IntervalsBetween(5))
-    hidexdecorations!(ax_DIP,grid=false,xminorgrid=false,xminorticks=false)
-    ax_AM3 = Axis(g2[2,1],aspect=DataAspect())
-    hidexdecorations!(ax_AM3,grid=false)
-    ax_err = Axis(g2[3,1],xlabel=xlab,aspect=DataAspect(),ylabel=ylab_err)
+    ax_DIP = Axis(g2[1,1],aspect=DataAspect(),ylabel=ylab,yticks=yticks,xminorticks=IntervalsBetween(5),yminorticks=IntervalsBetween(2),xminorgridvisible=true,yminorticksvisible=true,yminorgridvisible=true)
+    hidexdecorations!(ax_DIP,grid=false,minorgrid=false,minorticks=false)
+
+    ax_AM3 = Axis(g2[2,1],aspect=DataAspect(),xminorticks=IntervalsBetween(5),yminorticks=IntervalsBetween(2),xminorgridvisible=true,yminorgridvisible=true,yminorticksvisible=true)
+    hidexdecorations!(ax_AM3,grid=false,minorticks=false,minorgrid=false)
+
+    ax_err = Axis(g2[3,1],xlabel=xlab,aspect=DataAspect(),ylabel=ylab_err,yticks=[-1.0,0.0,1.0],xminorticks=IntervalsBetween(5),xminorgridvisible=true,xminorticksvisible=true)
 
     #pt = 4/3
     #Label(g2[1:2,0],ylab,rotation = pi/2,fontsize=9pt)
@@ -1898,7 +1900,9 @@ function AM3_DIP_Combo_MomentumDistributionPlot(filePath_AM3,sol_DIP,PhaseSpace_
             # AM3
             pdNdp_AM3 = meanp_AM3 .* f_pho[i,:][1] .* cm3_to_m3
             #println("$pdNdp")
-            scatterlines!(ax_AM3,log10.(meanp_AM3),log10.(pdNdp_AM3),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[1])
+            pdNdp_AM3_log=log10.(pdNdp_AM3)
+            replace!(pdNdp_AM3_log,-Inf=>-45.0)
+            scatterlines!(ax_AM3,log10.(meanp_AM3),pdNdp_AM3_log,linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[1])
 
             # DIP
             t_idx = findfirst(x->round(CodeToSIUnitsTime(x),sigdigits=4)==t_plot,sol_DIP.t)
@@ -1940,7 +1944,7 @@ function AM3_DIP_Combo_MomentumDistributionPlot(filePath_AM3,sol_DIP,PhaseSpace_
     end
 
     push!(legend_elements,LineElement(color = theme.textcolor[], linestyle = linestyles[1],linewidth = 2.0))
-    push!(line_labels,"Pho")
+    push!(line_labels,"Photon")
 
     ######## Electron Lines ########
     ################################
@@ -1977,7 +1981,9 @@ function AM3_DIP_Combo_MomentumDistributionPlot(filePath_AM3,sol_DIP,PhaseSpace_
 
             # AM3
             pdNdp_AM3 = meanp_AM3 .* f_ele[i,:][1] .* cm3_to_m3
-            scatterlines!(ax_AM3,log10.(meanp_AM3),log10.(pdNdp_AM3),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[2])
+            pdNdp_AM3_log=log10.(pdNdp_AM3)
+            replace!(pdNdp_AM3_log,-Inf=>-45.0)
+            scatterlines!(ax_AM3,log10.(meanp_AM3),pdNdp_AM3_log,linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[2])
 
             # DIP
             t_idx = findfirst(x->round(CodeToSIUnitsTime(x),sigdigits=3)==t_plot,sol_DIP.t)
@@ -1994,7 +2000,9 @@ function AM3_DIP_Combo_MomentumDistributionPlot(filePath_AM3,sol_DIP,PhaseSpace_
                 idx = findfirst(!iszero,pdNdp)
                 lines!(ax,[log10(meanp[idx]), log10(meanp[idx])],[-20.0, log10(pdNdp_DIP[idx])],linewidth=2.0,color = color,linestyle=linestyles[2])
             else
-                scatterlines!(ax_DIP,log10.(meanp),log10.(pdNdp_DIP),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[2])
+                pdNdp_DIP_log=log10.(pdNdp_DIP)
+                replace!(pdNdp_DIP_log,-Inf=>-45.0)
+                scatterlines!(ax_DIP,log10.(meanp),pdNdp_DIP_log,linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[2])
             end
 
             if ele_err
@@ -2017,7 +2025,7 @@ function AM3_DIP_Combo_MomentumDistributionPlot(filePath_AM3,sol_DIP,PhaseSpace_
     end
 
     push!(legend_elements,LineElement(color = theme.textcolor[], linestyle = linestyles[2],linewidth = 2.0))
-    push!(line_labels,"Ele")
+    push!(line_labels,"Electron")
 
     ######## Positron Lines ########
     ################################
@@ -2055,7 +2063,9 @@ function AM3_DIP_Combo_MomentumDistributionPlot(filePath_AM3,sol_DIP,PhaseSpace_
 
                 # AM3
                 pdNdp_AM3 = meanp_AM3 .* f_pos[i,:][1] .* cm3_to_m3
-                scatterlines!(ax_AM3,log10.(meanp_AM3),log10.(pdNdp_AM3),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[3])
+                pdNdp_AM3_log=log10.(pdNdp_AM3)
+                replace!(pdNdp_AM3_log,-Inf=>-45.0)
+                scatterlines!(ax_AM3,log10.(meanp_AM3),pdNdp_AM3_log,linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[3])
 
                 # DIP
                 t_idx = findfirst(x->round(CodeToSIUnitsTime(x),sigdigits=3)==t_plot,sol_DIP.t)
@@ -2072,7 +2082,9 @@ function AM3_DIP_Combo_MomentumDistributionPlot(filePath_AM3,sol_DIP,PhaseSpace_
                     idx = findfirst(!iszero,pdNdp)
                     lines!(ax,[log10(meanp[idx]), log10(meanp[idx])],[-20.0, log10(pdNdp_DIP[idx])],linewidth=2.0,color = color,linestyle=linestyles[3])
                 else
-                    scatterlines!(ax_DIP,log10.(meanp),log10.(pdNdp_DIP),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[3])
+                    pdNdp_DIP_log=log10.(pdNdp_DIP)
+                    replace!(pdNdp_DIP_log,-Inf=>-45.0)
+                    scatterlines!(ax_DIP,log10.(meanp),pdNdp_DIP_log,linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[3])
                 end
 
                 if pos_err
@@ -2093,7 +2105,7 @@ function AM3_DIP_Combo_MomentumDistributionPlot(filePath_AM3,sol_DIP,PhaseSpace_
             end
         end
         push!(legend_elements,LineElement(color = theme.textcolor[], linestyle = linestyles[3],linewidth = 2.0))
-        push!(line_labels,"Pos")
+        push!(line_labels,"Positron")
     end
 
     if t_grid == "u"
