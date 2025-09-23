@@ -1841,7 +1841,7 @@ function AM3_DIP_Combo_MomentumDistributionPlot(filePath_AM3,sol_DIP,PhaseSpace_
     ylab = L"$\log_{10}\left(p^2\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}V}\,[\text{m}^{-3}\left(m_ec\right)]\right)$"
     ylab_err = L"$\text{Frac. Diff.}$"
     
-    ax_DIP = Axis(g2[1,1],aspect=DataAspect(),ylabel=ylab,xminorticks=IntevalsBetween(5))
+    ax_DIP = Axis(g2[1,1],aspect=DataAspect(),ylabel=ylab,xminorticks=IntervalsBetween(5))
     hidexdecorations!(ax_DIP,grid=false)
     ax_AM3 = Axis(g2[2,1],aspect=DataAspect())
     hidexdecorations!(ax_AM3,grid=false)
