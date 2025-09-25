@@ -2,7 +2,8 @@ module DiplodocusPlots
 
     export DiplodocusDark, DiplodocusLight
     export Static, Animated, Interactive
-    export MomentumDistributionPlot, AngleDistributionPlot, MomentumAndPolarAngleDistributionPlot, MomentumComboAnimation
+    export MomentumDistributionPlot, AngleDistributionPlot, MomentumAndPolarAngleDistributionPlot, MomentumComboAnimation, MomentumAndAzimuthalAngleDistributionPlot, AzimuthalAngleDistributionPlot
+    export TimeScalePlot
     export InteractiveBinaryGainLossPlot
     export FracNumberDensityPlot, NumberDensityPlot
     export FracEnergyDensityPlot, EnergyDensityPlot
@@ -36,6 +37,7 @@ module DiplodocusPlots
     include("TransportPlots/Static/EnergyDensity.jl")
     include("TransportPlots/Static/ThermalAndIsotropic.jl")
     include("TransportPlots/Static/ObserverFlux.jl")
+    include("TransportPlots/Static/TimeScale.jl")
     
 
 end

@@ -104,13 +104,13 @@ function InteractiveBinaryGainLossPlot(Output::Tuple)
     Label(subgl2[4,1:2], label)
 
     GainMatrix3 = Output[2]
-    GainMatrix3Avg = dropdims(sum(GainMatrix3,dims=(2,3,5,6,8,9)),dims=(2,3,5,6,8,9)) / (u1_num*h1_num*u2_num*h2_num*u3_num*h3_num)
+    GainMatrix3Avg = dropdims(sum(GainMatrix3,dims=(2,3,5,6,8,9)),dims=(2,3,5,6,8,9)) #= / sum(u3_d) * u3_d[1] =# / sum(u1_d) * u1_d[1] / sum(u2_d) * u2_d[1]# / (u1_num*h1_num*u2_num*h2_num*u3_num*h3_num)
     GainMatrix4 = name1==name2 ? Output[2] : Output[3]
-    GainMatrix4Avg = dropdims(sum(GainMatrix4,dims=(2,3,5,6,8,9)),dims=(2,3,5,6,8,9)) / (u1_num*h1_num*u2_num*h2_num*u4_num*h4_num)
+    GainMatrix4Avg = dropdims(sum(GainMatrix4,dims=(2,3,5,6,8,9)),dims=(2,3,5,6,8,9)) #= / sum(u4_d) * u4_d[1] =# / sum(u1_d) * u1_d[1] / sum(u2_d) * u2_d[1]#/ (u1_num*h1_num*u2_num*h2_num*u4_num*h4_num)
     LossMatrix1 = Output[4]
-    LossMatrix1Avg = dropdims(sum(LossMatrix1,dims=(2,3,5,6)),dims=(2,3,5,6)) / (u1_num*h1_num*u2_num*h2_num)
+    LossMatrix1Avg = dropdims(sum(LossMatrix1,dims=(2,3,5,6)),dims=(2,3,5,6)) #= / sum(u1_d) * u1_d[1] =# / sum(u2_d) * u2_d[1]#/ (u1_num*h1_num*u2_num*h2_num)
     LossMatrix2 = name1==name2 ? Output[4] : Output[5]
-    LossMatrix2Avg = dropdims(sum(LossMatrix2,dims=(2,3,5,6)),dims=(2,3,5,6)) / (u1_num*h1_num*u2_num*h2_num)
+    LossMatrix2Avg = dropdims(sum(LossMatrix2,dims=(2,3,5,6)),dims=(2,3,5,6)) / sum(u1_d) * u1_d[1] #= / sum(u2_d) * u2_d[1] =##/ (u1_num*h1_num*u2_num*h2_num)
     #GainMatrix3 = Output[2]
     #GainMatrix4 = Output[3]
     #LossMatrix1 = Output[4]
