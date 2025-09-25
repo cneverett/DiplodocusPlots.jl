@@ -320,7 +320,7 @@ function MulitSolEngDenPlot(sols::Vector{OutputStruct},species::Vector{String},P
             end
         end
 
-        grid_label = L"%$(2^sol_idx)\times"
+        grid_label = L"%$(2^(sol_idx-1))\times"
 
         if t_grid == "u"
             scatterlines!(ax2,TimeUnits.(sol.t),frac_eng_total,linewidth=2.0,color = theme.textcolor[],markersize=0.0,linestyle=linestyles[sol_idx],label=grid_label)
