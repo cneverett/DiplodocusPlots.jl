@@ -238,7 +238,7 @@ function BFieldObserverPlot(sols::Vector{OutputStruct},PhaseSpaces::Vector{Phase
         xlab = L"$\log_{10}\left(p\,[m_ec]\right)$"
         xlab_t = L"$\log_{10}\left(\nu\,[\text{Hz}]\right)$"
         ylab = L"$\log_{10}\left(\nu F_{\nu}\,[\text{J}\text{m}^{-2}\text{s}^{-1}]\right)$"
-        ax = Axis(fig[1,1],xlabel=xlab,ylabel=ylab,aspect=DataAspect(),xminortiks=IntervalsBetween(5),yminorticks=IntervalsBetween(2),xminorgridvisible=true,yminorgridvisible=true,xminorticksvisible=true,yminorticksvisible=true)
+        ax = Axis(fig[1,1],xlabel=xlab,ylabel=ylab,aspect=DataAspect(),xminorticks=IntervalsBetween(5),yminorticks=IntervalsBetween(2),xminorgridvisible=true,yminorgridvisible=true,xminorticksvisible=true,yminorticksvisible=true)
         ax_t = Axis(fig[1,1],xlabel=xlab_t,xaxisposition=:top,aspect=DataAspect())
         hidespines!(ax_t)
         hidexdecorations!(ax_t,ticklabels=false,ticks=false,label=false,minorgrid=false,minorticks=false)
