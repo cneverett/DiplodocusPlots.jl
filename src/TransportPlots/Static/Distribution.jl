@@ -1844,7 +1844,7 @@ function AM3_DIP_Combo_MomentumDistributionPlot(filePath_AM3,sol_DIP,PhaseSpace_
     ax_DIP = Axis(g2[1,1],aspect=DataAspect(),ylabel=ylab,yticks=yticks,xminorticks=IntervalsBetween(5),yminorticks=IntervalsBetween(2),xminorgridvisible=true,yminorticksvisible=true,yminorgridvisible=true)
     hidexdecorations!(ax_DIP,grid=false,minorgrid=false,minorticks=false)
 
-    ax_AM3 = Axis(g2[2,1],aspect=DataAspect(),xminorticks=IntervalsBetween(5),yminorticks=IntervalsBetween(2),xminorgridvisible=true,yminorgridvisible=true,yminorticksvisible=true)
+    ax_AM3 = Axis(g2[2,1],aspect=DataAspect(),yticks=yticks,xminorticks=IntervalsBetween(5),yminorticks=IntervalsBetween(2),xminorgridvisible=true,yminorgridvisible=true,yminorticksvisible=true)
     hidexdecorations!(ax_AM3,grid=false,minorticks=false,minorgrid=false)
 
     ax_err = Axis(g2[3,1],xlabel=xlab,aspect=DataAspect(),ylabel=ylab_err,yticks=[-1.0,0.0,1.0],xminorticks=IntervalsBetween(5),xminorgridvisible=true,xminorticksvisible=true)
