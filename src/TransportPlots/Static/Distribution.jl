@@ -1806,9 +1806,9 @@ function AM3_DIP_Combo_MomentumDistributionPlot(filePath_AM3,sol_DIP,PhaseSpace_
         f_ele = f["f_ele"];
         t_ele = f["t_ele"];
 
-        #meanp_pos = f["meanp_pos"];
-        #f_pos = f["f_pos"];
-        #t_pos = f["t_pos"];
+        meanp_pos = f["meanp_pos"];
+        f_pos = f["f_pos"];
+        t_pos = f["t_pos"];
 
         meanp_pho = f["meanp_pho"];
         f_pho = f["f_pho"];
