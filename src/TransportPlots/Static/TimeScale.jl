@@ -7,7 +7,7 @@ Optional arguments:
 - `theme`: the colour theme to use for the plot, default is `DiplodocusDark()`.
 - `p_timescale`: whether to plot the timescale for momentum magnitude loss or state vector loss, default is `false` i.e. plot state vector losses to aid in assessing time step limits for stability.
 """
-function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vector{F},t_idx::Int64;wide=false,paraperp::Bool=false,p_timescale=false,legend=true,horz_lines=nothing,plot_limits=(nothing,nothing),theme=DiplodocusDark(),TimeUnits::Function=CodeToCodeUnitsTime,direction::String="all") where F<:AbstractFloat
+function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vector{F},t_idx::Int64;wide=false,paraperp::Bool=false,u_avg::Bool=true,p_timescale=false,legend=true,horz_lines=nothing,plot_limits=(nothing,nothing),theme=DiplodocusDark(),TimeUnits::Function=CodeToCodeUnitsTime,direction::String="all") where F<:AbstractFloat
 
     CairoMakie.activate!(inline=true) # plot in vs code window
     with_theme(theme) do
@@ -132,18 +132,29 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vec
             
 
         else
+            u_avg_T = zeros(Float64,length(mp_plot))
+
             for u in 1:u_num
 
-                scatterlines!(ax,mp_plot,log10.(TimeUnits.(Float64.(abs.(timescale2D[:,u])))),linewidth=2.0,color = theme.palette.color[][mod(2*u-1,7)+1],markersize=0.0,linestyle=linestyles[species])
+                if u_avg
+                    @. u_avg_T += timescale2D[:,u] / u_num
+                else
+                    scatterlines!(ax,mp_plot,log10.(TimeUnits.(Float64.(abs.(timescale2D[:,u])))),linewidth=2.0,color = theme.palette.color[][mod(2*u-1,7)+1],markersize=0.0,linestyle=linestyles[species])
 
-                #hlines!(ax,log10(1 / (1-mu[u]^2)),color = theme.palette.color[][mod(2*u-1,7)+1])
+                    #hlines!(ax,log10(1 / (1-mu[u]^2)),color = theme.palette.color[][mod(2*u-1,7)+1])
 
-                #=if species == 1
-                    push!(legend_elements_angle,LineElement(color = theme.textcolor[], linestyle = :solid,linewidth = 2.0))
-                    push!(line_labels_angle,L"%$(mu[u])")
-                end=#
+                    #=if species == 1
+                        push!(legend_elements_angle,LineElement(color = theme.textcolor[], linestyle = :solid,linewidth = 2.0))
+                        push!(line_labels_angle,L"%$(mu[u])")
+                    end=#
+                end
 
             end 
+
+            if u_avg
+                scatterlines!(ax,mp_plot,log10.(TimeUnits.(Float64.(abs.(u_avg_T)))),linewidth=2.0,color = theme.palette.color[][mod(2*u-1,7)+1],markersize=0.0,linestyle=linestyles[species])
+
+            end
         end
 
         #push!(legend_elements_angle,LineElement(color = theme.textcolor[], linestyle = :solid,linewidth = 2.0))
