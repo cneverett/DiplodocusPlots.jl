@@ -152,7 +152,7 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vec
             end 
 
             if u_avg
-                scatterlines!(ax,mp_plot,log10.(TimeUnits.(Float64.(abs.(u_avg_T)))),linewidth=2.0,color = theme.palette.color[][mod(2*u-1,7)+1],markersize=0.0,linestyle=linestyles[species])
+                scatterlines!(ax,mp_plot,log10.(TimeUnits.(Float64.(abs.(u_avg_T)))),linewidth=2.0,color = theme.palette.color[][mod(2*1-1,7)+1],markersize=0.0,linestyle=linestyles[species])
 
             end
         end
