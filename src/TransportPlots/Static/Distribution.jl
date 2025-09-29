@@ -1909,7 +1909,7 @@ function AM3_DIP_Combo_MomentumDistributionPlot(filePath_AM3,sol_DIP,PhaseSpace_
             scatterlines!(ax_AM3,log10.(meanp_AM3),pdNdp_AM3_log,linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[1])
 
             # DIP
-            t_idx = find_closest(sol.DIP.t,SIToCodeUnitsTime(t_plot))
+            t_idx = find_closest(sol_DIP.t,SIToCodeUnitsTime(t_plot))
             if isnothing(t_idx)
                 t_idx = 1 # works for both log and uniform diplodocus time stepping
             end          
@@ -1992,7 +1992,7 @@ function AM3_DIP_Combo_MomentumDistributionPlot(filePath_AM3,sol_DIP,PhaseSpace_
             scatterlines!(ax_AM3,log10.(meanp_AM3),pdNdp_AM3_log,linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[2])
 
             # DIP
-            t_idx = find_closest(sol.DIP.t,SIToCodeUnitsTime(t_plot))
+            t_idx = find_closest(sol_DIP.t,SIToCodeUnitsTime(t_plot))
             if isnothing(t_idx)
                 t_idx = 1 # works for both log and uniform diplodocus time stepping
             end 
@@ -2077,7 +2077,7 @@ function AM3_DIP_Combo_MomentumDistributionPlot(filePath_AM3,sol_DIP,PhaseSpace_
                 scatterlines!(ax_AM3,log10.(meanp_AM3),pdNdp_AM3_log,linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[3])
 
                 # DIP
-                t_idx = find_closest(sol.DIP.t,SIToCodeUnitsTime(t_plot))
+                t_idx = find_closest(sol_DIP.t,SIToCodeUnitsTime(t_plot))
                 if isnothing(t_idx)
                     t_idx = 1 # works for both log and uniform diplodocus time stepping
                 end 
