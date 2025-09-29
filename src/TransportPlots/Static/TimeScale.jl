@@ -91,7 +91,7 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,sol::Diplo
         timescale = timescale .* (timescale .<= 0.0) # only want loss rates 
 
         if plot_dt
-            hlines!(ax,log10.(dt),color=color,linewidth=2.0)
+            hlines!(ax,log10.(TimeUnits(dt)),color=color,linewidth=2.0)
         end
 
         for species in eachindex(name_list)
