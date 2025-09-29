@@ -1,50 +1,18 @@
 """
     TimeScalePlot(PhaseSpace, scheme, state)
 
-Function plots the time scales for interaction loss rates of a simulation given the system `state` at a time index `t_idx`.
+Function plots the time scales for interaction loss rates of a simulation given the system sulution `sol` at a time indices `t_idxs`.
 
 Optional arguments:
 - `theme`: the colour theme to use for the plot, default is `DiplodocusDark()`.
 - `p_timescale`: whether to plot the timescale for momentum magnitude loss or state vector loss, default is `false` i.e. plot state vector losses to aid in assessing time step limits for stability.
+- `logt`: default is `false`. If a uniform time grid is used for the solution, this can be toggled to `true` to display the solution in log10 time steps rather than uniform time steps.
+- `dt`: default is `false`. If `true` the time step `dt` corresponding to the current simulation time will also be plotted as a horizontal line.
 """
-function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vector{F},t_idx::Int64;wide=false,paraperp::Bool=false,u_avg::Bool=true,p_timescale=false,legend=true,horz_lines=nothing,plot_limits=(nothing,nothing),theme=DiplodocusDark(),TimeUnits::Function=CodeToCodeUnitsTime,direction::String="all") where F<:AbstractFloat
+function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,sol::DiplodocusTransport.OutputStruct,t_idxs::Tuple{Int64};wide=false,paraperp::Bool=false,u_avg::Bool=true,logt::Bool=false,p_timescale=false,legend=true,dt::Bool=false,plot_limits=(nothing,nothing),theme=DiplodocusDark(),TimeUnits::Function=CodeToCodeUnitsTime,direction::String="all") where F<:AbstractFloat
 
     CairoMakie.activate!(inline=true) # plot in vs code window
     with_theme(theme) do
-
-    PhaseSpace=method.PhaseSpace
-    Momentum = PhaseSpace.Momentum
-    Time = PhaseSpace.Time
-    Grids = PhaseSpace.Grids
-    tr = PhaseSpace.Grids.tr
-    p_num_list = Momentum.px_num_list 
-    u_num_list = Momentum.py_num_list
-    h_num_list = Momentum.pz_num_list
-    dp_list = Grids.dpx_list
-    mp_list = Grids.mpx_list
-    name_list = PhaseSpace.name_list
-
-    # only works for a single particle
-    #state = reshape(state,(p_num_list[1],u_num_list[1],h_num_list[1]))
-    #state = mp_list[1] .* state
-    #state = reshape(state,p_num_list[1]*u_num_list[1]*h_num_list[1])
-
-    dstate = zeros(eltype(state),size(state))
-    timescale = zeros(eltype(state),size(state))
-
-    dt0 = tr[2] - tr[1]
-    dt = tr[t_idx+1] - tr[t_idx]
-    t = tr[t_idx]
-
-    method(dstate,state,dt0,dt,t)
-
-    if direction == "all"
-        dstate = DiplodocusTransport.diag(method.temp) .* state
-    elseif direction == "I"
-        dstate = method.FluxM.Ap_Flux \ (DiplodocusTransport.diag(method.FluxM.I_Flux) .* (dt / dt0)) .* state
-    end
-
-    @. timescale =  -dt * state / dstate
 
     if wide
         fig = Figure(size=(576,216)) # double column 8:3 aspect ratio
@@ -70,100 +38,131 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,state::Vec
     legend_elements_angle = []
     line_labels_angle = []
 
-    if !isnothing(horz_lines)
+    PhaseSpace=method.PhaseSpace
+    Momentum = PhaseSpace.Momentum
+    Time = PhaseSpace.Time
+    Grids = PhaseSpace.Grids
+    tr = PhaseSpace.Grids.tr
+    t_min = logt ? tr[2]/10 : tr[1]
+    t_max = tr[end]
+    p_num_list = Momentum.px_num_list 
+    u_num_list = Momentum.py_num_list
+    h_num_list = Momentum.pz_num_list
+    dp_list = Grids.dpx_list
+    mp_list = Grids.mpx_list
+    name_list = PhaseSpace.name_list
 
-        for i in eachindex(horz_lines)
+    df = zeros(eltype(sol.f[1]),size(sol.f[1]))
+    timescale = zeros(eltype(sol.f[1]),size(sol.f[1]))
 
-            if Time.t_grid == "u"
-                t_horz = horz_lines[i]
-                color_val = (t_horz - TimeUnits(tr[1]))/(TimeUnits(tr[end])-TimeUnits(tr[1]))
-                println("colval=$color_val")
-                color = theme.colormap[][color_val]
-            elseif Time.t_grid == "l"
-                t_horz = horz_lines[i]
-                color_val = (t_horz - log10(TimeUnits(tr[1])))/(log10(TimeUnits(tr[end]))-log10(TimeUnits(tr[1])))
-                color = theme.colormap[][color_val]
+    for (idx,t_idx) in enumerate(t_idxs)
+
+        f = sol.f[t_idx]
+        t = sol.t[t_idx]
+        
+        if t_grid == "l" || logt
+            color = theme.colormap[][(log10(t) - log10(t_min)) / (log10(t_max) - log10(t_min))]
+        elseif t_grid == "u"
+            color = theme.colormap[][(t - t_min) / (t_max - t_min)]
+        end
+
+        t_idx_global = findfirst(x=>x==t,tr)-1
+        if t_idx_global != 1
+            t_idx_global -= 1 # -1 as sol is at t[t+1] except initial time step
+        end 
+
+        dt0 = tr[2] - tr[1]
+        dt = PhaseSpace.Grids.dt[t_idx_global]
+
+        method(dstate,state,dt0,dt,t)
+
+        if direction == "all"
+            df .= DiplodocusTransport.diag(method.temp) .* f
+        elseif direction == "I"
+            df .= method.FluxM.Ap_Flux \ (DiplodocusTransport.diag(method.FluxM.I_Flux) .* (dt / dt0)) .* f
+        end
+
+        @. timescale =  -dt * f / df
+
+        if dt
+            hlines!(ax,log10.(dt),color=color,linewidth=2.0)
+        end
+
+        for species in eachindex(name_list)
+
+            name = name_list[species]
+            p_num = p_num_list[species]
+            u_num = u_num_list[species]
+            h_num = h_num_list[species]
+            dp = dp_list[species]
+            mp = mp_list[species]
+            if Momentum.px_grid_list[species] == "l"
+                mp_plot = log10.(mp)
+            elseif Momentum.px_grid_list[species] == "u"
+                mp_plot = mp
+            end
+            mu = Grids.mpy_list[species]
+
+            timescale1D = copy(Location_Species_To_StateVector(timescale,PhaseSpace,species_index=species))
+            timescale3D = reshape(timescale1D,(p_num,u_num,h_num))
+            @. timescale3D = timescale3D*(timescale3D!=Inf)
+            @. timescale3D = timescale3D*(timescale3D!=-Inf)
+            #@. timescale3D = timescale3D*(timescale3D<=0.0)
+
+            timescale2D = dropdims(sum(timescale3D, dims=(3)),dims=(3))
+            # timescale is timescale for particle losses not particle energy losses, to get that we need to scale by dp/mp (i.e. dp/p)
+            if p_timescale
+                timescale2D = mp ./ dp .* timescale2D
             end
 
-            hlines!(ax,log10.(horz_lines[i]),color=color,linewidth=2.0)
+            if paraperp==true
 
-        end
+                println("tscale=$(TimeUnits.(Float64.(abs.(timescale2D[10,ceil(Int64,u_num/2)]))))")
 
-    end
+                scatterlines!(ax,mp_plot,log10.(TimeUnits.(Float64.(abs.(timescale2D[:,end])))),linewidth=2.0,color = color=theme.textcolor[],markersize=0.0,linestyle=linestyles[1])
+                push!(legend_elements_angle,LineElement(color = theme.textcolor[], linestyle = linestyles[1],linewidth = 2.0))
+                push!(line_labels_angle,L"\parallel")
 
-    for species in eachindex(name_list)
+                scatterlines!(ax,mp_plot,log10.(TimeUnits.(Float64.(abs.(timescale2D[:,ceil(Int64,u_num/2)])))),linewidth=2.0,color = color=theme.textcolor[],markersize=0.0,linestyle=linestyles[2])
+                push!(legend_elements_angle,LineElement(color = theme.textcolor[], linestyle = linestyles[2],linewidth = 2.0))
+                push!(line_labels_angle,L"\perp")
+                
 
-        name = name_list[species]
-        p_num = p_num_list[species]
-        u_num = u_num_list[species]
-        h_num = h_num_list[species]
-        dp = dp_list[species]
-        mp = mp_list[species]
-        if Momentum.px_grid_list[species] == "l"
-            mp_plot = log10.(mp)
-        elseif Momentum.px_grid_list[species] == "u"
-            mp_plot = mp
-        end
-        mu = Grids.mpy_list[species]
+            else
+                u_avg_T = zeros(Float64,length(mp_plot))
 
-        timescale1D = copy(Location_Species_To_StateVector(timescale,PhaseSpace,species_index=species))
-        timescale3D = reshape(timescale1D,(p_num,u_num,h_num))
-        @. timescale3D = timescale3D*(timescale3D!=Inf)
-        @. timescale3D = timescale3D*(timescale3D!=-Inf)
-        #@. timescale3D = timescale3D*(timescale3D<=0.0)
+                for u in 1:u_num
 
-        timescale2D = dropdims(sum(timescale3D, dims=(3)),dims=(3))
-        # timescale is timescale for particle losses not particle energy losses, to get that we need to scale by dp/mp (i.e. dp/p)
-        if p_timescale
-            timescale2D = mp ./ dp .* timescale2D
-        end
+                    if u_avg
+                        @. u_avg_T += timescale2D[:,u] / u_num
+                    else
+                        scatterlines!(ax,mp_plot,log10.(TimeUnits.(Float64.(abs.(timescale2D[:,u])))),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[species])
 
-        if paraperp==true
+                        #hlines!(ax,log10(1 / (1-mu[u]^2)),color = theme.palette.color[][mod(2*u-1,7)+1])
 
-            println("tscale=$(TimeUnits.(Float64.(abs.(timescale2D[10,ceil(Int64,u_num/2)]))))")
+                        #=if species == 1
+                            push!(legend_elements_angle,LineElement(color = theme.textcolor[], linestyle = :solid,linewidth = 2.0))
+                            push!(line_labels_angle,L"%$(mu[u])")
+                        end=#
+                    end
 
-            scatterlines!(ax,mp_plot,log10.(TimeUnits.(Float64.(abs.(timescale2D[:,end])))),linewidth=2.0,color = color=theme.textcolor[],markersize=0.0,linestyle=linestyles[1])
-            push!(legend_elements_angle,LineElement(color = theme.textcolor[], linestyle = linestyles[1],linewidth = 2.0))
-            push!(line_labels_angle,L"\parallel")
-
-            scatterlines!(ax,mp_plot,log10.(TimeUnits.(Float64.(abs.(timescale2D[:,ceil(Int64,u_num/2)])))),linewidth=2.0,color = color=theme.textcolor[],markersize=0.0,linestyle=linestyles[2])
-            push!(legend_elements_angle,LineElement(color = theme.textcolor[], linestyle = linestyles[2],linewidth = 2.0))
-            push!(line_labels_angle,L"\perp")
-            
-
-        else
-            u_avg_T = zeros(Float64,length(mp_plot))
-
-            for u in 1:u_num
+                end 
 
                 if u_avg
-                    @. u_avg_T += timescale2D[:,u] / u_num
-                else
-                    scatterlines!(ax,mp_plot,log10.(TimeUnits.(Float64.(abs.(timescale2D[:,u])))),linewidth=2.0,color = theme.palette.color[][mod(2*u-1,7)+1],markersize=0.0,linestyle=linestyles[species])
+                    scatterlines!(ax,mp_plot,log10.(TimeUnits.(Float64.(abs.(u_avg_T)))),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[species])
 
-                    #hlines!(ax,log10(1 / (1-mu[u]^2)),color = theme.palette.color[][mod(2*u-1,7)+1])
-
-                    #=if species == 1
-                        push!(legend_elements_angle,LineElement(color = theme.textcolor[], linestyle = :solid,linewidth = 2.0))
-                        push!(line_labels_angle,L"%$(mu[u])")
-                    end=#
                 end
-
-            end 
-
-            if u_avg
-                scatterlines!(ax,mp_plot,log10.(TimeUnits.(Float64.(abs.(u_avg_T)))),linewidth=2.0,color = theme.palette.color[][mod(2*1-1,7)+1],markersize=0.0,linestyle=linestyles[species])
-
             end
-        end
 
-        #push!(legend_elements_angle,LineElement(color = theme.textcolor[], linestyle = :solid,linewidth = 2.0))
-        #push!(line_labels_angle,L"%$(mu[u])")
+            #push!(legend_elements_angle,LineElement(color = theme.textcolor[], linestyle = :solid,linewidth = 2.0))
+            #push!(line_labels_angle,L"%$(mu[u])")
 
-        push!(legend_elements_species,LineElement(color = theme.textcolor[], linestyle = linestyles[species],linewidth = 2.0))
-        push!(line_labels_species,name)
+            push!(legend_elements_species,LineElement(color = theme.textcolor[], linestyle = linestyles[species],linewidth = 2.0))
+            push!(line_labels_species,name)
 
-    end # species loop
+        end # species loop
+
+    end # t loop
 
         if paraperp
             axislegend(ax,legend_elements_angle,line_labels_angle,position = :lb)
