@@ -78,7 +78,8 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,sol::Diplo
         method(df,f,dt0,dt,t)
 
         if direction == "all"
-            df .= DiplodocusTransport.diag(method.temp) .* f
+            #df .= DiplodocusTransport.diag(method.temp) .* f
+            df .= method.temp .* f
         elseif direction == "I"
             df .= method.FluxM.Ap_Flux \ (DiplodocusTransport.diag(method.FluxM.I_Flux) .* (dt / dt0)) .* f
         end
