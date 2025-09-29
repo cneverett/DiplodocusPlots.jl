@@ -96,22 +96,22 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,sol::Diplo
 
         for (species_idx, species_name) in enumerate(species) 
 
-        species = findfirst(x->x==species_name,name_list)
+            species_index = findfirst(x->x==species_name,name_list)
 
-            name = name_list[species]
-            p_num = p_num_list[species]
-            u_num = u_num_list[species]
-            h_num = h_num_list[species]
-            dp = dp_list[species]
-            mp = mp_list[species]
-            if Momentum.px_grid_list[species] == "l"
+            name = name_list[species_index]
+            p_num = p_num_list[species_index]
+            u_num = u_num_list[species_index]
+            h_num = h_num_list[species_index]
+            dp = dp_list[species_index]
+            mp = mp_list[species_index]
+            if Momentum.px_grid_list[species_index] == "l"
                 mp_plot = log10.(mp)
-            elseif Momentum.px_grid_list[species] == "u"
+            elseif Momentum.px_grid_list[species_index] == "u"
                 mp_plot = mp
             end
-            mu = Grids.mpy_list[species]
+            mu = Grids.mpy_list[species_index]
 
-            timescale1D = copy(Location_Species_To_StateVector(timescale,PhaseSpace,species_index=species))
+            timescale1D = copy(Location_Species_To_StateVector(timescale,PhaseSpace,species_index=species_index))
             timescale3D = reshape(timescale1D,(p_num,u_num,h_num))
             @. timescale3D = timescale3D*(timescale3D!=Inf)
             @. timescale3D = timescale3D*(timescale3D!=-Inf)
@@ -144,11 +144,11 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,sol::Diplo
                     if u_avg
                         @. u_avg_T += timescale2D[:,u] / u_num
                     else
-                        scatterlines!(ax,mp_plot,log10.(TimeUnits.(Float64.(abs.(timescale2D[:,u])))),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[species])
+                        scatterlines!(ax,mp_plot,log10.(TimeUnits.(Float64.(abs.(timescale2D[:,u])))),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[species_index])
 
                         #hlines!(ax,log10(1 / (1-mu[u]^2)),color = theme.palette.color[][mod(2*u-1,7)+1])
 
-                        #=if species == 1
+                        #=if species_index == 1
                             push!(legend_elements_angle,LineElement(color = theme.textcolor[], linestyle = :solid,linewidth = 2.0))
                             push!(line_labels_angle,L"%$(mu[u])")
                         end=#
@@ -157,7 +157,7 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,sol::Diplo
                 end 
 
                 if u_avg
-                    scatterlines!(ax,mp_plot,log10.(TimeUnits.(Float64.(abs.(u_avg_T)))),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[species])
+                    scatterlines!(ax,mp_plot,log10.(TimeUnits.(Float64.(abs.(u_avg_T)))),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[species_index])
 
                 end
             end
@@ -166,7 +166,7 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,sol::Diplo
             #push!(line_labels_angle,L"%$(mu[u])")
 
             if idx == 1
-                push!(legend_elements_species,LineElement(color = theme.textcolor[], linestyle = linestyles[species],linewidth = 2.0))
+                push!(legend_elements_species,LineElement(color = theme.textcolor[], linestyle = linestyles[species_index],linewidth = 2.0))
                 push!(line_labels_species,name)
             end
 
