@@ -74,13 +74,13 @@ function EnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;specie
         end
 
         if t_grid == "u"
-            t_plot = sol.t
+            t_plot = TimeUnits.(sol.t)
             if logt 
                 t_plot[1] = t_plot[2] /10
                 t_plot = log10.(t_plot)
             end
-            scatterlines!(ax,TimeUnits.(t_plot),eng,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j])
-            xlims!(ax,TimeUnits(t_plot[1]),TimeUnits(t_plot[end]))
+            scatterlines!(ax,t_plot,eng,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j])
+            xlims!(ax,t_plot[1],t_plot[end])
         elseif t_grid == "l"
             scatterlines!(ax,log10.(TimeUnits.(sol.t)),eng,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j])
             xlims!(ax,log10(TimeUnits(sol.t[1])),log10(TimeUnits(sol.t[end])))
@@ -90,8 +90,13 @@ function EnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;specie
 
     if species == "All"
         if t_grid == "u"
-            scatterlines!(ax,TimeUnits.(sol.t),eng_total,linewidth=2.0,color = theme.textcolor[],markersize=0.0,linestyle=:dash,label="All")
-            xlims!(ax,TimeUnits(sol.t[1]),TimeUnits(sol.t[end]))
+            t_plot = TimeUnits.(sol.t)
+            if logt 
+                t_plot[1] = t_plot[2] /10
+                t_plot = log10.(t_plot)
+            end
+            scatterlines!(ax,t_plot,eng_total,linewidth=2.0,color = theme.textcolor[],markersize=0.0,linestyle=:dash,label="All")
+            xlims!(ax,t_plot[1],t_plot[end])
         elseif t_grid == "l"
             scatterlines!(ax,log10.(TimeUnits.(sol.t)),eng_total,linewidth=2.0,color = theme.textcolor[],markersize=0.0,linestyle=:dash,label="All")
             xlims!(ax,log10(TimeUnits(sol.t[1])),log10(TimeUnits(sol.t[end])))
