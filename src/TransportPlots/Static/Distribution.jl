@@ -1889,7 +1889,7 @@ function AM3_DIP_Combo_MomentumDistributionPlot(filePath_AM3,sol_DIP,PhaseSpace_
         # AM3
         t = t_pho[i]
         #println("t=$t")
-        if log10(t) % 1 == 0.0 && t <= t_max # 10^n timesteps
+        if log10(t) % 1 == 0.0 && t <= t_max && t>=t_min# 10^n timesteps
             t_plot = t
             println("t=$t")
 
@@ -1978,7 +1978,7 @@ function AM3_DIP_Combo_MomentumDistributionPlot(filePath_AM3,sol_DIP,PhaseSpace_
     for i in 1:length(t_ele)
 
         t = t_ele[i]
-        if log10(t) % 1 == 0.0 && t <= t_max # 10^n timesteps 
+        if log10(t) % 1 == 0.0 && t <= t_max && t>=t_min# 10^n timesteps 
             t_plot = t
             if t_grid == "u"
                 color = theme.colormap[][(t - t_min) / (t_max - t_min)]
@@ -2064,7 +2064,7 @@ function AM3_DIP_Combo_MomentumDistributionPlot(filePath_AM3,sol_DIP,PhaseSpace_
         for i in 1:length(t_pos)
 
             t = t_pos[i]
-            if log10(t) % 1 == 0.0 && t <= t_max # 10^n timesteps 
+            if log10(t) % 1 == 0.0 && t <= t_max && t>=t_min# 10^n timesteps 
                 t_plot = t
                 if t_grid == "u"
                     color = theme.colormap[][(t - t_min) / (t_max - t_min)]
