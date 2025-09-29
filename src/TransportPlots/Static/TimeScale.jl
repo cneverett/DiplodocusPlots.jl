@@ -83,7 +83,7 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,sol::Diplo
             df .= method.FluxM.Ap_Flux \ (DiplodocusTransport.diag(method.FluxM.I_Flux) .* (dt / dt0)) .* f
         end
 
-        @. timescale =  -dt * f / df
+        @. timescale =  dt * f / df
         timescale = timescale .* (timescale .<= 0.0) # only want loss rates 
 
         if plot_dt
