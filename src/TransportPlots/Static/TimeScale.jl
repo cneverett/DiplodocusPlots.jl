@@ -67,7 +67,7 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,sol::Diplo
             color = theme.colormap[][(t - t_min) / (t_max - t_min)]
         end
 
-        t_idx_global = findfirst(x->x==t,tr)-1
+        t_idx_global = findfirst(isequal(t),tr)-1
         if t_idx_global != 1
             t_idx_global -= 1 # -1 as sol is at t[t+1] except initial time step
         end 
