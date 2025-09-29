@@ -41,6 +41,7 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,sol::Diplo
     PhaseSpace=method.PhaseSpace
     Momentum = PhaseSpace.Momentum
     Time = PhaseSpace.Time
+    t_grid = PhaseSpace.Time.t_grid
     Grids = PhaseSpace.Grids
     tr = PhaseSpace.Grids.tr
     t_min = logt ? tr[2]/10 : tr[1]
