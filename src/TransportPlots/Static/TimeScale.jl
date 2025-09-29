@@ -153,7 +153,7 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,sol::Diplo
                 end 
 
                 if u_avg
-                    scatterlines!(ax,mp_plot,log10.(TimeUnits.(Float64.(abs.(u_avg_T)))),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[species_idxx])
+                    scatterlines!(ax,mp_plot,log10.(TimeUnits.(Float64.(abs.(u_avg_T)))),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[species_idx])
 
                 end
             end
