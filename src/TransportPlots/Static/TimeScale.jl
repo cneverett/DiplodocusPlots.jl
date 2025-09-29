@@ -90,10 +90,6 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,sol::Diplo
         @. timescale =  dt * f / df
         timescale = timescale .* (timescale .<= 0.0) # only want loss rates 
 
-        if plot_dt
-            hlines!(ax,log10.(TimeUnits(dt)),color=color,linewidth=2.0)
-        end
-
         for (species_idx, species_name) in enumerate(species) 
 
             species_index = findfirst(x->x==species_name,name_list)
@@ -166,11 +162,25 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,sol::Diplo
             #push!(line_labels_angle,L"%$(mu[u])")
 
             if idx == 1
-                push!(legend_elements_species,LineElement(color = theme.textcolor[], linestyle = linestyles[species_index],linewidth = 2.0))
+                push!(legend_elements_species,LineElement(color = theme.textcolor[], linestyle = linestyles[species_idx],linewidth = 2.0))
+                if name == "Ele"
+                    name = "Electron"
+                elseif name == "Pho"
+                    name = "Photon"
+                elseif name == "Pos"
+                    name = "Positron"
+                end
                 push!(line_labels_species,name)
+                
             end
 
         end # species loop
+
+        if plot_dt && idx == 1
+            hlines!(ax,log10.(TimeUnits(dt)),color=theme.textcolor[],linewidth=2.0,linestyle = linestyles[length(species)+1])
+            push!(legend_elements_species,LineElement(color = theme.textcolor[], linestyle = linestyles[length(species)+1],linewidth = 2.0))
+            push!(line_labels_species,"dt")
+        end
 
     end # t loop
 
