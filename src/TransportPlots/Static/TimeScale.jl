@@ -68,6 +68,9 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,sol::Diplo
         end
 
         t_idx_global = find_closest(tr,t)
+        if isnothing(t_idx_global)
+            t_idx_global = 1
+        end
         if t_idx_global != 1
             t_idx_global -= 1 # -1 as sol is at t[t+1] except initial time step
         end 

@@ -90,7 +90,7 @@ function EnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;specie
 
     if species == "All"
         if t_grid == "u"
-            t_plot = TimeUnits.(sol.t)
+            t_plot = copy(TimeUnits.(sol.t))
             if logt 
                 t_plot[1] = t_plot[2] /10
                 t_plot = log10.(t_plot)
