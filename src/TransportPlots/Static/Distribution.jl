@@ -1909,11 +1909,10 @@ function AM3_DIP_Combo_MomentumDistributionPlot(filePath_AM3,sol_DIP,PhaseSpace_
             scatterlines!(ax_AM3,log10.(meanp_AM3),pdNdp_AM3_log,linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[1])
 
             # DIP
-            if i == 1
+            t_idx = find_closest(sol.DIP.t,SIToCodeUnitsTime(t_plot))
+            if isnothing(t_idx)
                 t_idx = 1 # works for both log and uniform diplodocus time stepping
-            else
-                t_idx = findfirst(x->round(CodeToSIUnitsTime(x),sigdigits=4)==t_plot,sol_DIP.t)
-            end
+            end          
             println(t_idx)
             f1D .= copy(Location_Species_To_StateVector(sol_DIP.f[t_idx],PhaseSpace_DIP,species_index=species_index))
             f3D .= reshape(f1D,(p_num,u_num,h_num))
@@ -1945,7 +1944,6 @@ function AM3_DIP_Combo_MomentumDistributionPlot(filePath_AM3,sol_DIP,PhaseSpace_
             replace!(err,Inf=>NaN) # remove values for which DIP does not have values
 
             scatterlines!(ax_err,log10.(meanp),err,linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[1])
-
 
         end
 
@@ -1994,11 +1992,10 @@ function AM3_DIP_Combo_MomentumDistributionPlot(filePath_AM3,sol_DIP,PhaseSpace_
             scatterlines!(ax_AM3,log10.(meanp_AM3),pdNdp_AM3_log,linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[2])
 
             # DIP
-            if i == 1
+            t_idx = find_closest(sol.DIP.t,SIToCodeUnitsTime(t_plot))
+            if isnothing(t_idx)
                 t_idx = 1 # works for both log and uniform diplodocus time stepping
-            else
-                t_idx = findfirst(x->round(CodeToSIUnitsTime(x),sigdigits=4)==t_plot,sol_DIP.t)
-            end
+            end 
             f1D .= copy(Location_Species_To_StateVector(sol_DIP.f[t_idx],PhaseSpace_DIP,species_index=species_index))
             f3D .= reshape(f1D,(p_num,u_num,h_num))
             @. f3D = f3D*(f3D!=Inf)
@@ -2080,11 +2077,10 @@ function AM3_DIP_Combo_MomentumDistributionPlot(filePath_AM3,sol_DIP,PhaseSpace_
                 scatterlines!(ax_AM3,log10.(meanp_AM3),pdNdp_AM3_log,linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[3])
 
                 # DIP
-                if i == 1
+                t_idx = find_closest(sol.DIP.t,SIToCodeUnitsTime(t_plot))
+                if isnothing(t_idx)
                     t_idx = 1 # works for both log and uniform diplodocus time stepping
-                else
-                    t_idx = findfirst(x->round(CodeToSIUnitsTime(x),sigdigits=4)==t_plot,sol_DIP.t)
-                end
+                end 
                 f1D .= copy(Location_Species_To_StateVector(sol_DIP.f[t_idx],PhaseSpace_DIP,species_index=species_index))
                 f3D .= reshape(f1D,(p_num,u_num,h_num))
                 @. f3D = f3D*(f3D!=Inf)
