@@ -84,6 +84,7 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,sol::Diplo
         end
 
         @. timescale =  -dt * f / df
+        timescale = timescale .* (timescale<=0.0) # only want loss rates 
 
         if plot_dt
             hlines!(ax,log10.(dt),color=color,linewidth=2.0)
