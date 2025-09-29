@@ -75,7 +75,7 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,sol::Diplo
         dt0 = tr[2] - tr[1]
         dt = PhaseSpace.Grids.dt[t_idx_global]
 
-        method(dstate,state,dt0,dt,t)
+        method(df,f,dt0,dt,t)
 
         if direction == "all"
             df .= DiplodocusTransport.diag(method.temp) .* f
