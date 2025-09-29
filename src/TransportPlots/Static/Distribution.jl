@@ -14,6 +14,7 @@ Common arguments:
 - `legend`: if `true`, a legend is added to the plot, default is `true`.
 - `thermal`: default is `false`. If `true` the expected thermal distribution for each species is plotted based on the final time step of the simulation.
 - `paraperp`: default is `false`. If `true` the first and center `u` bins will be plotted to represent the distribution parallel to the axis and perpendicular.
+- `logt`: default is `false`. If a uniform time grid is used for the solution, this can be toggled to `true` to display the solution in log10 time steps rather than uniform time steps.
 
 Static arguments:
 - `step`: the step size in time to plot, default is 1.
@@ -24,7 +25,7 @@ Animated arguments:
 - `figure`: default is `nothing`, which creates a new figure. If a figure is provided, the plot is added to that figure instead of creating a new one, this should be of the form of a tuple of `figure` and `time_idx` from the main plot.
 - `initial`: default is `false`, if `true` causes the initial distribution to remain on the plot
 """
-function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseSpaceStruct,type::Static;theme=DiplodocusDark(),order::Int64=1,TimeUnits::Function=CodeToCodeUnitsTime,thermal=false,plot_limits=(nothing,nothing),wide=false,legend=true,paraperp=false,step=1)
+function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseSpaceStruct,type::Static;theme=DiplodocusDark(),order::Int64=1,TimeUnits::Function=CodeToCodeUnitsTime,thermal=false,plot_limits=(nothing,nothing),wide=false,legend=true,paraperp=false,step=1,logt::Bool=false)
 
     CairoMakie.activate!(inline=true) # plot in vs code window
 
@@ -94,16 +95,19 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
     p_min = min(p_min,p_r[1])
     p_max = max(p_max,p_r[end])
 
+    t_min = logt ? sol.t[2]/10 : sol.t[1]
+    t_max = sol.t[end]
+
     for i in 1:t_save
 
         if (i in values || i == 1 || i == 2) # plot first step for initial conds, second for kernel 
 
             t = sol.t[i]
             #println("t=$(CodeToSIUnitsTime(t))")
-            if Time.t_grid == "u"
-                color = theme.colormap[][(t - sol.t[1]) / (sol.t[end] - sol.t[1])]
-            elseif Time.t_grid == "l"
-                color = theme.colormap[][(log10(t) - log10(sol.t[1])) / (log10(sol.t[end]) - log10(sol.t[1]))]
+            if Time.t_grid == "l" || logt
+                color = theme.colormap[][(log10(t) - log10(t_min)) / (log10(t_max) - log10(t_min))]
+            elseif Time.t_grid == "u"
+                color = theme.colormap[][(t - t_min) / (t_max - t_min)]
             end
 
             f1D .= copy(Location_Species_To_StateVector(sol.f[i],PhaseSpace,species_index=species_index))
@@ -1905,7 +1909,11 @@ function AM3_DIP_Combo_MomentumDistributionPlot(filePath_AM3,sol_DIP,PhaseSpace_
             scatterlines!(ax_AM3,log10.(meanp_AM3),pdNdp_AM3_log,linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[1])
 
             # DIP
-            t_idx = findfirst(x->round(CodeToSIUnitsTime(x),sigdigits=4)==t_plot,sol_DIP.t)
+            if i == 1
+                t_idx = 1 # works for both log and uniform diplodocus time stepping
+            else
+                t_idx = findfirst(x->round(CodeToSIUnitsTime(x),sigdigits=4)==t_plot,sol_DIP.t)
+            end
             println(t_idx)
             f1D .= copy(Location_Species_To_StateVector(sol_DIP.f[t_idx],PhaseSpace_DIP,species_index=species_index))
             f3D .= reshape(f1D,(p_num,u_num,h_num))
@@ -1986,7 +1994,11 @@ function AM3_DIP_Combo_MomentumDistributionPlot(filePath_AM3,sol_DIP,PhaseSpace_
             scatterlines!(ax_AM3,log10.(meanp_AM3),pdNdp_AM3_log,linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[2])
 
             # DIP
-            t_idx = findfirst(x->round(CodeToSIUnitsTime(x),sigdigits=3)==t_plot,sol_DIP.t)
+            if i == 1
+                t_idx = 1 # works for both log and uniform diplodocus time stepping
+            else
+                t_idx = findfirst(x->round(CodeToSIUnitsTime(x),sigdigits=4)==t_plot,sol_DIP.t)
+            end
             f1D .= copy(Location_Species_To_StateVector(sol_DIP.f[t_idx],PhaseSpace_DIP,species_index=species_index))
             f3D .= reshape(f1D,(p_num,u_num,h_num))
             @. f3D = f3D*(f3D!=Inf)
@@ -2068,7 +2080,11 @@ function AM3_DIP_Combo_MomentumDistributionPlot(filePath_AM3,sol_DIP,PhaseSpace_
                 scatterlines!(ax_AM3,log10.(meanp_AM3),pdNdp_AM3_log,linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[3])
 
                 # DIP
-                t_idx = findfirst(x->round(CodeToSIUnitsTime(x),sigdigits=3)==t_plot,sol_DIP.t)
+                if i == 1
+                    t_idx = 1 # works for both log and uniform diplodocus time stepping
+                else
+                    t_idx = findfirst(x->round(CodeToSIUnitsTime(x),sigdigits=4)==t_plot,sol_DIP.t)
+                end
                 f1D .= copy(Location_Species_To_StateVector(sol_DIP.f[t_idx],PhaseSpace_DIP,species_index=species_index))
                 f3D .= reshape(f1D,(p_num,u_num,h_num))
                 @. f3D = f3D*(f3D!=Inf)
