@@ -3,7 +3,7 @@
 
 Returns a plot of the energy density of all species as a function of time.
 """
-function EnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::String="All",fig=nothing,theme=DiplodocusDark(),title=nothing,TimeUnits::Function=CodeToCodeUnitsTime,perparticle=false)
+function EnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::String="All",fig=nothing,theme=DiplodocusDark(),title=nothing,TimeUnits::Function=CodeToCodeUnitsTime,perparticle=false,logt::Bool=false)
 
     CairoMakie.activate!(inline=true) # plot in vs code window
 
@@ -74,8 +74,12 @@ function EnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;specie
         end
 
         if t_grid == "u"
-            scatterlines!(ax,TimeUnits.(sol.t),eng,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j])
-            xlims!(ax,TimeUnits(sol.t[1]),TimeUnits(sol.t[end]))
+            t_plot = logt ? log10.(sol.t) : sol.t
+            if logt 
+                t_plot[1] = t_plot[2] /10
+            end
+            scatterlines!(ax,TimeUnits.(t_plot),eng,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j])
+            xlims!(ax,TimeUnits(t_plot[1]),TimeUnits(t_plot[end]))
         elseif t_grid == "l"
             scatterlines!(ax,log10.(TimeUnits.(sol.t)),eng,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j])
             xlims!(ax,log10(TimeUnits(sol.t[1])),log10(TimeUnits(sol.t[end])))
