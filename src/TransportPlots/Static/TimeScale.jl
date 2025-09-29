@@ -125,11 +125,11 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,sol::Diplo
 
                 println("tscale=$(TimeUnits.(Float64.(abs.(timescale2D[10,ceil(Int64,u_num/2)]))))")
 
-                scatterlines!(ax,mp_plot,log10.(TimeUnits.(Float64.(abs.(timescale2D[:,end])))),linewidth=2.0,color = color=theme.textcolor[],markersize=0.0,linestyle=linestyles[1])
+                scatterlines!(ax,mp_plot,log10.(TimeUnits.(Float64.(abs.(timescale2D[:,end])))),linewidth=2.0,color=theme.textcolor[],markersize=0.0,linestyle=linestyles[1])
                 push!(legend_elements_angle,LineElement(color = theme.textcolor[], linestyle = linestyles[1],linewidth = 2.0))
                 push!(line_labels_angle,L"\parallel")
 
-                scatterlines!(ax,mp_plot,log10.(TimeUnits.(Float64.(abs.(timescale2D[:,ceil(Int64,u_num/2)])))),linewidth=2.0,color = color=theme.textcolor[],markersize=0.0,linestyle=linestyles[2])
+                scatterlines!(ax,mp_plot,log10.(TimeUnits.(Float64.(abs.(timescale2D[:,ceil(Int64,u_num/2)])))),linewidth=2.0,color = theme.textcolor[],markersize=0.0,linestyle=linestyles[2])
                 push!(legend_elements_angle,LineElement(color = theme.textcolor[], linestyle = linestyles[2],linewidth = 2.0))
                 push!(line_labels_angle,L"\perp")
                 
@@ -163,8 +163,10 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,sol::Diplo
             #push!(legend_elements_angle,LineElement(color = theme.textcolor[], linestyle = :solid,linewidth = 2.0))
             #push!(line_labels_angle,L"%$(mu[u])")
 
-            push!(legend_elements_species,LineElement(color = theme.textcolor[], linestyle = linestyles[species],linewidth = 2.0))
-            push!(line_labels_species,name)
+            if idx == 1
+                push!(legend_elements_species,LineElement(color = theme.textcolor[], linestyle = linestyles[species],linewidth = 2.0))
+                push!(line_labels_species,name)
+            end
 
         end # species loop
 
