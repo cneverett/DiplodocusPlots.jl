@@ -74,9 +74,10 @@ function EnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;specie
         end
 
         if t_grid == "u"
-            t_plot = logt ? log10.(sol.t) : sol.t
+            t_plot = sol.t
             if logt 
                 t_plot[1] = t_plot[2] /10
+                t_plot = log10.(t_plot)
             end
             scatterlines!(ax,TimeUnits.(t_plot),eng,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j])
             xlims!(ax,TimeUnits(t_plot[1]),TimeUnits(t_plot[end]))
