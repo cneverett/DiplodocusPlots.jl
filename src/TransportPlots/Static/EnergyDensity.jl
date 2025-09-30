@@ -10,6 +10,19 @@ function EnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;specie
     with_theme(theme) do
 
     name_list = PhaseSpace.name_list
+    name_list_plot = similar(name_list)
+    for (idx, name) in enumerate(name_list)
+        if name == "Ele"
+            name = L"Electron"
+        elseif name == "Pho"
+            name = L"Photon"
+        elseif name == "Pos"
+            name = L"Positron"
+        else
+            name = name
+        end
+        name_list_plot[idx] = name
+    end
     Momentum = PhaseSpace.Momentum
     Grids = PhaseSpace.Grids
     Time = PhaseSpace.Time
@@ -79,10 +92,10 @@ function EnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;specie
                 t_plot[1] = t_plot[2] /10
                 t_plot = log10.(t_plot)
             end
-            scatterlines!(ax,t_plot,eng,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j])
+            scatterlines!(ax,t_plot,eng,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list_plot[j])
             xlims!(ax,t_plot[1],t_plot[end])
         elseif t_grid == "l"
-            scatterlines!(ax,log10.(TimeUnits.(sol.t)),eng,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j])
+            scatterlines!(ax,log10.(TimeUnits.(sol.t)),eng,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list_plot[j])
             xlims!(ax,log10(TimeUnits(sol.t[1])),log10(TimeUnits(sol.t[end])))
         end
 
@@ -104,7 +117,7 @@ function EnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;specie
     end
 
     #fig[1,2] = Legend(fig,ax,"Particles")
-    axislegend(ax,position = :rc)
+    axislegend(ax,position = :lc)
 
     end # with_theme
 
