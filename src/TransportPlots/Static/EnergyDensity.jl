@@ -13,11 +13,11 @@ function EnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;specie
     name_list_plot = similar(name_list)
     for (idx, name) in enumerate(name_list)
         if name == "Ele"
-            name = L"Electron"
+            name = "Electron"
         elseif name == "Pho"
-            name = L"Photon"
+            name = "Photon"
         elseif name == "Pos"
-            name = L"Positron"
+            name = "Positron"
         else
             name = name
         end
@@ -111,7 +111,7 @@ function EnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;specie
             scatterlines!(ax,t_plot,eng_total,linewidth=2.0,color = theme.textcolor[],markersize=0.0,linestyle=:dash,label="All")
             xlims!(ax,t_plot[1],t_plot[end])
         elseif t_grid == "l"
-            scatterlines!(ax,log10.(TimeUnits.(sol.t)),eng_total,linewidth=2.0,color = theme.textcolor[],markersize=0.0,linestyle=:dash,label=L"All")
+            scatterlines!(ax,log10.(TimeUnits.(sol.t)),eng_total,linewidth=2.0,color = theme.textcolor[],markersize=0.0,linestyle=:dash,label="All")
             xlims!(ax,log10(TimeUnits(sol.t[1])),log10(TimeUnits(sol.t[end])))
         end
     end
@@ -142,11 +142,11 @@ function FracEnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;sp
     name_list_plot = similar(name_list)
     for (idx, name) in enumerate(name_list)
         if name == "Ele"
-            name = L"Electron"
+            name = "Electron"
         elseif name == "Pho"
-            name = L"Photon"
+            name = "Photon"
         elseif name == "Pos"
-            name = L"Positron"
+            name = "Positron"
         else
             name = name
         end
@@ -239,10 +239,10 @@ function FracEnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;sp
             end
         end
         if t_grid == "u"
-            scatterlines!(ax,TimeUnits.(sol.t),frac_eng_total,linewidth=2.0,color = theme.textcolor[],markersize=0.0,linestyle=:dash,label=L"\text{All}")
+            scatterlines!(ax,TimeUnits.(sol.t),frac_eng_total,linewidth=2.0,color = theme.textcolor[],markersize=0.0,linestyle=:dash,label="All")
             xlims!(ax,TimeUnits(sol.t[1]),TimeUnits(sol.t[end]))
         elseif t_grid == "l"
-            scatterlines!(ax,log10.(TimeUnits.(sol.t)),frac_eng_total,linewidth=2.0,color = theme.textcolor[],markersize=0.0,linestyle=:dash,label=L"\text{All}")
+            scatterlines!(ax,log10.(TimeUnits.(sol.t)),frac_eng_total,linewidth=2.0,color = theme.textcolor[],markersize=0.0,linestyle=:dash,label="All")
             xlims!(ax,log10(TimeUnits(sol.t[1])),log10(TimeUnits(sol.t[end])))
         end
     end
