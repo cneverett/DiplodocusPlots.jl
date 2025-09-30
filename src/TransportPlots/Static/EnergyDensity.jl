@@ -126,6 +126,19 @@ function FracEnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;sp
     with_theme(theme) do
 
     name_list = PhaseSpace.name_list
+    name_list_plot = similar(name_list)
+    for (idx, name) in enumerate(name_list)
+        if name == "Ele"
+            name = L"Electron"
+        elseif name == "Pho"
+            name = L"Photon"
+        elseif name == "Pos"
+            name = L"Positron"
+        else
+            name = name
+        end
+        name_list_plot[idx] = name
+    end
     Momentum = PhaseSpace.Momentum
     Grids = PhaseSpace.Grids
     Time = PhaseSpace.Time
@@ -194,10 +207,10 @@ function FracEnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;sp
 
         if !only_all
             if t_grid == "u"
-                scatterlines!(ax,TimeUnits.(sol.t),frac_eng,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j])
+                scatterlines!(ax,TimeUnits.(sol.t),frac_eng,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list_plot[j])
                 xlims!(ax,TimeUnits(sol.t[1]),TimeUnits(sol.t[end]))
             elseif t_grid == "l"
-                scatterlines!(ax,log10.(TimeUnits.(sol.t)),frac_eng,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j])
+                scatterlines!(ax,log10.(TimeUnits.(sol.t)),frac_eng,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list_plot[j])
                 xlims!(ax,log10(TimeUnits(sol.t[1])),log10(TimeUnits(sol.t[end])))
             end
         end
@@ -213,16 +226,16 @@ function FracEnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;sp
             end
         end
         if t_grid == "u"
-            scatterlines!(ax,TimeUnits.(sol.t),frac_eng_total,linewidth=2.0,color = theme.textcolor[],markersize=0.0,linestyle=:dash,label="All")
+            scatterlines!(ax,TimeUnits.(sol.t),frac_eng_total,linewidth=2.0,color = theme.textcolor[],markersize=0.0,linestyle=:dash,label=L"\text{All}")
             xlims!(ax,TimeUnits(sol.t[1]),TimeUnits(sol.t[end]))
         elseif t_grid == "l"
-            scatterlines!(ax,log10.(TimeUnits.(sol.t)),frac_eng_total,linewidth=2.0,color = theme.textcolor[],markersize=0.0,linestyle=:dash,label="All")
+            scatterlines!(ax,log10.(TimeUnits.(sol.t)),frac_eng_total,linewidth=2.0,color = theme.textcolor[],markersize=0.0,linestyle=:dash,label=L"\text{All}")
             xlims!(ax,log10(TimeUnits(sol.t[1])),log10(TimeUnits(sol.t[end])))
         end
     end
 
     #fig[1,2] = Legend(fig,ax,"Particles")
-    axislegend(ax,position = :rb)
+    axislegend(ax,position = :lc)
 
     end # with_theme
 
