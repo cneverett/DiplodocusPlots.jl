@@ -169,10 +169,10 @@ function FracEnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;sp
 
     t_unit_string = TimeUnits()
 
-    if t_grid == "u"
-        xlab = L"$t$ $%$t_unit_string$"
-    elseif t_grid == "l"
+    if t_grid == "l" || logt
         xlab = L"\log_{10}($t$ $%$t_unit_string$)"
+    elseif t_grid == "u"
+        xlab = L"$t$ $%$t_unit_string$"
     end
 
     if isnothing(fig)
