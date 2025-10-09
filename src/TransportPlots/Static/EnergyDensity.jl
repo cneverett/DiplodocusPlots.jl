@@ -43,10 +43,10 @@ function EnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;specie
 
     t_unit_string = TimeUnits()
 
-    if t_grid == "u"
-        xlab = L"$t$ $%$t_unit_string$"
-    elseif t_grid == "l"
+    if t_grid == "l" || logt
         xlab = L"\log_{10}($t$ $%$t_unit_string$)"
+    elseif t_grid == "u"
+        xlab = L"$t$ $%$t_unit_string$"
     end
 
     if perparticle
@@ -132,7 +132,7 @@ end
 
 Returns a plot of the fractional change in energy density of all species between time setups as a function of time.
 """
-function FracEnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::String="All",fig=nothing,theme=DiplodocusDark(),title=nothing,only_all=false,TimeUnits::Function=CodeToCodeUnitsTime)
+function FracEnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::String="All",fig=nothing,theme=DiplodocusDark(),title=nothing,only_all=false,TimeUnits::Function=CodeToCodeUnitsTime,logt::Bool=false)
 
     CairoMakie.activate!(inline=true) # plot in vs code window
 
@@ -220,8 +220,13 @@ function FracEnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;sp
 
         if !only_all
             if t_grid == "u"
-                scatterlines!(ax,TimeUnits.(sol.t),frac_eng,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list_plot[j])
-                xlims!(ax,TimeUnits(sol.t[1]),TimeUnits(sol.t[end]))
+                t_plot = TimeUnits.(sol.t)
+                if logt 
+                    t_plot[1] = t_plot[2] /10
+                    t_plot = log10.(t_plot)
+                end
+                scatterlines!(ax,t_plot,frac_eng,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list_plot[j])
+                xlims!(ax,t_plot[1],t_plot[end])
             elseif t_grid == "l"
                 scatterlines!(ax,log10.(TimeUnits.(sol.t)),frac_eng,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list_plot[j])
                 xlims!(ax,log10(TimeUnits(sol.t[1])),log10(TimeUnits(sol.t[end])))
@@ -239,8 +244,13 @@ function FracEnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;sp
             end
         end
         if t_grid == "u"
-            scatterlines!(ax,TimeUnits.(sol.t),frac_eng_total,linewidth=2.0,color = theme.textcolor[],markersize=0.0,linestyle=:dash,label="All")
-            xlims!(ax,TimeUnits(sol.t[1]),TimeUnits(sol.t[end]))
+            t_plot = copy(TimeUnits.(sol.t))
+            if logt 
+                t_plot[1] = t_plot[2] /10
+                t_plot = log10.(t_plot)
+            end
+            scatterlines!(ax,t_plot,frac_eng_total,linewidth=2.0,color = theme.textcolor[],markersize=0.0,linestyle=:dash,label="All")
+            xlims!(ax,t_plot[1],t_plot[end])
         elseif t_grid == "l"
             scatterlines!(ax,log10.(TimeUnits.(sol.t)),frac_eng_total,linewidth=2.0,color = theme.textcolor[],markersize=0.0,linestyle=:dash,label="All")
             xlims!(ax,log10(TimeUnits(sol.t[1])),log10(TimeUnits(sol.t[end])))
