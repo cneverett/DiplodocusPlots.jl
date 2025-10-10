@@ -193,7 +193,7 @@ function ObserverFluxPlot(PhaseSpace::PhaseSpaceStruct,sol::OutputStruct,time_id
 
     if !isnothing(title)
         titlestr = L" β =%$(β)\pi, t=%$(t) %$t_unit_string"
-        ax.title = titlestr
+        ax_t.title = titlestr
     end
 
     max_total = -Inf32
