@@ -186,10 +186,10 @@ function ObserverFluxPlot(PhaseSpace::PhaseSpaceStruct,sol::OutputStruct,time_id
     xlab_t = L"$\log_{10}\left(\nu [\text{Hz}]\right)$"
     ylab = L"$\log_{10}\left(pF_{p}\,[\text{J}\text{m}^{-2}\text{s}^{-1}]\right)$"
     ax = Axis(fig[1,1],xlabel=xlab,ylabel=ylab,aspect=DataAspect())
-    ax_t = Axis(fig[1,1],xlabel=xlab_t,xaxisposition=:top)
-    #hidespines!(ax_t)
-    linkyaxes!(ax,ax_t)
-    #hidedecorations!(ax_t)
+    ax_t = Axis(fig[1,1],xlabel=xlab_t,xaxisposition=:top,aspect=DataAspect())
+    hidespines!(ax_t)
+    hidexdecorations!(ax_t,ticklabels=false,ticks=false,label=false,minorgrid=false,minorticks=false)
+    hideydecorations!(ax_t,ticklabels=false,ticks=false,minorgrid=false,minorticks=false)
 
     if !isnothing(title)
         titlestr = L" β =%$(β)\pi, t=%$(t) %$t_unit_string"
@@ -219,7 +219,7 @@ function ObserverFluxPlot(PhaseSpace::PhaseSpaceStruct,sol::OutputStruct,time_id
         ax_t.xlimits = log10.(10^plot_limits_x .* mEle*c^2/h)
     end
 
-    axislegend(ax,position=:lt)
+    axislegend(ax,position=:rt)
 
     return fig
 
