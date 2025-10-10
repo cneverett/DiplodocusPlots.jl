@@ -189,7 +189,7 @@ function ObserverFluxPlot(PhaseSpace::PhaseSpaceStruct,sol::OutputStruct,time_id
     ax_t = Axis(fig[1,1],xlabel=xlab_t,xaxisposition=:top,aspect=DataAspect())
     hidespines!(ax_t)
     hidexdecorations!(ax_t,ticklabels=false,ticks=false,label=false,minorgrid=false,minorticks=false)
-    hideydecorations!(ax_t,ticklabels=false,ticks=false,minorgrid=false,minorticks=false)
+    hideydecorations!(ax_t,ticklabels=true,ticks=true,minorgrid=false,minorticks=false)
 
     if !isnothing(title)
         titlestr = L" β =%$(β)\pi, t=%$(t) %$t_unit_string"
@@ -216,7 +216,7 @@ function ObserverFluxPlot(PhaseSpace::PhaseSpaceStruct,sol::OutputStruct,time_id
         ax.limits = plot_limits
         plot_limits_x = plot_limits[1]
         plot_limits_y = plot_limits[2]
-        ax_t.xlimits = log10.(10^plot_limits_x .* mEle*c^2/h)
+        ax_t.limits = (log10.(10 .^ plot_limits_x .* (mEle*c^2/h)),plot_limits_y)
     end
 
     axislegend(ax,position=:rt)
