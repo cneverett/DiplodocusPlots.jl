@@ -59,7 +59,7 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,sol::Diplo
     for (idx,t_idx) in enumerate(t_idxs)
 
         f = sol.f[t_idx]
-        @. f = f*(f>=1f-28) # to align with solver cut
+        @. f = f*(f>=1f-20) # to align with solver cut
         t = sol.t[t_idx]
         
         if t_grid == "l" || logt
