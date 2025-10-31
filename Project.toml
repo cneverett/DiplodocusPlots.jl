@@ -1,7 +1,7 @@
 name = "DiplodocusPlots"
 uuid = "e2feba3a-3769-4cd4-93ab-3db026c329dd"
 authors = ["Christopher Everett <cn.everett@outlook.com> and contributors"]
-version = "0.1.2"
+version = "0.2.0"
 
 [deps]
 CairoMakie = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
@@ -13,8 +13,8 @@ Revise = "295af30f-e4ad-537b-8983-00126c2a3abe"
 
 [compat]
 CairoMakie = "0.13.7"
-DiplodocusCollisions = "0.1.1"
-DiplodocusTransport = "0.1.1"
+DiplodocusCollisions = "0.1"
+DiplodocusTransport = "0.2, 0.1"
 GLMakie = "0.11.8"
 Makie = "0.22.10"
 Revise = "3.8.0"
