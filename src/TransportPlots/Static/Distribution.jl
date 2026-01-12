@@ -406,7 +406,7 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
         # recording the animation
         time_idxs = 1:length(sol.t)
         record(fig,filename,time_idxs,framerate=framerate,backend=CairoMakie) do frame
-            println("$frame")
+            print("generating frame: $frame \r")
             time_idx[] = frame
         end
     end
@@ -671,7 +671,7 @@ function AngleDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseSpac
         # recording the animation
         time_idxs = 1:length(sol.t)
         record(fig,filename,time_idxs,framerate=framerate,backend=CairoMakie) do frame
-            println("$frame")
+            print("generating frame: $frame \r")
             time_idx[] = frame
         end
     end
@@ -949,7 +949,7 @@ function AzimuthalAngleDistributionPlot(sol,species::Vector{String},PhaseSpace::
         # recording the animation
         time_idxs = 1:length(sol.t)
         record(fig,filename,time_idxs,framerate=framerate,backend=CairoMakie) do frame
-            println("$frame")
+            print("generating frame: $frame \r")
             time_idx[] = frame
         end
     end
@@ -1229,7 +1229,7 @@ function MomentumAndPolarAngleDistributionPlot(sol,species::Vector{String},Phase
         # recording the animation
         time_idxs = 1:length(sol.t)
         record(fig,filename,time_idxs,framerate=framerate,backend=CairoMakie) do frame
-            println("$frame")
+            print("generating frame: $frame \r")
             time_idx[] = frame
         end
     end
@@ -1621,7 +1621,7 @@ function MomentumAndAzimuthalAngleDistributionPlot(sol,species::Vector{String},P
         # recording the animation
         time_idxs = 1:length(sol.t)
         record(fig,filename,time_idxs,framerate=framerate,backend=CairoMakie) do frame
-            println("$frame")
+            print("generating frame: $frame \r")
             time_idx[] = frame
         end
     end
@@ -1679,7 +1679,7 @@ function MomentumComboAnimation(sol,species::Vector{String},PhaseSpace::PhaseSpa
         time_idxs = 1:length(sol.t)
 
         record(fig,filename,time_idxs,framerate=framerate,backend=CairoMakie,compression=1) do frame
-            println("$frame")
+            print("generating frame: $frame \r")
             time_idx[] = frame
         end
         
@@ -1740,7 +1740,7 @@ function AM3_MomentumDistributionPlot(filePath,t_max,t_min,t_grid;plot_limits=(n
     for i in 1:length(t_pho)
 
         t = t_pho[i]
-        println("t=$t")
+        print("t=$t \r")
         if log10(t) % 1 == 0.0 && t <= t_max # 10^n timesteps
             if t_grid == "u"
                 color = theme.colormap[][(t - t_min) / (t_max - t_min)]
@@ -2269,7 +2269,7 @@ function TwoSolAngleDistributionPlot(twosol::Tuple{OutputStruct,OutputStruct},sp
         # recording the animation
         time_idxs = 1:length(twosol[1].t)
         record(fig,filename,time_idxs,framerate=framerate,backend=CairoMakie) do frame
-            println("$frame")
+            print("generating frame: $frame \r")
             time_idx[] = frame
         end
     end
