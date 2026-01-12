@@ -101,7 +101,7 @@ end
 
 Returns a plot of the fractional change in number density of all species between time setups as a function of time.
 """
-function FracNumberDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::String="All",fig=nothing,theme=DiplodocusDark(),title=nothing,TimeUnits::Function=CodeToCodeUnitsTime)
+function FracNumberDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::String="All",fig=nothing,theme=DiplodocusDark(),title=nothing,TimeUnits::Function=CodeToCodeUnitsTime,only_all::Bool=false)
 
     CairoMakie.activate!(inline=true) # plot in vs code window
 
@@ -144,6 +144,8 @@ function FracNumberDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;sp
 
     frac_num = zeros(Float64,length(sol.t))
     num = 0.0
+    num_total = zeros(Float64,length(sol.t))
+    frac_num_total = zeros(Float64,length(sol.t))
 
     for j in (species != "All" ? findfirst(x->x==species,name_list) : eachindex(name_list))
 
@@ -162,16 +164,41 @@ function FracNumberDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;sp
 
             num = DiplodocusTransport.ScalarNumberDensity(Nᵃ,Uₐ)
         
+            if species== "All"
+                num_total[i] += num
+            end
+
+        end
+
+        if !only_all
+            if t_grid == "u"
+                scatterlines!(ax,TimeUnits.(sol.t),frac_num,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j])
+                xlims!(ax,TimeUnits(sol.t[1]),TimeUnits(sol.t[end]))
+            elseif t_grid == "l"
+                scatterlines!(ax,log10.(TimeUnits.(sol.t)),frac_num,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j])
+                xlims!(ax,log10(TimeUnits(sol.t[1])),log10(TimeUnits(sol.t[end])))
+            end
+        end
+
+    end
+
+    if species == "All"
+
+        for i in eachindex(sol.t)
+            if i == 1
+                frac_num_total[i] = 0.0
+            else
+                frac_num_total[i] = num_total[i]/num_total[i-1] - 1.0
+            end
         end
 
         if t_grid == "u"
-            scatterlines!(ax,TimeUnits.(sol.t),frac_num,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j])
+            scatterlines!(ax,TimeUnits.(sol.t),frac_num_total,linewidth=2.0,color = theme.textcolor[],markersize=0.0,linestyle=:dash,label="All")
             xlims!(ax,TimeUnits(sol.t[1]),TimeUnits(sol.t[end]))
         elseif t_grid == "l"
-            scatterlines!(ax,log10.(TimeUnits.(sol.t)),frac_num,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j])
+            scatterlines!(ax,log10.(TimeUnits.(sol.t)),frac_num_total,linewidth=2.0,color = theme.textcolor[],markersize=0.0,linestyle=:dash,label="All")
             xlims!(ax,log10(TimeUnits(sol.t[1])),log10(TimeUnits(sol.t[end])))
         end
-
     end
 
     #fig[1,2] = Legend(fig,ax,"Particles")
