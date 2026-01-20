@@ -134,7 +134,7 @@ end
 
 Returns a plot of the fractional change in energy density of all species between time setups as a function of time.
 """
-function FracEnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::String="All",fig=nothing,theme=DiplodocusDark(),title=nothing,only_all=false,TimeUnits::Function=CodeToCodeUnitsTime,logt::Bool=false,legend::Bool=true)
+function FracEnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::String="All",fig=nothing,theme=DiplodocusDark(),title=nothing,only_all=false,TimeUnits::Function=CodeToCodeUnitsTime,logt::Bool=false,legend::Bool=true,perparticle=false)
 
     CairoMakie.activate!(inline=true) # plot in vs code window
 
@@ -177,11 +177,17 @@ function FracEnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;sp
         xlab = L"$t$ $%$t_unit_string$"
     end
 
+    if perparticle
+        ylab = "Mean Eng. Per Particle. Frac. Change"
+    else
+        ylab = "Eng. Den. Frac. Change"
+    end
+
     if isnothing(fig)
         fig = Figure()
-        ax = Axis(fig[1,1],xlabel=xlab,ylabel="Eng. Den. Frac. Change",xgridvisible=false,ygridvisible=false) # check units
+        ax = Axis(fig[1,1],xlabel=xlab,ylabel=ylab,xgridvisible=false,ygridvisible=false) # check units
     else
-        ax = Axis(fig,xlabel=xlab,ylabel="Eng. Den. Frac. Change",xgridvisible=false,ygridvisible=false) # check units
+        ax = Axis(fig,xlabel=xlab,ylabel=ylab,xgridvisible=false,ygridvisible=false) # check units
     end
 
     if !isnothing(title)
@@ -209,10 +215,10 @@ function FracEnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;sp
             if i == 1
                 frac_eng[i] = 0.0 # initial value
             else
-                frac_eng[i] = DiplodocusTransport.ScalarEnergyDensity(Tᵃᵇ,Uₐ,num)/eng - 1.0
+                frac_eng[i] = DiplodocusTransport.ScalarEnergyDensity(Tᵃᵇ,Uₐ,num,perparticle=perparticle)/eng - 1.0
             end
 
-            eng = DiplodocusTransport.ScalarEnergyDensity(Tᵃᵇ,Uₐ,num)
+            eng = DiplodocusTransport.ScalarEnergyDensity(Tᵃᵇ,Uₐ,num,perparticle=perparticle)
 
             if species== "All"
                 eng_total[i] += eng
