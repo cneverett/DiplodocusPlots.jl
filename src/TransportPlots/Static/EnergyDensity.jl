@@ -3,7 +3,7 @@
 
 Returns a plot of the energy density of all species as a function of time.
 """
-function EnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::String="All",fig=nothing,theme=DiplodocusDark(),title=nothing,TimeUnits::Function=CodeToCodeUnitsTime,perparticle=false,logt::Bool=false)
+function EnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::String="All",fig=nothing,theme=DiplodocusDark(),title=nothing,TimeUnits::Function=CodeToCodeUnitsTime,perparticle=false,logt::Bool=false,legend::Bool=true)
 
     CairoMakie.activate!(inline=true) # plot in vs code window
 
@@ -117,7 +117,9 @@ function EnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;specie
     end
 
     #fig[1,2] = Legend(fig,ax,"Particles")
-    axislegend(ax,position = :lc)
+    if legend
+        axislegend(ax,position = :lc)
+    end
 
     end # with_theme
 
@@ -132,7 +134,7 @@ end
 
 Returns a plot of the fractional change in energy density of all species between time setups as a function of time.
 """
-function FracEnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::String="All",fig=nothing,theme=DiplodocusDark(),title=nothing,only_all=false,TimeUnits::Function=CodeToCodeUnitsTime,logt::Bool=false)
+function FracEnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::String="All",fig=nothing,theme=DiplodocusDark(),title=nothing,only_all=false,TimeUnits::Function=CodeToCodeUnitsTime,logt::Bool=false,legend::Bool=true)
 
     CairoMakie.activate!(inline=true) # plot in vs code window
 
@@ -258,7 +260,9 @@ function FracEnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;sp
     end
 
     #fig[1,2] = Legend(fig,ax,"Particles")
-    axislegend(ax,position = :lc)
+    if legend
+        axislegend(ax,position = :lc)
+    end
 
     end # with_theme
 
