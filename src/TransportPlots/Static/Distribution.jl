@@ -1047,7 +1047,7 @@ function MomentumAndPolarAngleDistributionPlot(sol,species::String,PhaseSpace::P
 
     max_dis = maximum(x for x in [dis1; dis2; dis3] if !isnan(x))
     min_dis = minimum(x for x in [dis1; dis2; dis3] if !isnan(x))
-    col_range = (log10(max_dis)-12.0,log10(max_dis)+1.0)
+    col_range = (log10(max_dis)-11.5,log10(max_dis)+0.5)
 
     ax1 = PolarAxis(fig[1,1+1],theta_0=-pi/2,direction=-1,width=176)
     ax1.radius_at_origin = log10(p_r[1])-1.0
@@ -1069,7 +1069,7 @@ function MomentumAndPolarAngleDistributionPlot(sol,species::String,PhaseSpace::P
     @. u_as_theta_grid = pi - pi * (u_r+1)/2 # convert u grid to a set of theta values such that u can be plotted as polar angle
     @. u_as_theta_grid_tick_locations = pi - pi * (u_as_theta_grid_tick_values+1)/2 # convert u grid ticks to a set of theta values such that u can be plotted as polar angle
 
-    hm1 = heatmap!(ax1,u_as_theta_grid,log10.(p_r),log10.(dis1'),colormap=theme.colormap_var,colorrange=col_range,colorscale=x->asinh(x-col_range[2]))
+    hm1 = heatmap!(ax1,u_as_theta_grid,log10.(p_r),log10.(dis1'),colormap=theme.colormap_var,colorrange=col_range,colorscale=x->asinh(x-col_range[2]),lowclip=theme.colormap_var[][0.0])
     hm2 = heatmap!(ax2,u_as_theta_grid,log10.(p_r),log10.(dis2'),colormap=theme.colormap_var,colorrange=col_range,colorscale=x->asinh(x-col_range[2]))
     hm3 = heatmap!(ax3,u_as_theta_grid,log10.(p_r),log10.(dis3'),colormap=theme.colormap_var,colorrange=col_range,colorscale=x->asinh(x-col_range[2]))
 
@@ -1196,7 +1196,7 @@ function MomentumAndPolarAngleDistributionPlot(sol,species::Vector{String},Phase
     @. u_as_theta_grid = pi - pi * (u_r+1)/2 # convert u grid to a set of theta values such that u can be plotted as polar angle
     @. u_as_theta_grid_tick_locations = pi - pi * (u_as_theta_grid_tick_values+1)/2 # convert u grid ticks to a set of theta values such that u can be plotted as polar angle
 
-    hm = heatmap!(ax,u_as_theta_grid,log10.(p_r),dis,colormap=theme.colormap_var,colorrange=col_range,colorscale=@lift(x->asinh(x-$max_dis)))
+    hm = heatmap!(ax,u_as_theta_grid,log10.(p_r),dis,colormap=theme.colormap_var,colorrange=col_range,colorscale=@lift(x->asinh(x-$max_dis)),lowclip=theme.colormap_var[][0.0])
 
     translate!(hm,0,0,-100)
 
