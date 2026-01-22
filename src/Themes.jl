@@ -12,7 +12,7 @@ Deault figure size will be designed for single column with a width of 3.25 inche
 function DiplodocusDark()
     # inspired from Makie's theme_black but with latex fonts and some modifications
     return Theme(
-        figure_padding = 0.0,
+        figure_padding = 10.0,
         backgroundcolor=(:black,0.0),
         textcolor=:white,
         linecolor=:white,
@@ -123,9 +123,9 @@ function DiplodocusDark()
 end
 
 function DiplodocusLight()
-    # slight modifications from the default theme but with Latex fonts and some modifications
+    # slight modifications from the defa1ult theme but with Latex fonts and some modifications
     return Theme(
-        figure_padding = 0.0,
+        figure_padding = 10.0,
         backgroundcolor=(:white,0.0),
         textcolor=:black,
         linecolor=:black,
