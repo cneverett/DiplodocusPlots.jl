@@ -3,7 +3,7 @@
 
 Returns a plot of the number density of all species as a function of time.
 """
-function NumberDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::String="All",fig=nothing,theme=DiplodocusDark(),title=nothing,TimeUnits::Function=CodeToCodeUnitsTime,legend::Bool=true)
+function NumberDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::String="All",fig=nothing,theme=DiplodocusDark(),title=nothing,TimeUnits::Function=CodeToCodeUnitsTime,legend::Bool=true,legend_pos::Symbol=:rb)
 
     CairoMakie.activate!(inline=true) # plot in vs code window
 
@@ -86,7 +86,7 @@ function NumberDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;specie
 
     #fig[1,2] = Legend(fig,ax,"Particles")
     if legend
-        axislegend(ax,position = :rb)
+        axislegend(ax,position = legend_pos)
     end
 
     end # with_theme
@@ -102,7 +102,7 @@ end
 
 Returns a plot of the fractional change in number density of all species between time setups as a function of time.
 """
-function FracNumberDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::String="All",fig=nothing,theme=DiplodocusDark(),title=nothing,TimeUnits::Function=CodeToCodeUnitsTime,only_all::Bool=false,legend::Bool=true)
+function FracNumberDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::String="All",fig=nothing,theme=DiplodocusDark(),title=nothing,TimeUnits::Function=CodeToCodeUnitsTime,only_all::Bool=false,legend::Bool=true,legend_pos::Symbol=:rb)
 
     CairoMakie.activate!(inline=true) # plot in vs code window
 
@@ -204,7 +204,7 @@ function FracNumberDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;sp
 
     #fig[1,2] = Legend(fig,ax,"Particles")
     if legend
-        axislegend(ax,position = :rb)
+        axislegend(ax,position = legend_pos)
     end
 
     end # with_theme
