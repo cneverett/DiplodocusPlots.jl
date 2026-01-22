@@ -1098,28 +1098,36 @@ function MomentumAndPolarAngleDistributionPlot(sol,species::String,PhaseSpace::P
     end
 
     t_unit_string = TimeUnits()
-
     pt = 4/3
-    text!(ax1,L"$\log_{10}\left(p\,[m_ec]\right)$",position=(-3.05,log10(p_r[end])),rotation=pi/2,fontsize=9pt)
+
     ax1_label=Axis(fig[2,2])
     ax2_label=Axis(fig[2,3])
     ax3_label=Axis(fig[2,4])
+    t1 = text!(ax1_label,L"$t=%$(round(TimeUnits(t[1]),sigdigits=3))$ $%$t_unit_string$",space=:relative,position=(0.5,0.6),fontsize=10pt,align=(:center,:center))
+    t2 = text!(ax2_label,L"$t=%$(round(TimeUnits(t[2]),sigdigits=3))$ $%$t_unit_string$",space=:relative,position=(0.5,0.6),fontsize=10pt,align=(:center,:center))
+    t3 = text!(ax3_label,L"$t=%$(round(TimeUnits(t[3]),sigdigits=3))$ $%$t_unit_string$",space=:relative,position=(0.5,0.6),fontsize=10pt,align=(:center,:center))
+
+    
+    text!(ax1,L"$\log_{10}\left(p\,[m_ec]\right)$",position=(-3.05,log10(p_r[end])),rotation=pi/2,fontsize=9pt)
+    
     hidedecorations!(ax1_label)
     hidedecorations!(ax2_label)
     hidedecorations!(ax3_label)
     hidespines!(ax1_label)
     hidespines!(ax2_label)
     hidespines!(ax3_label)
-    text!(ax1_label,L"$t=%$(round(TimeUnits(t[1]),sigdigits=3))$ $%$t_unit_string$",space=:relative,position=(0.5,0.5),fontsize=10pt,align=(:center,:center))
-    text!(ax2_label,L"$t=%$(round(TimeUnits(t[2]),sigdigits=3))$ $%$t_unit_string$",space=:relative,position=(0.5,0.5),fontsize=10pt,align=(:center,:center))
-    text!(ax3_label,L"$t=%$(round(TimeUnits(t[3]),sigdigits=3))$ $%$t_unit_string$",space=:relative,position=(0.5,0.5),fontsize=10pt,align=(:center,:center))
+    
 
-    colsize!(fig.layout,1,Relative(0.1))
+    translate!(t1,0,0,200)
+    translate!(t2,0,0,200)
+    translate!(t3,0,0,200)
+
+    colsize!(fig.layout,1,Relative(0.05))
     colsize!(fig.layout,2,Relative(0.3))
     colsize!(fig.layout,3,Relative(0.3))
     colsize!(fig.layout,4,Relative(0.3))
-    rowsize!(fig.layout,2,Relative(0.06))
-    rowgap!(fig.layout,1,0.0)
+    rowsize!(fig.layout,2,Relative(0.05))
+    rowgap!(fig.layout,1,Relative(-0.05))
     
     return fig
 
