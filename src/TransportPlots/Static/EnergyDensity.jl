@@ -95,13 +95,16 @@ function EnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;specie
         end
 
         if loge
+            if eng[1] == 0.0
+                eng[1] = eng[2]*1e-10
+            end
             eng = log10.(eng)
         end
 
         if t_grid == "u"
             t_plot = TimeUnits.(sol.t)
-            if logt 
-                t_plot[1] = t_plot[2] /10
+            if logt && t_plot[1] == 0.0
+                t_plot[1] = t_plot[2] / 10
                 t_plot = log10.(t_plot)
             end
             scatterlines!(ax,t_plot,eng,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list_plot[j])
@@ -120,8 +123,8 @@ function EnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;specie
     if species == "All"
         if t_grid == "u"
             t_plot = copy(TimeUnits.(sol.t))
-            if logt 
-                t_plot[1] = t_plot[2] /10
+            if logt && t_plot[1] == 0.0
+                t_plot[1] = t_plot[2] / 10
                 t_plot = log10.(t_plot)
             end
             scatterlines!(ax,t_plot,eng_total,linewidth=2.0,color = theme.textcolor[],markersize=0.0,linestyle=:dash,label="All")
@@ -250,7 +253,7 @@ function FracEnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;sp
             if t_grid == "u"
                 t_plot = TimeUnits.(sol.t)
                 if logt 
-                    t_plot[1] = t_plot[2] /10
+                    t_plot[1] = t_plot[2] / 10
                     t_plot = log10.(t_plot)
                 end
                 scatterlines!(ax,t_plot,frac_eng,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list_plot[j])
