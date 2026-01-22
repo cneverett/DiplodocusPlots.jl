@@ -1103,9 +1103,9 @@ function MomentumAndPolarAngleDistributionPlot(sol,species::String,PhaseSpace::P
     ax1_label=Axis(fig[2,2])
     ax2_label=Axis(fig[2,3])
     ax3_label=Axis(fig[2,4])
-    text!(ax1_label,L"$t=%$(round(TimeUnits(t[1]),sigdigits=3))$ $%$t_unit_string$",space=:relative,position=(0.5,0.6),fontsize=10pt,align=(:center,:center))
-    text!(ax2_label,L"$t=%$(round(TimeUnits(t[2]),sigdigits=3))$ $%$t_unit_string$",space=:relative,position=(0.5,0.6),fontsize=10pt,align=(:center,:center))
-    text!(ax3_label,L"$t=%$(round(TimeUnits(t[3]),sigdigits=3))$ $%$t_unit_string$",space=:relative,position=(0.5,0.6),fontsize=10pt,align=(:center,:center))
+    text!(ax1_label,L"$t=%$(round(TimeUnits(t[1]),sigdigits=3))$ $%$t_unit_string$",space=:relative,position=(0.5,0.5),fontsize=10pt,align=(:center,:center))
+    text!(ax2_label,L"$t=%$(round(TimeUnits(t[2]),sigdigits=3))$ $%$t_unit_string$",space=:relative,position=(0.5,0.5),fontsize=10pt,align=(:center,:center))
+    text!(ax3_label,L"$t=%$(round(TimeUnits(t[3]),sigdigits=3))$ $%$t_unit_string$",space=:relative,position=(0.5,0.5),fontsize=10pt,align=(:center,:center))
 
     
     text!(ax1,L"$\log_{10}\left(p\,[m_ec]\right)$",position=(-3.05,log10(p_r[end])),rotation=pi/2,fontsize=9pt)
