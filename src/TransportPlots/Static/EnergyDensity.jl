@@ -3,7 +3,7 @@
 
 Returns a plot of the energy density of all species as a function of time.
 """
-function EnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::String="All",fig=nothing,theme=DiplodocusDark(),title=nothing,TimeUnits::Function=CodeToCodeUnitsTime,perparticle=false,logt::Bool=false,legend::Bool=true)
+function EnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::String="All",fig=nothing,theme=DiplodocusDark(),title=nothing,TimeUnits::Function=CodeToCodeUnitsTime,perparticle=false,logt::Bool=false,loge::Bool=false,legend::Bool=true)
 
     CairoMakie.activate!(inline=true) # plot in vs code window
 
@@ -49,10 +49,18 @@ function EnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;specie
         xlab = L"$t$ $%$t_unit_string$"
     end
 
-    if perparticle
-        ylab = L"$\overline{p^0}$ $[m_ec]$"
+    if loge 
+        if perparticle
+            ylab = L"\log_{10}\left(\overline{p^0} $[m_ec]$\right)"
+        else
+            ylab = L"\log_{10}\left(e/c $[m_ec~\mathrm{m}^{-3}]$\right) "
+        end
     else
-        ylab = L"$e/c$ $[m_ec\mathrm{m}^{-3}]$"
+        if perparticle
+            ylab = L"$\overline{p^0}$ $[m_ec]$"
+        else
+            ylab = L"$e/c$ $[m_ec~\mathrm{m}^{-3}]$"
+        end
     end
 
     if isnothing(fig)
@@ -86,6 +94,10 @@ function EnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;specie
         
         end
 
+        if loge
+            eng = log10.(eng)
+        end
+
         if t_grid == "u"
             t_plot = TimeUnits.(sol.t)
             if logt 
@@ -99,6 +111,10 @@ function EnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;specie
             xlims!(ax,log10(TimeUnits(sol.t[1])),log10(TimeUnits(sol.t[end])))
         end
 
+    end
+
+    if loge
+        eng_total = log10.(eng_total)
     end
 
     if species == "All"
