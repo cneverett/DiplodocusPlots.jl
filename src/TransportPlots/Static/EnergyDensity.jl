@@ -104,7 +104,7 @@ function EnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;specie
         if t_grid == "u"
             t_plot = TimeUnits.(sol.t)
             if logt && t_plot[1] == 0.0
-                t_plot[1] = t_plot[2] / 10
+                t_plot[1] = t_plot[2] / 20
                 t_plot = log10.(t_plot)
             end
             scatterlines!(ax,t_plot,eng,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list_plot[j])
@@ -124,7 +124,7 @@ function EnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;specie
         if t_grid == "u"
             t_plot = copy(TimeUnits.(sol.t))
             if logt && t_plot[1] == 0.0
-                t_plot[1] = t_plot[2] / 10
+                t_plot[1] = t_plot[2] / 20
                 t_plot = log10.(t_plot)
             end
             scatterlines!(ax,t_plot,eng_total,linewidth=2.0,color = theme.textcolor[],markersize=0.0,linestyle=:dash,label="All")
