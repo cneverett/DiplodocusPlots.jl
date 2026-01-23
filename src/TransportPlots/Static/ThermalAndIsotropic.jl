@@ -249,11 +249,15 @@ function IsThermalAndIsotropicPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruc
             Pressure = DiplodocusTransport.ScalarPressure(Tᵃᵇ,Δab)
             Temperature = DiplodocusTransport.ScalarTemperature(Pressure,num)
 
-            MJ = DiplodocusTransport.MaxwellJuttner_Distribution(PhaseSpace,"Sph",Temperature;n=num)
+            if mass_list[j] != 0.0
+                Ther = DiplodocusTransport.MaxwellJuttner_Distribution(PhaseSpace,name_list[j],Temperature;n=num)
+            else
+                Ther = DiplodocusTransport.BlackBody_Distribution(PhaseSpace,name_list[j],Temperature;n=num)
+            end
 
             f1D = dropdims(sum(reshape(f,(p_num_list[j],u_num_list[j],h_num_list[j])),dims=(2,3)),dims=(2,3))
 
-            residuals = (f1D .- MJ).^2
+            residuals = (f1D .- Ther).^2
             residuals = residuals[isfinite.(residuals)]
 
             SumSquaredResiduals[i] = sum(residuals)

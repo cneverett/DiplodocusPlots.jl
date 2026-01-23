@@ -178,12 +178,20 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
         Pressure = DiplodocusTransport.ScalarPressure(Tᵃᵇ,Δab)
         Temperature = DiplodocusTransport.ScalarTemperature(Pressure,num)
 
-        MJ = DiplodocusTransport.MaxwellJuttner_Distribution(PhaseSpace,species[species_idx],Temperature;n=num)
+        if mass != 0.0
+            Ther = DiplodocusTransport.MaxwellJuttner_Distribution(PhaseSpace,species_name,Temperature;n=num)
+            lab = "Maxwell-Juttner"
+        else
+            Ther = DiplodocusTransport.BlackBody_Distribution(PhaseSpace,species_name,Temperature;n=num)
+            lab = "Black Body"
+        end
+        #MJ = DiplodocusTransport.MaxwellJuttner_Distribution(PhaseSpace,species[species_idx],Temperature;n=num)
+
         # scale by order
         # f = dN/dpdudh * dpdudh therefore dN/dp = f / dp and p^order * dN/dp = f * mp^order / dp
-        @. MJ *= (meanp^(order)) / dp
+        @. Ther *= (meanp^(order)) / dp
 
-        scatterlines!(ax,mp_plot,log10.(MJ),linewidth=1.0,color = theme.textcolor[],markersize=0.0,label="Maxwell-Juttner")
+        scatterlines!(ax,mp_plot,log10.(Ther),linewidth=1.0,color = theme.textcolor[],markersize=0.0,label=lab)
 
     end
 
