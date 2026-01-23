@@ -13,6 +13,7 @@ Common arguments:
 - `wide`: if `true`, the plot is generated in a wide format (double column 8:3 aspect ratio), default is `false` (single column 4:3 aspect ratio).
 - `legend`: if `true`, a legend is added to the plot, default is `true`.
 - `thermal`: default is `false`. If `true` the expected thermal distribution for each species is plotted based on the final time step of the simulation.
+- `wien`: default is `false`. If `false` and `thermal` is also `true`, the expected black body distribution is plotted for massless species based on the final time step of the simulation, else the Wien distribution is plotted.
 - `paraperp`: default is `false`. If `true` the first and center `u` bins will be plotted to represent the distribution parallel to the axis and perpendicular.
 - `logt`: default is `false`. If a uniform time grid is used for the solution, this can be toggled to `true` to display the solution in log10 time steps rather than uniform time steps.
 
@@ -25,7 +26,7 @@ Animated arguments:
 - `figure`: default is `nothing`, which creates a new figure. If a figure is provided, the plot is added to that figure instead of creating a new one, this should be of the form of a tuple of `figure` and `time_idx` from the main plot.
 - `initial`: default is `false`, if `true` causes the initial distribution to remain on the plot
 """
-function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseSpaceStruct,type::Static;theme=DiplodocusDark(),order::Int64=1,TimeUnits::Function=CodeToCodeUnitsTime,thermal=false,plot_limits=(nothing,nothing),wide=false,legend=true,paraperp=false,step=1,logt::Bool=false)
+function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseSpaceStruct,type::Static;theme=DiplodocusDark(),order::Int64=1,TimeUnits::Function=CodeToCodeUnitsTime,thermal=false,wien=false,plot_limits=(nothing,nothing),wide=false,legend=true,paraperp=false,step=1,logt::Bool=false)
 
     CairoMakie.activate!(inline=true) # plot in vs code window
 
@@ -182,8 +183,13 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
             Ther = DiplodocusTransport.MaxwellJuttner_Distribution(PhaseSpace,species_name,Temperature;n=num)
             lab = "Maxwell-Juttner"
         else
-            Ther = DiplodocusTransport.BlackBody_Distribution(PhaseSpace,species_name,Temperature;n=num)
-            lab = "Black Body"
+            if wien
+                Ther = DiplodocusTransport.Wien_Distribution(PhaseSpace,species_name,Temperature;n=num)
+                lab = "Wien"
+            else
+                Ther = DiplodocusTransport.BlackBody_Distribution(PhaseSpace,species_name,Temperature;n=num)
+                lab = "Black Body"
+            end
         end
         #MJ = DiplodocusTransport.MaxwellJuttner_Distribution(PhaseSpace,species[species_idx],Temperature;n=num)
 
@@ -234,7 +240,7 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
 
 end
 
-function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseSpaceStruct,type::Animated;theme=DiplodocusDark(),order::Int64=1,TimeUnits::Function=CodeToCodeUnitsTime,thermal=false,plot_limits=(nothing,nothing),wide=false,legend=true,framerate=12,filename="MomentumDistribution.mp4",initial=true,paraperp=false,figure=nothing)
+function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseSpaceStruct,type::Animated;theme=DiplodocusDark(),order::Int64=1,TimeUnits::Function=CodeToCodeUnitsTime,thermal=false,wien=false,plot_limits=(nothing,nothing),wide=false,legend=true,framerate=12,filename="MomentumDistribution.mp4",initial=true,paraperp=false,figure=nothing)
 
     CairoMakie.activate!(inline=true) # plot in vs code window
     with_theme(theme) do
@@ -391,12 +397,25 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
         Pressure = DiplodocusTransport.ScalarPressure(Tᵃᵇ,Δab)
         Temperature = DiplodocusTransport.ScalarTemperature(Pressure,num)
 
-        MJ = DiplodocusTransport.MaxwellJuttner_Distribution(PhaseSpace,species[species_idx],Temperature;n=num)
+        if mass != 0.0
+            Ther = DiplodocusTransport.MaxwellJuttner_Distribution(PhaseSpace,species_name,Temperature;n=num)
+            lab = "Maxwell-Juttner"
+        else
+            if wien
+                Ther = DiplodocusTransport.Wien_Distribution(PhaseSpace,species_name,Temperature;n=num)
+                lab = "Wien"
+            else
+                Ther = DiplodocusTransport.BlackBody_Distribution(PhaseSpace,species_name,Temperature;n=num)
+                lab = "Black Body"
+            end
+        end
+
+        #MJ = DiplodocusTransport.MaxwellJuttner_Distribution(PhaseSpace,species[species_idx],Temperature;n=num)
         # scale by order
         # f = dN/dpdudh * dpdudh therefore dN/dp = f / dp and p^order * dN/dp = f * mp^order / dp
-        @. MJ *= (meanp^(order)) / dp
+        @. Ther *= (meanp^(order)) / dp
 
-        scatterlines!(ax,log10.(meanp),log10.(MJ),linewidth=2.0,color = theme.textcolor[],markersize=0.0,label="Maxwell-Juttner",linestyle=(:dash,:dense))
+        scatterlines!(ax,log10.(meanp),log10.(Ther),linewidth=2.0,color = theme.textcolor[],markersize=0.0,label=lab,linestyle=(:dash,:dense))
 
     end
 
