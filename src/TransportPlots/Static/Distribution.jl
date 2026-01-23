@@ -197,7 +197,7 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
         # f = dN/dpdudh * dpdudh therefore dN/dp = f / dp and p^order * dN/dp = f * mp^order / dp
         @. Ther *= (meanp^(order)) / dp
 
-        scatterlines!(ax,mp_plot,log10.(Ther),linewidth=1.0,color = theme.textcolor[],markersize=0.0,label=lab)
+        scatterlines!(ax,mp_plot,log10.(Ther),linewidth=1.0,color = theme.textcolor[],markersize=0.0,label=lab,linestyle = linestyles[species_idx])
 
     end
 
@@ -415,7 +415,7 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
         # f = dN/dpdudh * dpdudh therefore dN/dp = f / dp and p^order * dN/dp = f * mp^order / dp
         @. Ther *= (meanp^(order)) / dp
 
-        scatterlines!(ax,log10.(meanp),log10.(Ther),linewidth=2.0,color = theme.textcolor[],markersize=0.0,label=lab,linestyle=(:dash,:dense))
+        scatterlines!(ax,log10.(meanp),log10.(Ther),linewidth=2.0,color = theme.textcolor[],markersize=0.0,label=lab,linestyle = linestyles[species_idx])
 
     end
 
