@@ -1832,7 +1832,7 @@ function AM3_MomentumDistributionPlot(filePath,t_max,t_min,t_grid;plot_limits=(n
 
 end
 
-function AM3_DIP_Combo_MomentumDistributionPlot(filePath_AM3,sol_DIP,PhaseSpace_DIP,t_max,t_min,t_grid;plot_limits=(nothing,nothing),theme=DiplodocusDark(),ele_err=true,pos_err=true,yticks=1:2:15)
+function AM3_DIP_Combo_MomentumDistributionPlot(filePath_AM3,sol_DIP,PhaseSpace_DIP,t_max,t_min,t_grid;plot_limits=(nothing,nothing),theme=DiplodocusDark(),ele_err=true,pos_err=true,yticks=1:2:15,pos=true)
 
     name_list = PhaseSpace_DIP.name_list
     Momentum = PhaseSpace_DIP.Momentum
@@ -1848,9 +1848,11 @@ function AM3_DIP_Combo_MomentumDistributionPlot(filePath_AM3,sol_DIP,PhaseSpace_
         f_ele = f["f_ele"];
         t_ele = f["t_ele"];
 
-        meanp_pos = f["meanp_pos"];
-        f_pos = f["f_pos"];
-        t_pos = f["t_pos"];
+        if pos
+            meanp_pos = f["meanp_pos"];
+            f_pos = f["f_pos"];
+            t_pos = f["t_pos"];
+        end
 
         meanp_pho = f["meanp_pho"];
         f_pho = f["f_pho"];

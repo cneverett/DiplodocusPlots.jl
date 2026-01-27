@@ -157,7 +157,7 @@ end
 
 Returns a plot of the fractional change in energy density of all species between time setups as a function of time.
 """
-function FracEnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::String="All",fig=nothing,theme=DiplodocusDark(),title=nothing,only_all=false,TimeUnits::Function=CodeToCodeUnitsTime,logt::Bool=false,legend::Bool=true,perparticle=false,legend_pos::Symbol=:lc)
+function FracEnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::String="All",fig=nothing,theme=DiplodocusDark(),title=nothing,only_all=false,TimeUnits::Function=CodeToCodeUnitsTime,logt::Bool=false,legend::Bool=true,perparticle=false,legend_pos::Symbol=:lc,plot_limits=(nothing,nothing))
 
     CairoMakie.activate!(inline=true) # plot in vs code window
 
@@ -216,6 +216,8 @@ function FracEnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;sp
     if !isnothing(title)
         ax.title = title
     end
+
+    ax.limits = plot_limits
 
     #j = findfirst(x->x==species,name_list)
 
