@@ -773,10 +773,10 @@ function AzimuthalAngleDistributionPlot(sol,species::Vector{String},PhaseSpace::
     legend_elements = []
     line_labels = []
 
-    t_save = length(sol.t)
+    t_save = length(sol.t) # minus one for kernel step
     t_plot = ceil(Int64,t_save/step)
 
-    values = (1:t_save)*step .+ 2 # add 2 to skip initial and kernel steps
+    values = (1:(t_save-1))*step .+ 1 # add 1 to account for kernel step
 
     for (species_idx, species_name) in enumerate(species) 
 
