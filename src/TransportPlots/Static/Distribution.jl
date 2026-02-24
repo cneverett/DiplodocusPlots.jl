@@ -25,7 +25,7 @@ Animated arguments:
 - `figure`: default is `nothing`, which creates a new figure. If a figure is provided, the plot is added to that figure instead of creating a new one, this should be of the form of a tuple of `figure` and `time_idx` from the main plot.
 - `initial`: default is `false`, if `true` causes the initial distribution to remain on the plot
 """
-function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseSpaceStruct,type::Static;theme=DiplodocusDark(),order::Int64=1,TimeUnits::Function=CodeToCodeUnitsTime,thermal=false,plot_limits=(nothing,nothing),wide=false,legend=true,paraperp=false,step=1,logt::Bool=false)
+function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseSpaceStruct,type::Static;theme=DiplodocusDark(),order::Int64=1,TimeUnits::Function=CodeToCodeUnitsTime,thermal=false,plot_limits=(nothing,nothing),wide=false,legend=true,paraperp=false,step=1,logt::Bool=false,x_idx::Int64=1,y_idx::Int64=1,z_idx::Int64=1)
 
     CairoMakie.activate!(inline=true) # plot in vs code window
 
@@ -110,7 +110,7 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
                 color = theme.colormap[][(t - t_min) / (t_max - t_min)]
             end
 
-            f1D .= copy(Location_Species_To_StateVector(sol.f[i],PhaseSpace,species_index=species_index))
+            f1D .= copy(Location_Species_To_StateVector(sol.f[i],PhaseSpace,species_index=species_index,x_idx=x_idx,y_idx=y_idx,z_idx=z_idx))
 
             f3D .= reshape(f1D,(p_num,u_num,h_num))
 
@@ -977,7 +977,7 @@ Animated arguments:
 - `filename`: the name of the file to save the animation to, default is "MomentumAndPolarAngleDistribution.mp4".
 
 """
-function MomentumAndPolarAngleDistributionPlot(sol,species::String,PhaseSpace::PhaseSpaceStruct,type::Static,timevalues::T;theme=DiplodocusDark(),order::Int64=1,TimeUnits::Function=CodeToCodeUnitsTime) where T <: Union{Tuple{Float64,Float64,Float64},Tuple{Int64,Int64,Int64}}
+function MomentumAndPolarAngleDistributionPlot(sol,species::String,PhaseSpace::PhaseSpaceStruct,type::Static,timevalues::T;theme=DiplodocusDark(),order::Int64=1,TimeUnits::Function=CodeToCodeUnitsTime,x_idx::Int64=1,y_idx::Int64=1,z_idx::Int64=1) where T <: Union{Tuple{Float64,Float64,Float64},Tuple{Int64,Int64,Int64}}
 
     CairoMakie.activate!(inline=true) # plot in vs code window
 
@@ -1018,9 +1018,9 @@ function MomentumAndPolarAngleDistributionPlot(sol,species::String,PhaseSpace::P
 
     fig = Figure(size=(576,276)) # 8:3 aspect ratio
 
-    f1 = copy(Location_Species_To_StateVector(sol.f[t_idx[1]],PhaseSpace,species_index=species_index))
-    f2 = copy(Location_Species_To_StateVector(sol.f[t_idx[2]],PhaseSpace,species_index=species_index))
-    f3 = copy(Location_Species_To_StateVector(sol.f[t_idx[3]],PhaseSpace,species_index=species_index))
+    f1 = copy(Location_Species_To_StateVector(sol.f[t_idx[1]],PhaseSpace,species_index=species_index,x_idx=x_idx,y_idx=y_idx,z_idx=z_idx))
+    f2 = copy(Location_Species_To_StateVector(sol.f[t_idx[2]],PhaseSpace,species_index=species_index,x_idx=x_idx,y_idx=y_idx,z_idx=z_idx))
+    f3 = copy(Location_Species_To_StateVector(sol.f[t_idx[3]],PhaseSpace,species_index=species_index,x_idx=x_idx,y_idx=y_idx,z_idx=z_idx))
 
     #dis1 = dropdims(sum(reshape(sol.f[t_idx[1]].x[species_index],(p_num,u_num,h_num)),dims=3),dims=3)
     #dis2 = dropdims(sum(reshape(sol.f[t_idx[2]].x[species_index],(p_num,u_num,h_num)),dims=3),dims=3)
