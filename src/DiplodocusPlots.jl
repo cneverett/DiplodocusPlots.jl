@@ -2,17 +2,17 @@ module DiplodocusPlots
 
     export DiplodocusDark, DiplodocusLight
     export Static, Animated, Interactive
+    export InteractiveBinaryGainLossPlot, InteractiveEmissionGainLossPlot
+
     export MomentumDistributionPlot0D, MomentumAndPolarAngleDistributionPlot0D
     # export AngleDistributionPlot, MomentumComboAnimation, MomentumAndAzimuthalAngleDistributionPlot, AzimuthalAngleDistributionPlot
-    export TimeScalePlot
-    export InteractiveBinaryGainLossPlot
+    #export TimeScalePlot
     export NumberDensityPlot0D
     export EnergyDensityPlot0D
     export IsThermalAndIsotropicPlot0D
     #export IsThermalPlot, IsIsotropicPlot, 
-    export InteractiveEmissionGainLossPlot
     export CodeToSIUnitsTime, CodeToCodeUnitsTime, SIToCodeUnitsTime, SyncToCodeUnitsTime, CodeToSyncUnitsTime
-    export ObserverFluxPlot
+    # export ObserverFluxPlot
 
     using CairoMakie
     using GLMakie
