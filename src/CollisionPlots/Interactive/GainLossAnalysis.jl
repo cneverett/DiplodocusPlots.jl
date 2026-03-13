@@ -125,8 +125,8 @@ function InteractiveBinaryGainLossPlot(Output::Tuple)
     p1_loss = @lift($(cbAngAvg.checked) ? log10.(LossMatrix1Avg[$p1_idx,$p2_idx]) : log10.(LossMatrix1[$p1_idx,$u1_idx,$h1_idx,$p2_idx,$u2_idx,$h2_idx]))
     p2_loss = @lift($(cbAngAvg.checked) ? log10.(LossMatrix2Avg[$p2_idx,$p1_idx]) : log10.(LossMatrix2[$p2_idx,$u2_idx,$h2_idx,$p1_idx,$u1_idx,$h1_idx]))
     # Gain Matrix
-    p3_gain = @lift($(cbAngAvg.checked) ? log10.(GainMatrix3Avg[1:end,$p1_idx,$p2_idx]) : log10.(GainMatrix3[1:end,$u3_idx,$h3_idx,$p1_idx,$u1_idx,$h1_idx,$p2_idx,$u2_idx,$h2_idx]))
-    p4_gain = @lift($(cbAngAvg.checked) ? log10.(GainMatrix4Avg[1:end,$p1_idx,$p2_idx]) : log10.(GainMatrix4[1:end,$u4_idx,$h4_idx,$p1_idx,$u1_idx,$h1_idx,$p2_idx,$u2_idx,$h2_idx]))
+    p3_gain = @lift($(cbAngAvg.checked) ? log10.(GainMatrix3Avg[2:end-1,$p1_idx,$p2_idx]) : log10.(GainMatrix3[2:end-1,$u3_idx,$h3_idx,$p1_idx,$u1_idx,$h1_idx,$p2_idx,$u2_idx,$h2_idx]))
+    p4_gain = @lift($(cbAngAvg.checked) ? log10.(GainMatrix4Avg[2:end-1,$p1_idx,$p2_idx]) : log10.(GainMatrix4[2:end-1,$u4_idx,$h4_idx,$p1_idx,$u1_idx,$h1_idx,$p2_idx,$u2_idx,$h2_idx]))
 
     # limits
     y_max = @lift(max($p1_loss,$p2_loss,-40.0)+2.0)
@@ -136,7 +136,6 @@ function InteractiveBinaryGainLossPlot(Output::Tuple)
 
     ax1 = Axis(fig[1:2, 1:2],xlabel=L"$\log_{10}\left(p[m_\text{Ele}c]\right)$",ylabel= L"$\log_{10} \left(p\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}t} [\text{some units}]\right)$")
 
-     
     onany(x_min,x_max,y_min,y_max) do _x_min, _x_max, _y_min, _y_max
         ylims!(ax1,_y_min,_y_max)
         xlims!(ax1,_x_min,_x_max)
@@ -248,6 +247,8 @@ function InteractiveEmissionGainLossPlot(Output::Tuple)
     p2: [u2: [$(round(u2_r[$u2_idx],sigdigits=2)),$(round(u2_r[$u2_idx+1],sigdigits=2))], h2: [$(round(h2_r[$h2_idx],sigdigits=2)),$(round(h2_r[$h2_idx+1],sigdigits=2))]
     \n
     u3: [$(round(u3_r[$u3_idx],sigdigits=2)),$(round(u3_r[$u3_idx+1],sigdigits=2))], h3: [$(round(h3_r[$h3_idx],sigdigits=2)),$(round(h3_r[$h3_idx+1],sigdigits=2))]
+    \n 
+    Ext: [$(round(Ext[$Ext_idx],sigdigits=2))]
     ") 
 
     Label(subgl2[4,1:2], label)
@@ -256,7 +257,7 @@ function InteractiveEmissionGainLossPlot(Output::Tuple)
     GainMatrix3Avg = dropdims(sum(GainMatrix3,dims=(2,3,5,6)),dims=(2,3,5,6)) / (u1_num*h1_num*u3_num*h3_num)
 
     # Gain Matrix
-    p3_gain = @lift($(cbAngAvg.checked) ? log10.(GainMatrix3Avg[1:end,$p1_idx]) : log10.(GainMatrix3[1:end,$u3_idx,$h3_idx,$p1_idx,$u1_idx,$h1_idx]))
+    p3_gain = @lift($(cbAngAvg.checked) ? log10.(GainMatrix3Avg[1:end,$p1_idx,$Ext_idx]) : log10.(GainMatrix3[1:end,$u3_idx,$h3_idx,$p1_idx,$u1_idx,$h1_idx,$Ext_idx]))
 
     # limits
     #y_max = @lift(max(maximum($p3_gain),-40.0)+2.0)
@@ -282,7 +283,7 @@ function InteractiveEmissionGainLossPlot(Output::Tuple)
 
     if type == "Sync"
         # critical frequency
-        ω0 = @lift(abs((z1*1.6e-19*Ext[1]))/(10^$p1_val*9.11e-31))
+        ω0 = @lift(abs((z1*1.6e-19*Ext[$Ext_idx]))/(10^$p1_val*9.11e-31))
         pc = @lift(log10(1.054e-34*$ω0/(9.11e-31*3e8^2)*(10^$p1_val)^3))
         vlines!(ax1,pc,color=:black,linestyle=(:dot,:dense))
     end

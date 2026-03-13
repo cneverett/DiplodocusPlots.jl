@@ -1,9 +1,26 @@
 """
-    function IsThermalPlot(sol,PhaseSpace;species="All",fig=nothing,theme=DiplodocusDark())
+    function IsThermalPlot0D(type,PhaseSpace,sol,species;...)
 
 Returns a plot of the sum of squared residuals between the distribution function for each species and an expected thermal distribution based on the current distribution of that species as a function of time.  
+
+Arguments:
+- `type::PlotType` determines the type of plot to generate, it can be either `Static` or `Animated`.
+- `PhaseSpace::PhaseSpaceStruct` is the structure containing the phase space information of the simulation.
+- `sol::OutputStruct` is the solution object containing the distribution function of all particles and time stepping information of the simulation. 
+- `species::String` is the abbreviated three letter name of the particle species to plot. Can be set to `"All"` to plot all species.
+
+Common keyword arguments:
+- `theme=DiplodocusDark()`: the colour theme to use for the plot, can be either `DiplodocusDark()` for dark mode or `DiplodocusLight()` for light mode.
+- `TimeUnits::Tuple{Float64,String}=(1.0, "\\text{Code Units}")`: a tuple that converts the time given in code units to the desired units for plotting. The first entry is the conversion factor and the second is a string that will be converted into a LaTeX string for the time label.
+- `frac=false`: Whether to plot the fractional difference of number density between time-steps.
+- `logt=false`: If `true` time will be converted to `log10` format for plotting.
+- `title=nothing`: A string to place as the figure title, no title by default.
+- `fig=nothing` is the figure to plot on, if `nothing` a new figure will be created.
+- `x_idx::Int64=1`, the x index of the spatial grid cell that you want to plot the distribution for, default is 1.
+- `y_idx::Int64=1`, the y index of the spatial grid cell that you want to plot the distribution for, default is 1.
+- `z_idx::Int64=1`, the z index of the spatial grid cell that you want to plot the distribution for, default is 1.
 """
-function IsThermalPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::String="All",fig=nothing,theme=DiplodocusDark(),title=nothing,TimeUnits::Function=CodeToCodeUnitsTime)
+function IsThermalPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct,species::String;fig=nothing,theme=DiplodocusDark(),title=nothing,logt::Bool=false,TimeUnits::Tuple{Float64,String}=(1.0,"\\text{Code Units}"),x_idx=1,y_idx=1,z_idx=1)
 
     CairoMakie.activate!(inline=true) # plot in vs code window
 
@@ -13,8 +30,6 @@ function IsThermalPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::S
     Momentum = PhaseSpace.Momentum
     Grids = PhaseSpace.Grids
     Time = PhaseSpace.Time
-
-    t_grid = Time.t_grid
 
     p_num_list = Momentum.px_num_list
     u_num_list = Momentum.py_num_list
@@ -27,14 +42,15 @@ function IsThermalPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::S
 
     SumSquaredResiduals = zeros(Float64,length(sol.t))
 
-    t_unit_string = TimeUnits()
+    t_unit_string = TimeUnits[2]
+    t_unit_scale = TimeUnits[1]
 
-    if t_grid == "u"
-        xlab = L"$t$ $%$t_unit_string$"
+    if logt
+        xlab = L"\log_{10}($t\, [%$t_unit_string]$)"
+        ylab = L"\log_{10}(SSR)" 
+    else
+        xlab = L"$t\,[%$t_unit_string]$"
         ylab = L"SSR"
-    elseif t_grid == "l"
-        xlab = L"\log_{10}($t$ $%$t_unit_string$)"
-        ylab = L"\log_{10}(SSR)"
     end
 
     if isnothing(fig)
@@ -52,11 +68,8 @@ function IsThermalPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::S
 
         for i in eachindex(sol.t)
 
-            name = name_list[j]
-            mass = mass_list[j]
-
-            f = copy(Location_Species_To_StateVector(sol.f[i],PhaseSpace,species_index=j))
-            Nᵃ = DiplodocusTransport.FourFlow(f,p_num_list[j],u_num_list[j],h_num_list[j],pr_list[j],ur_list[j],hr_list[j],mass)
+            f = copy(Location_Species_To_StateVector(sol.f[i],PhaseSpace,species_index=j,x_idx=x_idx,y_idx=y_idx,z_idx=z_idx))
+            Nᵃ = DiplodocusTransport.FourFlow(f,p_num_list[j],u_num_list[j],h_num_list[j],pr_list[j],ur_list[j],hr_list[j],mass_list[j])
             Uₐ = [-1.0,0.0,0.0,0.0] # static observer
             num = DiplodocusTransport.ScalarNumberDensity(Nᵃ,Uₐ)
             Δab = DiplodocusTransport.ProjectionTensor(Uₐ)
@@ -79,12 +92,12 @@ function IsThermalPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::S
         
         end
 
-        if t_grid == "u"
-            scatterlines!(ax,TimeUnits.(sol.t),SumSquaredResiduals,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j])
-            xlims!(ax,TimeUnits(sol.t[1]),TimeUnits(sol.t[end]))
-        elseif t_grid == "l"
-            scatterlines!(ax,log10.(TimeUnits.(sol.t)),log10.(SumSquaredResiduals),marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j])
-            xlims!(ax,log10(TimeUnits(sol.t[1])),log10(TimeUnits(sol.t[end])))
+        if logt
+            scatterlines!(ax,log10.(sol.t .* t_unit_scale),log10.(SumSquaredResiduals),marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j])
+            xlims!(ax,log10(sol.t[1] * t_unit_scale),log10(sol.t[end] * t_unit_scale))
+        else
+            scatterlines!(ax,sol.t .* t_unit_scale,SumSquaredResiduals,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j])
+            xlims!(ax,sol.t[1] * t_unit_scale,sol.t[end] * t_unit_scale)
         end
 
     end
@@ -186,11 +199,28 @@ function IsIsotropicPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species:
 end
 
 """
-    function IsThermalAndIsotropicPlot(sol,PhaseSpace;species="All",fig=nothing,theme=DiplodocusDark())
+    function IsThermalAndIsotropicPlot0D(type,PhaseSpace,sol,species;...)
 
-Returns a plot of the sum of squared residuals between the distribution function for each species and an expected Maxwell-Juttner distribution and an isotropic distribution based on the current distribution of that species as a function of time.  
+Returns a plot of the sum of squared residuals between the distribution function for each species and an expected thermal distribution and an isotropic distribution based on the current distribution of that species as a function of time.  
+
+Arguments:
+- `type::PlotType` determines the type of plot to generate, it can be either `Static` or `Animated`.
+- `PhaseSpace::PhaseSpaceStruct` is the structure containing the phase space information of the simulation.
+- `sol::OutputStruct` is the solution object containing the distribution function of all particles and time stepping information of the simulation. 
+- `species::String` is the abbreviated three letter name of the particle species to plot. Can be set to `"All"` to plot all species.
+
+Common keyword arguments:
+- `theme=DiplodocusDark()`: the colour theme to use for the plot, can be either `DiplodocusDark()` for dark mode or `DiplodocusLight()` for light mode.
+- `TimeUnits::Tuple{Float64,String}=(1.0, "\\text{Code Units}")`: a tuple that converts the time given in code units to the desired units for plotting. The first entry is the conversion factor and the second is a string that will be converted into a LaTeX string for the time label.
+- `frac=false`: Whether to plot the fractional difference of number density between time-steps.
+- `logt=false`: If `true` time will be converted to `log10` format for plotting.
+- `title=nothing`: A string to place as the figure title, no title by default.
+- `fig=nothing` is the figure to plot on, if `nothing` a new figure will be created.
+- `x_idx::Int64=1`, the x index of the spatial grid cell that you want to plot the distribution for, default is 1.
+- `y_idx::Int64=1`, the y index of the spatial grid cell that you want to plot the distribution for, default is 1.
+- `z_idx::Int64=1`, the z index of the spatial grid cell that you want to plot the distribution for, default is 1.
 """
-function IsThermalAndIsotropicPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::String="All",fig=nothing,theme=DiplodocusDark(),title=nothing,TimeUnits::Function=CodeToCodeUnitsTime)
+function IsThermalAndIsotropicPlot0D(type::Static,PhaseSpace::PhaseSpaceStruct,sol::OutputStruct,species::String;fig=nothing,theme=DiplodocusDark(),title=nothing,logt::Bool=false,TimeUnits::Tuple{Float64,String}=(1.0,"\\text{Code Units}"),x_idx=1,y_idx=1,z_idx=1)
 
     CairoMakie.activate!(inline=true) # plot in vs code window
 
@@ -200,8 +230,6 @@ function IsThermalAndIsotropicPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruc
     Momentum = PhaseSpace.Momentum
     Grids = PhaseSpace.Grids
     Time = PhaseSpace.Time
-
-    t_grid = Time.t_grid
 
     p_num_list = Momentum.px_num_list
     u_num_list = Momentum.py_num_list
@@ -214,14 +242,15 @@ function IsThermalAndIsotropicPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruc
 
     SumSquaredResiduals = zeros(Float64,length(sol.t))
 
-    t_unit_string = TimeUnits()
+    t_unit_string = TimeUnits[2]
+    t_unit_scale = TimeUnits[1]
 
-    if t_grid == "u"
-        xlab = L"$t$ $%$t_unit_string$"
-        ylab = L"SSR"
-    elseif t_grid == "l"
-        xlab = L"\log_{10}($t$ $%$t_unit_string$)"
-        ylab = L"\log_{10}(SSR)"
+    if logt
+        xlab = L"\log_{10}($t\, [%$t_unit_string]$)"
+        ylab = L"\log_{10}(SSR)" 
+    else
+        xlab = L"$t\,[%$t_unit_string]$"
+        ylab = L"\log_{10}(SSR)" 
     end
 
     if isnothing(fig)
@@ -240,12 +269,12 @@ function IsThermalAndIsotropicPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruc
 
         for i in eachindex(sol.t)
 
-            f = copy(Location_Species_To_StateVector(sol.f[i],PhaseSpace,species_index=j))
-            Nᵃ = DiplodocusTransport.FourFlow(f,p_num_list[j],u_num_list[j],h_num_list[j],pr_list[j],ur_list[j],hr_list[j],mass_list[j])
+            f = copy(Location_Species_To_StateVector(sol.f[i],PhaseSpace,species_index=j,x_idx=x_idx,y_idx=y_idx,z_idx=z_idx))
+            Nᵃ = DiplodocusTransport.FourFlow(sol.f[i],PhaseSpace,j;x_idx=x_idx,y_idx=y_idx,z_idx=z_idx)
             Uₐ = [-1.0,0.0,0.0,0.0] # static observer
             num = DiplodocusTransport.ScalarNumberDensity(Nᵃ,Uₐ)
             Δab = DiplodocusTransport.ProjectionTensor(Uₐ)
-            Tᵃᵇ = DiplodocusTransport.StressEnergyTensor(f,p_num_list[j],u_num_list[j],h_num_list[j],pr_list[j],ur_list[j],hr_list[j],mass_list[j])
+            Tᵃᵇ = DiplodocusTransport.StressEnergyTensor(sol.f[i],PhaseSpace,j;x_idx=x_idx,y_idx=y_idx,z_idx=z_idx)
             Pressure = DiplodocusTransport.ScalarPressure(Tᵃᵇ,Δab)
             Temperature = DiplodocusTransport.ScalarTemperature(Pressure,num)
 
@@ -264,12 +293,12 @@ function IsThermalAndIsotropicPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruc
         
         end
 
-        if t_grid == "u"
-            scatterlines!(ax,TimeUnits.(sol.t),SumSquaredResiduals,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j]*" Thermal?")
-            xlims!(ax,TimeUnits(sol.t[1]),TimeUnits(sol.t[end]))
-        elseif t_grid == "l"
-            scatterlines!(ax,log10.(TimeUnits.(sol.t)),log10.(SumSquaredResiduals),marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j]*" Thermal?")
-            xlims!(ax,log10(TimeUnits(sol.t[1])),log10(TimeUnits(sol.t[end])))
+        if logt
+            scatterlines!(ax,log10.(sol.t .* t_unit_scale),log10.(SumSquaredResiduals),marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j]*" Thermal?")
+            xlims!(ax,log10(sol.t[1] * t_unit_scale),log10(sol.t[end] * t_unit_scale))
+        else
+            scatterlines!(ax,sol.t .* t_unit_scale,log10.(SumSquaredResiduals),marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list[j]*" Thermal?")
+            xlims!(ax,sol.t[1] * t_unit_scale,sol.t[end] * t_unit_scale)
         end
 
     end
@@ -279,7 +308,7 @@ function IsThermalAndIsotropicPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruc
 
         for i in eachindex(sol.t)
 
-            f = copy(Location_Species_To_StateVector(sol.f[i],PhaseSpace,species_index=j))
+            f = copy(Location_Species_To_StateVector(sol.f[i],PhaseSpace,species_index=j,x_idx=x_idx,y_idx=y_idx,z_idx=z_idx))
             f3D = reshape(f,(p_num_list[j],u_num_list[j],h_num_list[j]))
             # sum over angles and divide by number of bins
             f_avg = dropdims(sum(f3D,dims=(2,3)),dims=(2,3)) / (u_num_list[j]*h_num_list[j])
@@ -291,12 +320,12 @@ function IsThermalAndIsotropicPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruc
         
         end
 
-        if t_grid == "u"
-            scatterlines!(ax,TimeUnits.(sol.t),SumSquaredResiduals,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,linestyle=:dash,label=name_list[j]*" Isotropic?")
-            xlims!(ax,TimeUnits(sol.t[1]),TimeUnits(sol.t[end]))
-        elseif t_grid == "l"
-            scatterlines!(ax,log10.(TimeUnits.(sol.t)),log10.(SumSquaredResiduals),marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,linestyle=:dash,label=name_list[j]*" Isotropic?")
-            xlims!(ax,log10(TimeUnits(sol.t[1])),log10(TimeUnits(sol.t[end])))
+        if logt
+            scatterlines!(ax,log10.(sol.t .* t_unit_scale),log10.(SumSquaredResiduals),marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,linestyle=:dash,label=name_list[j]*" Isotropic?")
+            xlims!(ax,log10(sol.t[1] * t_unit_scale),log10(sol.t[end] * t_unit_scale))
+        else
+            scatterlines!(ax,sol.t .* t_unit_scale,log10.(SumSquaredResiduals),marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,linestyle=:dash,label=name_list[j]*" Isotropic?")
+            xlims!(ax,sol.t[1] * t_unit_scale,sol.t[end] * t_unit_scale)
         end
 
     end

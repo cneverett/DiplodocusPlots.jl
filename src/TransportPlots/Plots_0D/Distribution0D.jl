@@ -1,32 +1,39 @@
 """
-    MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseSpaceStruct,type::PlotType;step=1,order=1,legend=true,thermal=false,paraperp=false,plot_limits=(nothing,nothing),TimeUnits=CodeToCodeUnitsTime,theme=DiplodocusDark())
+    MomentumDistributionPlot0D(type,PhaseSpace,sol,species;...)
 
-Plots the angle averaged distribution function of of a given vector of particle `species` as a function of time given by the `sol` based on the conditions held in `PhaseSpace`. 
-    
-The plot can be either static, animated or interactive depending on the `type` argument. `Static` and `Animated` plots are generated using CairoMakie and are best for publications and presentations, while `Interactive` plots are generated using GLMakie and allow for user interaction with the plot.
+Plots the angle averaged distribution function of a given set of particle `species` as a function momentum ``p`` and time at a single location in space. 
 
-Common arguments:
-- `theme`: the colour theme to use for the plot, default is `DiplodocusDark()`.
-- `order`: the order of p in p^order * dN/dp dV, default is 1, i.e. number density spectrum. 2 is "energy" density spectrum.
-- `TimeUnits`: a function that converts the time given in code units to the desired units for plotting
-- `plot_limits`: the limits of the x and y axes, default is `(nothing,nothing)` which sets the limits automatically based on the data.
-- `wide`: if `true`, the plot is generated in a wide format (double column 8:3 aspect ratio), default is `false` (single column 4:3 aspect ratio).
-- `legend`: if `true`, a legend is added to the plot, default is `true`.
-- `thermal`: default is `false`. If `true` the expected thermal distribution for each species is plotted based on the final time step of the simulation.
-- `wien`: default is `false`. If `false` and `thermal` is also `true`, the expected black body distribution is plotted for massless species based on the final time step of the simulation, else the Wien distribution is plotted.
-- `paraperp`: default is `false`. If `true` the first and center `u` bins will be plotted to represent the distribution parallel to the axis and perpendicular.
-- `logt`: default is `false`. If a uniform time grid is used for the solution, this can be toggled to `true` to display the solution in log10 time steps rather than uniform time steps.
+Arguments:
+- `type::PlotType` determines the type of plot to generate, it can be either `Static` or `Animated`.
+- `PhaseSpace::PhaseSpaceStruct` is the structure containing the phase space information of the simulation.
+- `sol::OutputStruct` is the solution object containing the distribution function of all particles and time stepping information of the simulation. 
+- `species::Vector{String}` is a vector of the abbreviated three letter names of the particle species to plot.
 
-Static arguments:
-- `step`: the step size in time to plot, default is 1.
+Static keyword arguments:
+- `step::Int64=1`: the step size in time to plot, i.e. how many steps to skip between each plotted line.
 
-Animated arguments:
-- `framerate`: the frame rate of the animation, default is 12 fps.
-- `filename`: the name of the file to save the animation to, default is "MomentumDistribution.mp4".
-- `figure`: default is `nothing`, which creates a new figure. If a figure is provided, the plot is added to that figure instead of creating a new one, this should be of the form of a tuple of `figure` and `time_idx` from the main plot.
-- `initial`: default is `false`, if `true` causes the initial distribution to remain on the plot
+Animated keyword arguments:
+- `framerate::Int64=12`: the frame rate of the animation, in frames per second.
+- `filename::String="MomentumDistribution.mp4"`: the name of the file to save the animation to.
+- `figure=nothing`: default is `nothing`, which creates a new figure. If a figure is provided, the plot is added to that figure instead of creating a new one, this should be of the form of a tuple of `figure` and `time_idx` from the main plot.
+- `initial::Bool=false`: if `true` causes the initial distribution to remain on the plot
+
+Common keyword arguments:
+- `theme=DiplodocusDark()`: the colour theme to use for the plot, can be either `DiplodocusDark()` for dark mode or `DiplodocusLight()` for light mode.
+- `order::Int64=1`: the order of p in p^order * dN/dp dV. order=1 gives the number density spectrum. 2 is "energy" density spectrum.
+- `TimeUnits::Tuple{Float64,String}=(1.0, "\\text{Code Units}")`: a tuple that converts the time given in code units to the desired units for plotting. The first entry is the conversion factor and the second is a string that will be converted into a LaTeX string for the time label.
+- `plot_limits=(nothing,nothing)`: the limits of the x and y axes, default sets the limits automatically based on the data.
+- `wide=false`: if `true`, the plot is generated in a wide format (double column 8:3 aspect ratio), if `false` (single column 4:3 aspect ratio).
+- `legend=true`: whether or not to include the plot legend.
+- `thermal=false`: If `true` the expected thermal distribution for each species is plotted based on the final time step of the simulation.
+- `wien=false`: If `true` the expected thermal distribution for massless particles is plotted as a Wien distribution, if `false` it is plotted as a Black Body distribution.
+- `paraperp=false`: If `true` the first and center `u` bins will be plotted to represent the distribution parallel to the axis and perpendicular (Not tested for all `u` grid types).
+- `logt=false`: If `true` time will be converted to `log10` format for plotting.
+- `x_idx::Int64=1`, the x index of the spatial grid cell that you want to plot the distribution for, default is 1.
+- `y_idx::Int64=1`, the y index of the spatial grid cell that you want to plot the distribution for, default is 1.
+- `z_idx::Int64=1`, the z index of the spatial grid cell that you want to plot the distribution for, default is 1.
 """
-function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseSpaceStruct,type::Static;theme=DiplodocusDark(),order::Int64=1,TimeUnits::Function=CodeToCodeUnitsTime,thermal=false,wien=false,plot_limits=(nothing,nothing),wide=false,legend=true,paraperp=false,step=1,logt::Bool=false)
+function MomentumDistributionPlot0D(type::Static,PhaseSpace::PhaseSpaceStruct,sol::OutputStruct,species::Vector{String};theme=DiplodocusDark(),order::Int64=1,TimeUnits::Tuple{Float64,String}=(1.0, "\\text{Code Units}"),thermal=false,wien=false,plot_limits=(nothing,nothing),wide=false,legend=true,paraperp=false,step::Int64=1,logt::Bool=false,x_idx::Int64=1,y_idx::Int64=1,z_idx::Int64=1)
 
     CairoMakie.activate!(inline=true) # plot in vs code window
 
@@ -68,7 +75,7 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
     t_save = length(sol.t)
     t_plot = ceil(Int64,t_save/step)
 
-    values = (1:t_save)*step .+ 2 # add 2 to skip initial and kernel steps
+    values = (1:t_save)*step .+ 1 # add 1 to skip initial step
 
     for (species_idx, species_name) in enumerate(species) 
 
@@ -98,22 +105,22 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
     p_min = min(p_min,p_r[1])
     p_max = max(p_max,p_r[end])
 
-    t_min = logt ? sol.t[2]/10 : sol.t[1]
+    t_min = sol.t[1]
     t_max = sol.t[end]
 
     for i in 1:t_save
 
-        if (i in values || i == 1 || i == 2) # plot first step for initial conds, second for kernel 
+        if (i in values || i == 1) # plot first step for initial conds
 
             t = sol.t[i]
             #println("t=$(CodeToSIUnitsTime(t))")
-            if Time.t_grid == "l" || logt
+            if logt
                 color = theme.colormap[][(log10(t) - log10(t_min)) / (log10(t_max) - log10(t_min))]
-            elseif Time.t_grid == "u"
+            else
                 color = theme.colormap[][(t - t_min) / (t_max - t_min)]
             end
 
-            f1D .= copy(Location_Species_To_StateVector(sol.f[i],PhaseSpace,species_index=species_index))
+            f1D .= copy(Location_Species_To_StateVector(sol.f[i],PhaseSpace,species_index=species_index,x_idx=x_idx,y_idx=y_idx,z_idx=z_idx))
 
             f3D .= reshape(f1D,(p_num,u_num,h_num))
 
@@ -170,12 +177,11 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
     if thermal
 
         # expected thermal spectrum based on final time step
-        f = copy(Location_Species_To_StateVector(sol.f[end],PhaseSpace,species_index=species_index))
-        Nᵃ = DiplodocusTransport.FourFlow(f,p_num,u_num,h_num,p_r,u_r,h_r,mass)
+        Nᵃ = DiplodocusTransport.FourFlow(sol.f[end],PhaseSpace,species_index;x_idx=x_idx,y_idx=y_idx,z_idx=z_idx)
         Uₐ = [-1.0,0.0,0.0,0.0] # static observer
         num = DiplodocusTransport.ScalarNumberDensity(Nᵃ,Uₐ)
         Δab = DiplodocusTransport.ProjectionTensor(Uₐ)
-        Tᵃᵇ = DiplodocusTransport.StressEnergyTensor(f,p_num,u_num,h_num,p_r,u_r,h_r,mass)
+        Tᵃᵇ = DiplodocusTransport.StressEnergyTensor(sol.f[end],PhaseSpace,species_index;x_idx=x_idx,y_idx=y_idx,z_idx=z_idx)
         Pressure = DiplodocusTransport.ScalarPressure(Tᵃᵇ,Δab)
         Temperature = DiplodocusTransport.ScalarTemperature(Pressure,num)
 
@@ -215,12 +221,13 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
         push!(line_labels,L"\perp")
     end
 
-    t_unit_string = TimeUnits()
+    t_unit_string = TimeUnits[2]
+    t_unit_scale = TimeUnits[1]
 
-    if Time.t_grid == "u"
-        Colorbar(fig[1,2],colormap = theme.colormap,limits=(TimeUnits(sol.t[1]),TimeUnits(sol.t[end])),label=L"$t\,$ $%$t_unit_string$")
-    elseif Time.t_grid == "l"
-        Colorbar(fig[1,2],colormap = theme.colormap,limits=(log10(round(TimeUnits(sol.t[1]),sigdigits=5)),log10(round(TimeUnits(sol.t[end]),sigdigits=5))),label=L"$\log_{10}\left(t\,%$t_unit_string \right)$")
+    if logt
+        Colorbar(fig[1,2],colormap = theme.colormap,limits=(log10(round(t_units_scale*sol.t[1],sigdigits=5)),log10(round(t_units_scale*sol.t[end],sigdigits=5))),label=L"$\log_{10}\left(t\,[%$t_unit_string] \right)$")
+    else
+        Colorbar(fig[1,2],colormap = theme.colormap,limits=(sol.t[1] * t_unit_scale,sol.t[end] * t_unit_scale),label=L"$t\, [%$t_unit_string]$")
     end
 
     if legend
@@ -231,8 +238,6 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
         xlims!(ax,(log10(p_min)-1.0,log10(p_max)+1.0))
         ylims!(ax,(log10(max_total)-9.0,log10(max_total)+1.0)) 
     end
-    #println("$((log10(p_min)-1.0,log10(p_max)+1.0))")
-    #println("$((log10(max_total)-9.0,log10(max_total)+1.0))")
 
     return fig
 
@@ -240,7 +245,7 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
 
 end
 
-function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseSpaceStruct,type::Animated;theme=DiplodocusDark(),order::Int64=1,TimeUnits::Function=CodeToCodeUnitsTime,thermal=false,wien=false,plot_limits=(nothing,nothing),wide=false,legend=true,framerate=12,filename="MomentumDistribution.mp4",initial=true,paraperp=false,figure=nothing)
+function MomentumDistributionPlot0D(type::Animated,PhaseSpace::PhaseSpaceStruct,sol::OutputStruct,species::Vector{String};theme=DiplodocusDark(),order::Int64=1,TimeUnits::Tuple{Float64,String}=(1.0,"\\text{ units}"),thermal=false,wien=false,plot_limits=(nothing,nothing),wide=false,legend=true,framerate::Int64=12,filename="MomentumDistribution.mp4",initial=true,paraperp=false,figure=nothing,x_idx::Int64=1,y_idx::Int64=1,z_idx::Int64=1)
 
     CairoMakie.activate!(inline=true) # plot in vs code window
     with_theme(theme) do
@@ -307,7 +312,7 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
     if paraperp == false 
         pdNdp = @lift begin
         f1D = zeros(Float32,p_num*u_num*h_num)
-        f1D .= copy(Location_Species_To_StateVector(sol.f[$time_idx],PhaseSpace,species_index=species_index))
+        f1D .= copy(Location_Species_To_StateVector(sol.f[$time_idx],PhaseSpace,species_index=species_index,x_idx=x_idx,y_idx=y_idx,z_idx=z_idx))
         f3D = zeros(Float32,p_num,u_num,h_num)
         f3D .= reshape(f1D,(p_num,u_num,h_num))
         @. f3D = f3D*(f3D!=Inf)
@@ -326,7 +331,7 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
 
         pdNdp_para = @lift begin
         f1D = zeros(Float32,p_num*u_num*h_num)
-        f1D .= copy(Location_Species_To_StateVector(sol.f[$time_idx],PhaseSpace,species_index=species_index))
+        f1D .= copy(Location_Species_To_StateVector(sol.f[$time_idx],PhaseSpace,species_index=species_index,x_idx=x_idx,y_idx=y_idx,z_idx=z_idx))
         f3D = zeros(Float32,p_num,u_num,h_num)
         f3D .= reshape(f1D,(p_num,u_num,h_num))
         @. f3D = f3D*(f3D!=Inf)
@@ -341,7 +346,7 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
 
         pdNdp_perp = @lift begin
         f1D = zeros(Float32,p_num*u_num*h_num)
-        f1D .= copy(Location_Species_To_StateVector(sol.f[$time_idx],PhaseSpace,species_index=species_index))
+        f1D .= copy(Location_Species_To_StateVector(sol.f[$time_idx],PhaseSpace,species_index=species_index,x_idx=x_idx,y_idx=y_idx,z_idx=z_idx))
         f3D = zeros(Float32,p_num,u_num,h_num)
         f3D .= reshape(f1D,(p_num,u_num,h_num))
         @. f3D = f3D*(f3D!=Inf)
@@ -363,7 +368,7 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
 
         pdNdp_initial = begin
             f1D_initial = zeros(Float32,p_num*u_num*h_num)
-            f1D_initial .= copy(Location_Species_To_StateVector(sol.f[1],PhaseSpace,species_index=species_index))
+            f1D_initial .= copy(Location_Species_To_StateVector(sol.f[1],PhaseSpace,species_index=species_index,x_idx=x_idx,y_idx=y_idx,z_idx=z_idx))
             f3D_initial = zeros(Float32,p_num,u_num,h_num)
             f3D_initial .= reshape(f1D_initial,(p_num,u_num,h_num))
             @. f3D_initial = f3D_initial*(f3D_initial!=Inf)
@@ -388,12 +393,11 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
     if thermal
 
         # expected thermal spectrum based on final time step
-        f = copy(Location_Species_To_StateVector(sol.f[end],PhaseSpace,species_index=species_index))
-        Nᵃ = DiplodocusTransport.FourFlow(f,p_num,u_num,h_num,p_r,u_r,h_r,mass)
+        Nᵃ = DiplodocusTransport.FourFlow(sol.f[end],PhaseSpace,species_index;x_idx=x_idx,y_idx=y_idx,z_idx=z_idx)
         Uₐ = [-1.0,0.0,0.0,0.0] # static observer
         num = DiplodocusTransport.ScalarNumberDensity(Nᵃ,Uₐ)
         Δab = DiplodocusTransport.ProjectionTensor(Uₐ)
-        Tᵃᵇ = DiplodocusTransport.StressEnergyTensor(f,p_num,u_num,h_num,p_r,u_r,h_r,mass)
+        Tᵃᵇ = DiplodocusTransport.StressEnergyTensor(sol.f[end],PhaseSpace,species_index;x_idx=x_idx,y_idx=y_idx,z_idx=z_idx)
         Pressure = DiplodocusTransport.ScalarPressure(Tᵃᵇ,Δab)
         Temperature = DiplodocusTransport.ScalarTemperature(Pressure,num)
 
@@ -437,7 +441,7 @@ function MomentumDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseS
         # recording the animation
         time_idxs = 1:length(sol.t)
         record(fig,filename,time_idxs,framerate=framerate,backend=CairoMakie) do frame
-            println("$frame")
+            print("generating frame: $frame \r")
             time_idx[] = frame
         end
     end
@@ -702,7 +706,7 @@ function AngleDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseSpac
         # recording the animation
         time_idxs = 1:length(sol.t)
         record(fig,filename,time_idxs,framerate=framerate,backend=CairoMakie) do frame
-            println("$frame")
+            print("generating frame: $frame \r")
             time_idx[] = frame
         end
     end
@@ -980,7 +984,7 @@ function AzimuthalAngleDistributionPlot(sol,species::Vector{String},PhaseSpace::
         # recording the animation
         time_idxs = 1:length(sol.t)
         record(fig,filename,time_idxs,framerate=framerate,backend=CairoMakie) do frame
-            println("$frame")
+            print("generating frame: $frame \r")
             time_idx[] = frame
         end
     end
@@ -990,15 +994,15 @@ function AzimuthalAngleDistributionPlot(sol,species::Vector{String},PhaseSpace::
 end
 
 """
-    MomentumAndPolarAngleDistributionPlot(sol,species::String,PhaseSpace::PhaseSpaceStruct,type::PlotType)
+    MomentumAndPolarAngleDistributionPlot0D(type,PhaseSpace,sol,species,...;...)
 
-Plots the distribution function of of a given particle `species` as a function of momentum ``p`` and polar angle ``u`` as a function of time given by the `sol` based on the conditions held in `PhaseSpace`. 
+Plots azimuthal averaged distribution function of a given particle `species` as a function of momentum ``p`` and polar angle ``u`` as a function of time at a single location in space. 
 
-The plot can be either static, animated or interactive depending on the `type` argument. `Static` and `Animated` plots are generated using CairoMakie and are best for publications and presentations, while `Interactive` plots are generated using GLMakie and allow for user interaction with the plot.
-
-Common arguments:
-- `theme`: the colour theme to use for the plot, default is `DiplodocusDark()`.
-- `order`: the order of p in p^order * dN/dp dV, default is 1, i.e. number density spectrum. 2 is "energy" density spectrum.
+Arguments:
+- `type::PlotType` determines the type of plot to generate, it can be either `Static` or `Animated`.
+- `PhaseSpace::PhaseSpaceStruct` is the structure containing the phase space information of the simulation.
+- `sol::OutputStruct` is the solution object containing the distribution function of all particles and time stepping information of the simulation. 
+- `species::Vector{String}` an abbreviated three letter name of the particle species to plot. Animated plot can plot multiple species at once, while Static plot can only plot a single species.
 
 Static arguments:
 - `timevalues`: a NOT OPTIONAL `tuple` of 3 either `Int64` or `Float64` time values to be plotted. `Int64` values are taken to be the time index in `sol.t`, whereas `Float64` values are taken to be actural time valus in code units that are then converted to the closest index in `sol.t`.
@@ -1007,8 +1011,16 @@ Animated arguments:
 - `framerate`: the frame rate of the animation, default is 12 fps.
 - `filename`: the name of the file to save the animation to, default is "MomentumAndPolarAngleDistribution.mp4".
 
+Common arguments:
+- `theme`: the colour theme to use for the plot, default is `DiplodocusDark()`.
+- `order`: the order of p in p^order * dN/dp dV, default is 1, i.e. number density spectrum. 2 is "energy" density spectrum.
+- `TimeUnits::Tuple{Float64,String}=(1.0, "\\text{Code Units}")`: a tuple that converts the time given in code units to the desired units for plotting. The first entry is the conversion factor and the second is a string that will be converted into a LaTeX string for the time label.
+- `x_idx::Int64=1`, the x index of the spatial grid cell that you want to plot the distribution for, default is 1.
+- `y_idx::Int64=1`, the y index of the spatial grid cell that you want to plot the distribution for, default is 1.
+- `z_idx::Int64=1`, the z index of the spatial grid cell that you want to plot the distribution for, default is 1.
+
 """
-function MomentumAndPolarAngleDistributionPlot(sol,species::String,PhaseSpace::PhaseSpaceStruct,type::Static,timevalues::T;theme=DiplodocusDark(),order::Int64=1,TimeUnits::Function=CodeToCodeUnitsTime) where T <: Union{Tuple{Float64,Float64,Float64},Tuple{Int64,Int64,Int64}}
+function MomentumAndPolarAngleDistributionPlot0D(type::Static,PhaseSpace::PhaseSpaceStruct,sol::OutputStruct,species::Vector{String},timevalues::T;theme=DiplodocusDark(),order::Int64=1,TimeUnits::Tuple{Float64,String}=(1.0,"\\text{Code Units}"),x_idx::Int64=1,y_idx::Int64=1,z_idx::Int64=1) where T <: Union{Tuple{Float64,Float64,Float64},Tuple{Int64,Int64,Int64}}
 
     CairoMakie.activate!(inline=true) # plot in vs code window
 
@@ -1018,6 +1030,12 @@ function MomentumAndPolarAngleDistributionPlot(sol,species::String,PhaseSpace::P
     Momentum = PhaseSpace.Momentum
     Grids = PhaseSpace.Grids
     Time = PhaseSpace.Time
+
+    if length(species) != 1
+        error("For Static plot, only a single species is allowed")
+    end
+
+    species = species[1]
 
     species_index = findfirst(x->x==species,name_list)
 
@@ -1043,15 +1061,15 @@ function MomentumAndPolarAngleDistributionPlot(sol,species::String,PhaseSpace::P
     elseif typeof(timevalues) == Tuple{Float64,Float64,Float64}
         for i in 1:3
         t[i] = timevalues[i]
-        t_idx[i] = findmin(abs.(sol.t .- t[i]))[2] #findfirst(x->x==t[i],sol.t)
+        t_idx[i] = findmin(abs.(sol.t .- t[i]))[2] 
         end
     end
 
     fig = Figure(size=(576,276)) # 8:3 aspect ratio
 
-    f1 = copy(Location_Species_To_StateVector(sol.f[t_idx[1]],PhaseSpace,species_index=species_index))
-    f2 = copy(Location_Species_To_StateVector(sol.f[t_idx[2]],PhaseSpace,species_index=species_index))
-    f3 = copy(Location_Species_To_StateVector(sol.f[t_idx[3]],PhaseSpace,species_index=species_index))
+    f1 = copy(Location_Species_To_StateVector(sol.f[t_idx[1]],PhaseSpace,species_index=species_index,x_idx=x_idx,y_idx=y_idx,z_idx=z_idx))
+    f2 = copy(Location_Species_To_StateVector(sol.f[t_idx[2]],PhaseSpace,species_index=species_index,x_idx=x_idx,y_idx=y_idx,z_idx=z_idx))
+    f3 = copy(Location_Species_To_StateVector(sol.f[t_idx[3]],PhaseSpace,species_index=species_index,x_idx=x_idx,y_idx=y_idx,z_idx=z_idx))
 
     #dis1 = dropdims(sum(reshape(sol.f[t_idx[1]].x[species_index],(p_num,u_num,h_num)),dims=3),dims=3)
     #dis2 = dropdims(sum(reshape(sol.f[t_idx[2]].x[species_index],(p_num,u_num,h_num)),dims=3),dims=3)
@@ -1124,25 +1142,25 @@ function MomentumAndPolarAngleDistributionPlot(sol,species::String,PhaseSpace::P
         Colorbar(fig[1,1],hm1,label=L"$\log_{10}\left(p^{%$(order)}\,\frac{\mathrm{d}N}{\mathrm{d}p\mathrm{d}u\mathrm{d}V}\,[\text{m}^{-3}\left(m_ec\right)^{%$(order-1)}]\right)$",flipaxis=false,height=Relative(0.75),tellheight=false)
     end
 
-    t_unit_string = TimeUnits()
+    t_unit_string = TimeUnits[2]
+    t_unit_scale = TimeUnits[1]
+
     pt = 4/3
-
-    ax1_label=Axis(fig[2,2])
-    ax2_label=Axis(fig[2,3])
-    ax3_label=Axis(fig[2,4])
-    text!(ax1_label,L"$t=%$(round(TimeUnits(t[1]),sigdigits=3))$ $%$t_unit_string$",space=:relative,position=(0.5,0.5),fontsize=10pt,align=(:center,:center))
-    text!(ax2_label,L"$t=%$(round(TimeUnits(t[2]),sigdigits=3))$ $%$t_unit_string$",space=:relative,position=(0.5,0.5),fontsize=10pt,align=(:center,:center))
-    text!(ax3_label,L"$t=%$(round(TimeUnits(t[3]),sigdigits=3))$ $%$t_unit_string$",space=:relative,position=(0.5,0.5),fontsize=10pt,align=(:center,:center))
-
     
     text!(ax1,L"$\log_{10}\left(p\,[m_ec]\right)$",position=(-3.05,log10(p_r[end])),rotation=pi/2,fontsize=9pt)
     
+    ax1_label=Axis(fig[2,2])
+    ax2_label=Axis(fig[2,3])
+    ax3_label=Axis(fig[2,4])
     hidedecorations!(ax1_label)
     hidedecorations!(ax2_label)
     hidedecorations!(ax3_label)
     hidespines!(ax1_label)
     hidespines!(ax2_label)
-    hidespines!(ax3_label)    
+    hidespines!(ax3_label)
+    text!(ax1_label,L"$t=%$(round(t_unit_scale * t[1],sigdigits=3))\, [%$t_unit_string]$",space=:relative,position=(0.5,0.5),fontsize=10pt,align=(:center,:center))
+    text!(ax2_label,L"$t=%$(round(t_unit_scale * t[2],sigdigits=3))\, [%$t_unit_string]$",space=:relative,position=(0.5,0.5),fontsize=10pt,align=(:center,:center))
+    text!(ax3_label,L"$t=%$(round(t_unit_scale * t[3],sigdigits=3))\, [%$t_unit_string]$",space=:relative,position=(0.5,0.5),fontsize=10pt,align=(:center,:center))
 
     colsize!(fig.layout,1,Relative(0.05))
     colsize!(fig.layout,2,Relative(0.3))
@@ -1157,7 +1175,7 @@ function MomentumAndPolarAngleDistributionPlot(sol,species::String,PhaseSpace::P
 
 end
 
-function MomentumAndPolarAngleDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseSpaceStruct,type::Animated;theme=DiplodocusDark(),order::Int64=1,framerate=12,filename="MomentumAndPolarAngleDistribution.mp4",figure=nothing,TimeUnits::Function=CodeToCodeUnitsTime)
+function MomentumAndPolarAngleDistributionPlot0D(type::Animated,PhaseSpace::PhaseSpaceStruct,sol::OutputStruct,species::Vector{String};theme=DiplodocusDark(),order::Int64=1,framerate=12,filename="MomentumAndPolarAngleDistribution.mp4",figure=nothing,TimeUnits::Tuple{Float64,String}=(1.0,"\\text{Code Units}"),x_idx::Int64=1,y_idx::Int64=1,z_idx::Int64=1)
 
     CairoMakie.activate!(inline=true) # plot in vs code window
 
@@ -1195,7 +1213,7 @@ function MomentumAndPolarAngleDistributionPlot(sol,species::Vector{String},Phase
 
 
     dis = @lift begin
-        f1D = copy(Location_Species_To_StateVector(sol.f[$time_idx],PhaseSpace,species_index=species_index))
+        f1D = copy(Location_Species_To_StateVector(sol.f[$time_idx],PhaseSpace,species_index=species_index,x_idx=x_idx,y_idx,y_idx,z_idx=z_idx))
         f2D = dropdims(sum(reshape(f1D,(p_num,u_num,h_num)),dims=3),dims=3)
         # scale by order
         # f = dN/dpdudh * dpdudh therefore dN/dpdu = f / dpdu and p^order * dN/dpdu = f * mp^order / dpdu
@@ -1267,7 +1285,7 @@ function MomentumAndPolarAngleDistributionPlot(sol,species::Vector{String},Phase
         # recording the animation
         time_idxs = 1:length(sol.t)
         record(fig,filename,time_idxs,framerate=framerate,backend=CairoMakie) do frame
-            println("$frame")
+            print("generating frame: $frame \r")
             time_idx[] = frame
         end
     end
@@ -1659,7 +1677,7 @@ function MomentumAndAzimuthalAngleDistributionPlot(sol,species::Vector{String},P
         # recording the animation
         time_idxs = 1:length(sol.t)
         record(fig,filename,time_idxs,framerate=framerate,backend=CairoMakie) do frame
-            println("$frame")
+            print("generating frame: $frame \r")
             time_idx[] = frame
         end
     end
@@ -1717,7 +1735,7 @@ function MomentumComboAnimation(sol,species::Vector{String},PhaseSpace::PhaseSpa
         time_idxs = 1:length(sol.t)
 
         record(fig,filename,time_idxs,framerate=framerate,backend=CairoMakie,compression=1) do frame
-            println("$frame")
+            print("generating frame: $frame \r")
             time_idx[] = frame
         end
         
@@ -1778,7 +1796,7 @@ function AM3_MomentumDistributionPlot(filePath,t_max,t_min,t_grid;plot_limits=(n
     for i in 1:length(t_pho)
 
         t = t_pho[i]
-        println("t=$t")
+        print("t=$t \r")
         if log10(t) % 1 == 0.0 && t <= t_max # 10^n timesteps
             if t_grid == "u"
                 color = theme.colormap[][(t - t_min) / (t_max - t_min)]
@@ -2309,7 +2327,7 @@ function TwoSolAngleDistributionPlot(twosol::Tuple{OutputStruct,OutputStruct},sp
         # recording the animation
         time_idxs = 1:length(twosol[1].t)
         record(fig,filename,time_idxs,framerate=framerate,backend=CairoMakie) do frame
-            println("$frame")
+            print("generating frame: $frame \r")
             time_idx[] = frame
         end
     end
