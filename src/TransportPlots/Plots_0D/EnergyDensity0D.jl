@@ -1,9 +1,26 @@
 """
-    EnergyDensityPlot(sol,PhaseSpace;species="All",fig=nothing,theme=DiplodocusDark(),title=nothing)
+    EnergyDensityPlot(type,PhaseSpace,sol,species;...)
 
-Returns a plot of the energy density of all species as a function of time.
+Returns a plot of the energy density of a `species`` as a function of time.
+
+Arguments:
+- `type::PlotType` determines the type of plot to generate, it can be either `Static` or `Animated`.
+- `PhaseSpace::PhaseSpaceStruct` is the structure containing the phase space information of the simulation.
+- `sol::OutputStruct` is the solution object containing the distribution function of all particles and time stepping information of the simulation. 
+- `species::String` is the abbreviated three letter name of the particle species to plot. Can be set to `"All"` to plot all species.
+
+Common keyword arguments:
+- `theme=DiplodocusDark()`: the colour theme to use for the plot, can be either `DiplodocusDark()` for dark mode or `DiplodocusLight()` for light mode.
+- `TimeUnits::Tuple{Float64,String}=(1.0, "\\text{Code Units}")`: a tuple that converts the time given in code units to the desired units for plotting. The first entry is the conversion factor and the second is a string that will be converted into a LaTeX string for the time label.
+- `frac=false`: Whether to plot the fractional difference of number density between time-steps.
+- `logt=false`: If `true` time will be converted to `log10` format for plotting.
+- `title=nothing`: A string to place as the figure title, no title by default.
+- `fig=nothing` is the figure to plot on, if `nothing` a new figure will be created.
+- `x_idx::Int64=1`, the x index of the spatial grid cell that you want to plot the distribution for, default is 1.
+- `y_idx::Int64=1`, the y index of the spatial grid cell that you want to plot the distribution for, default is 1.
+- `z_idx::Int64=1`, the z index of the spatial grid cell that you want to plot the distribution for, default is 1.
 """
-function EnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;species::String="All",fig=nothing,theme=DiplodocusDark(),title=nothing,TimeUnits::Function=CodeToCodeUnitsTime,perparticle=false,logt::Bool=false)
+function EnergyDensityPlot0D(type::Static,PhaseSpace::PhaseSpaceStruct,sol::OutputStruct,species::String;fig=nothing,theme=DiplodocusDark(),title=nothing,legend=false,frac::Bool=false,perparticle::Bool=false,logt::Bool=false,TimeUnits::Tuple{Float64,String}=(1.0,"\\text{Code Units}"),x_idx=1,y_idx=1,z_idx=1)
 
     CairoMakie.activate!(inline=true) # plot in vs code window
 
@@ -23,11 +40,14 @@ function EnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;specie
         end
         name_list_plot[idx] = name
     end
+
     Momentum = PhaseSpace.Momentum
     Grids = PhaseSpace.Grids
     Time = PhaseSpace.Time
 
-    t_grid = Time.t_grid
+    Characteristic = PhaseSpace.Characteristic
+
+    CHAR_number_density = Characteristic.CHAR_number_density
 
     p_num_list = Momentum.px_num_list
     u_num_list = Momentum.py_num_list
@@ -40,19 +60,30 @@ function EnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;specie
 
     eng = zeros(Float64,length(sol.t))
     eng_total = zeros(Float64,length(sol.t))
+    val = 0.0
+    val_prev = 0.0
 
-    t_unit_string = TimeUnits()
+    t_unit_string = TimeUnits[2]
+    t_unit_scale = TimeUnits[1]
 
-    if t_grid == "l" || logt
-        xlab = L"\log_{10}($t$ $%$t_unit_string$)"
-    elseif t_grid == "u"
-        xlab = L"$t$ $%$t_unit_string$"
+    if logt
+        xlab = L"\log_{10}($t\, [%$t_unit_string]$)"
+    else
+        xlab = L"$t\, [%$t_unit_string$]"
     end
 
     if perparticle
-        ylab = L"$\overline{p^0}$ $[m_ec]$"
+        if frac
+            ylab = L"$\overline{p^0}\text{ Frac. Change}$"
+        else
+            ylab = L"$\overline{p^0}\, [m_ec]$"
+        end
     else
-        ylab = L"$e/c$ $[m_ec\mathrm{m}^{-3}]$"
+        if frac
+            ylab = L"$\text{Eng. Den. Frac. Change}$"
+        else
+            ylab = L"$e/c$ $[m_ec\,\mathrm{m}^{-3}]$"
+        end
     end
 
     if isnothing(fig)
@@ -70,15 +101,25 @@ function EnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;specie
 
         for i in eachindex(sol.t)
 
-            f1D = copy(Location_Species_To_StateVector(sol.f[i],PhaseSpace,species_index=j))
-
-            Nᵃ = DiplodocusTransport.FourFlow(f1D,p_num_list[j],u_num_list[j],h_num_list[j],pr_list[j],ur_list[j],hr_list[j],mass_list[j])
+            Nᵃ = DiplodocusTransport.FourFlow(sol.f[i],PhaseSpace,j;x_idx=x_idx,y_idx=y_idx,z_idx=z_idx)
             Uₐ = [-1.0,0.0,0.0,0.0] # static observer
             num = DiplodocusTransport.ScalarNumberDensity(Nᵃ,Uₐ)
 
-            Tᵃᵇ = DiplodocusTransport.StressEnergyTensor(f1D,p_num_list[j],u_num_list[j],h_num_list[j],pr_list[j],ur_list[j],hr_list[j],mass_list[j]) 
+            Tᵃᵇ = DiplodocusTransport.StressEnergyTensor(sol.f[i],PhaseSpace,j;x_idx=x_idx,y_idx=y_idx,z_idx=z_idx) 
 
-            eng[i] = DiplodocusTransport.ScalarEnergyDensity(Tᵃᵇ,Uₐ,num,perparticle=perparticle)
+            val_prev = val
+            val = DiplodocusTransport.ScalarEnergyDensity(Tᵃᵇ,Uₐ,num,perparticle=perparticle)
+            val *= perparticle ? 1.0 : CHAR_number_density
+
+            if frac
+                if i == 1
+                    eng[i] = 0.0 # initial value
+                else
+                    eng[i] = val/val_prev - 1.0
+                end
+            else
+                eng[i] = val
+            end
 
             if species== "All"
                 eng_total[i] += eng[i]
@@ -86,38 +127,36 @@ function EnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;specie
         
         end
 
-        if t_grid == "u"
-            t_plot = TimeUnits.(sol.t)
-            if logt 
-                t_plot[1] = t_plot[2] /10
-                t_plot = log10.(t_plot)
-            end
-            scatterlines!(ax,t_plot,eng,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list_plot[j])
-            xlims!(ax,t_plot[1],t_plot[end])
-        elseif t_grid == "l"
-            scatterlines!(ax,log10.(TimeUnits.(sol.t)),eng,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list_plot[j])
-            xlims!(ax,log10(TimeUnits(sol.t[1])),log10(TimeUnits(sol.t[end])))
+        if logt
+            scatterlines!(ax,log10.(sol.t .* t_unit_scale),eng,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list_plot[j])
+            xlims!(ax,log10(t_unit_scale*sol.t[1]),log10(t_unit_scale*sol.t[end]))
+            
+        else
+            scatterlines!(ax,sol.t .* t_unit_scale,eng,marker = :circle,color=theme.palette.color[][mod(2*j-1,7)+1],markersize=0.0,label=name_list_plot[j])
+            xlims!(ax,t_unit_scale*sol.t[1],t_unit_scale*sol.t[end])
         end
 
     end
 
     if species == "All"
-        if t_grid == "u"
-            t_plot = copy(TimeUnits.(sol.t))
-            if logt 
-                t_plot[1] = t_plot[2] /10
-                t_plot = log10.(t_plot)
+        if frac
+            for i in length(eng_total):-1:2
+                eng_total[i] = eng_total[i]/eng_total[i-1] - 1.0
             end
-            scatterlines!(ax,t_plot,eng_total,linewidth=2.0,color = theme.textcolor[],markersize=0.0,linestyle=:dash,label="All")
-            xlims!(ax,t_plot[1],t_plot[end])
-        elseif t_grid == "l"
-            scatterlines!(ax,log10.(TimeUnits.(sol.t)),eng_total,linewidth=2.0,color = theme.textcolor[],markersize=0.0,linestyle=:dash,label="All")
-            xlims!(ax,log10(TimeUnits(sol.t[1])),log10(TimeUnits(sol.t[end])))
+            eng_total[1] = 0.0
+        end
+        if logt
+            scatterlines!(ax,log10.(sol.t .* t_unit_scale),eng_total,linewidth=2.0,color = theme.textcolor[],markersize=0.0,linestyle=:dash,label="All")
+            xlims!(ax,log10(t_unit_scale*sol.t[1]),log10(t_unit_scale*sol.t[end]))
+        else
+            scatterlines!(ax,sol.t .* t_unit_scale,eng_total,linewidth=2.0,color = theme.textcolor[],markersize=0.0,linestyle=:dash,label="All")
+            xlims!(ax,t_unit_scale*sol.t[1],t_unit_scale*sol.t[end])
         end
     end
 
-    #fig[1,2] = Legend(fig,ax,"Particles")
-    axislegend(ax,position = :lc)
+    if legend
+        axislegend(ax,position = :lc)
+    end
 
     end # with_theme
 
@@ -127,7 +166,7 @@ end
 
 
 
-"""
+#="""
     FracEnergyDensityPlot(sol,PhaseSpace;species="All",fig=nothing,theme=DiplodocusDark(),title=nothing,only_all=false)
 
 Returns a plot of the fractional change in energy density of all species between time setups as a function of time.
@@ -386,4 +425,4 @@ function MulitSolEngDenPlot(sols::Vector{OutputStruct},species::Vector{String},P
         
     end # theme
 
-end
+end=#

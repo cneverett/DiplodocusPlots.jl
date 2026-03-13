@@ -2,22 +2,20 @@ module DiplodocusPlots
 
     export DiplodocusDark, DiplodocusLight
     export Static, Animated, Interactive
-    export MomentumDistributionPlot, AngleDistributionPlot, MomentumAndPolarAngleDistributionPlot, MomentumComboAnimation, MomentumAndAzimuthalAngleDistributionPlot, AzimuthalAngleDistributionPlot
+    export MomentumDistributionPlot0D, MomentumAndPolarAngleDistributionPlot0D
+    # export AngleDistributionPlot, MomentumComboAnimation, MomentumAndAzimuthalAngleDistributionPlot, AzimuthalAngleDistributionPlot
     export TimeScalePlot
     export InteractiveBinaryGainLossPlot
-    export FracNumberDensityPlot, NumberDensityPlot
-    export FracEnergyDensityPlot, EnergyDensityPlot
-    export IsThermalPlot, IsIsotropicPlot, IsThermalAndIsotropicPlot
+    export NumberDensityPlot0D
+    export EnergyDensityPlot0D
+    export IsThermalAndIsotropicPlot0D
+    #export IsThermalPlot, IsIsotropicPlot, 
     export InteractiveEmissionGainLossPlot
     export CodeToSIUnitsTime, CodeToCodeUnitsTime, SIToCodeUnitsTime, SyncToCodeUnitsTime, CodeToSyncUnitsTime
     export ObserverFluxPlot
 
-    #using Makie
     using CairoMakie
     using GLMakie
-    #using Interpolations
-    #using ScatteredInterpolation
-    #using DIVAnd
 
     import DiplodocusCollisions as DC
     using DiplodocusTransport
@@ -32,12 +30,14 @@ module DiplodocusPlots
     #Interactive Plots
     #include("TransportPlots/Interactive/ObserverFlux.jl")
     # Static Plots
-    include("TransportPlots/Static/Distribution.jl")
-    include("TransportPlots/Static/NumberDensity.jl")
-    include("TransportPlots/Static/EnergyDensity.jl")
-    include("TransportPlots/Static/ThermalAndIsotropic.jl")
     include("TransportPlots/Static/ObserverFlux.jl")
     include("TransportPlots/Static/TimeScale.jl")
+
+    # 0D (space) plots
+    include("TransportPlots/Plots_0D/Distribution0D.jl")
+    include("TransportPlots/Plots_0D/NumberDensity0D.jl")
+    include("TransportPlots/Plots_0D/EnergyDensity0D.jl")
+    include("TransportPlots/Plots_0D/ThermalAndIsotropic0D.jl")
 
     # 1D (space) plots
     include("TransportPlots/Static/Distribution1D.jl")

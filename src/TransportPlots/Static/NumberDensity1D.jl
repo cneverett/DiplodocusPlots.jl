@@ -101,9 +101,9 @@ function NumberDensity1DPlot(type::Static,sol::OutputStruct,PhaseSpace::PhaseSpa
 
                 t = sol.t[i]
                 #println("t=$(CodeToSIUnitsTime(t))")
-                if Time.t_grid == "l" || logt
+                if logt
                     color = theme.colormap[][(log10(t) - log10(t_min)) / (log10(t_max) - log10(t_min))]
-                elseif Time.t_grid == "u"
+                else
                     color = theme.colormap[][(t - t_min) / (t_max - t_min)]
                 end
 
@@ -150,10 +150,10 @@ function NumberDensity1DPlot(type::Static,sol::OutputStruct,PhaseSpace::PhaseSpa
 
     t_unit_string = TimeUnits()
 
-    if Time.t_grid == "u"
-        Colorbar(fig[1,2],colormap = theme.colormap,limits=(TimeUnits(sol.t[1]),TimeUnits(sol.t[end])),label=L"$t\,$ $%$t_unit_string$")
-    elseif Time.t_grid == "l"
+    if logt
         Colorbar(fig[1,2],colormap = theme.colormap,limits=(log10(round(TimeUnits(sol.t[1]),sigdigits=5)),log10(round(TimeUnits(sol.t[end]),sigdigits=5))),label=L"$\log_{10}\left(t\,%$t_unit_string \right)$")
+    else
+        Colorbar(fig[1,2],colormap = theme.colormap,limits=(TimeUnits(sol.t[1]),TimeUnits(sol.t[end])),label=L"$t\,$ $%$t_unit_string$")
     end
     
     #axislegend(ax,position = :rb)
