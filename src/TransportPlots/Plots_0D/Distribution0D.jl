@@ -1213,7 +1213,7 @@ function MomentumAndPolarAngleDistributionPlot0D(type::Animated,PhaseSpace::Phas
 
 
     dis = @lift begin
-        f1D = copy(Location_Species_To_StateVector(sol.f[$time_idx],PhaseSpace,species_index=species_index,x_idx=x_idx,y_idx,y_idx,z_idx=z_idx))
+        f1D = copy(Location_Species_To_StateVector(sol.f[$time_idx],PhaseSpace,species_index=species_index,x_idx=x_idx,y_idx=y_idx,z_idx=z_idx))
         f2D = dropdims(sum(reshape(f1D,(p_num,u_num,h_num)),dims=3),dims=3)
         # scale by order
         # f = dN/dpdudh * dpdudh therefore dN/dpdu = f / dpdu and p^order * dN/dpdu = f * mp^order / dpdu
@@ -1687,25 +1687,36 @@ function MomentumAndAzimuthalAngleDistributionPlot(sol,species::Vector{String},P
 end
 
 """
-    MomentumComboAnimation(sol,species::String,PhaseSpace::PhaseSpaceStruct)
+    MomentumComboAnimation0D(type,PhaseSpace,sol,species;...)
 
-Animates the angle averaged and angle dependent particle distribution function for `species` as a function of time given by the `sol` based on the conditions held in `PhaseSpace`. 
-
-The plot can be either static, animated or interactive depending on the `type` argument. `Static` and `Animated` plots are generated using CairoMakie and are best for publications and presentations, while `Interactive` plots are generated using GLMakie and allow for user interaction with the plot.
+Animates the angle averaged and angle dependent particle distribution function for `species` as a function of time. 
 
 Arguments:
-- `theme`: the colour theme to use for the plot, default is `DiplodocusDark()`.
-- `order`: the order of p in p^order * dN/dp dV, default is 1, i.e. number density spectrum. 2 is "energy" density spectrum.
+- `type::PlotType` only `Animated` implimented.
+- `PhaseSpace::PhaseSpaceStruct` is the structure containing the phase space information of the simulation.
+- `sol::OutputStruct` is the solution object containing the distribution function of all particles and time stepping information of the simulation. 
+- `species::Vector{String}` is a vector of the abbreviated three letter names of the particle species to plot.
+
+
+Animated keyword arguments:
 - `framerate`: the frame rate of the animation, default is 12 fps.
 - `filename`: the name of the file to save the animation to, default is "MomentumComboAnimation.mp4".
+
+Common keyword arguments:
+- `theme`: the colour theme to use for the plot, default is `DiplodocusDark()`.
+- `order`: the order of p in p^order * dN/dp dV, default is 1, i.e. number density spectrum. 2 is "energy" density spectrum.
+- `TimeUnits::Tuple{Float64,String}=(1.0, "\\text{Code Units}")`: a tuple that converts the time given in code units to the desired units for plotting. The first entry is the conversion factor and the second is a string that will be converted into a LaTeX string for the time label.
 - `plot_limits_momentum`: the limits of the momentum plot, default is `(nothing,nothing)`.
 - `thermal`: whether to plot the expected thermal spectrum based on the final time step, default is `false`.
 - `paraperp`: default is `false`. If `true` the first and center `u` bins will be plotted to represent the distribution parallel to the axis and perpendicular.
 - `initial`: default is `false`, if `true` causes the initial distribution to remain on the plot
+- `x_idx::Int64=1`, the x index of the spatial grid cell that you want to plot the distribution for, default is 1.
+- `y_idx::Int64=1`, the y index of the spatial grid cell that you want to plot the distribution for, default is 1.
+- `z_idx::Int64=1`, the z index of the spatial grid cell that you want to plot the distribution for, default is 1.
 
 
 """
-function MomentumComboAnimation(sol,species::Vector{String},PhaseSpace::PhaseSpaceStruct;theme=DiplodocusDark(),order::Int64=1,thermal=false,paraperp=false,legend=false,initial=false,framerate=12,filename="MomentumComboAnimation.mp4",plot_limits_momentum=(nothing,nothing),TimeUnits::Function=CodeToCodeUnitsTime)
+function MomentumComboAnimation0D(type::Animated,PhaseSpace::PhaseSpaceStruct,sol::OutputStruct,species::Vector{String};theme=DiplodocusDark(),order::Int64=1,thermal=false,paraperp=false,legend=false,initial=false,framerate=12,filename="MomentumComboAnimation.mp4",plot_limits_momentum=(nothing,nothing),TimeUnits::Tuple{Float64,String}=(1.0, "\\text{Code Units}"),x_idx::Int64=1,y_idx::Int64=1,z_idx::Int64=1)
 
     CairoMakie.activate!(inline=true) 
 
@@ -1713,18 +1724,19 @@ function MomentumComboAnimation(sol,species::Vector{String},PhaseSpace::PhaseSpa
 
         fig = Figure(size=(5.416inch,3.25inch)) # 5:3 aspect ratio
 
-        time_idx = Observable(1) # index of the current time step
-        t = @lift(TimeUnits(sol.t[$time_idx]))
+        t_unit_string = TimeUnits[2]
+        t_unit_scale = TimeUnits[1]
 
-        MomentumDistributionPlot(sol,species,PhaseSpace,Animated();theme=theme,order=order,TimeUnits=CodeToCodeUnitsTime,thermal=thermal,plot_limits=plot_limits_momentum,wide=false,legend=legend,framerate=framerate,filename=nothing,initial=initial,paraperp=paraperp,figure=(fig[2,1],time_idx))
-        MomentumAndPolarAngleDistributionPlot(sol,species,PhaseSpace,Animated();order=order,theme=theme,framerate=framerate,filename=nothing,figure=(fig[1:3,2],time_idx))
+        time_idx = Observable(1) # index of the current time step
+        t = @lift(sol.t[$time_idx] * t_unit_scale)
+
+        MomentumDistributionPlot0D(Animated(),PhaseSpace,sol,species;theme=theme,order=order,TimeUnits=TimeUnits,thermal=thermal,plot_limits=plot_limits_momentum,wide=false,legend=legend,framerate=framerate,filename=nothing,initial=initial,paraperp=paraperp,figure=(fig[2,1],time_idx),x_idx=x_idx,y_idx=y_idx,z_idx=z_idx)
+        MomentumAndPolarAngleDistributionPlot0D(Animated(),PhaseSpace,sol,species;order=order,theme=theme,framerate=framerate,filename=nothing,figure=(fig[1:3,2],time_idx),TimeUnits=TimeUnits,x_idx=x_idx,y_idx=y_idx,z_idx=z_idx)
 
         grid = fig[3,1] = GridLayout()
-
-        t_unit_string = TimeUnits()
                
         Label(grid[1,1],@lift("t=$(round($(t), sigdigits = 3))"),fontsize=18pt)
-        Label(grid[1,2],L"%$t_unit_string",fontsize=18pt)
+        Label(grid[1,2],L"[%$t_unit_string]",fontsize=18pt)
 
         rowsize!(fig.layout,1,Relative(0.02))
         rowsize!(fig.layout,2,Relative(0.8))
