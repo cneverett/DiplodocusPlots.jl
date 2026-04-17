@@ -1,5 +1,5 @@
 """
-    NumberDensityPlot(type,PhaseSpace,sol,species;...)
+    NumberDensityPlot0D(type,PhaseSpace,sol,species;...)
 
 Returns a plot of the number density of a `species` as a function of time.
 

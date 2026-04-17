@@ -42,9 +42,10 @@ module DiplodocusPlots
     # 1D (space) plots
     include("TransportPlots/Static/Distribution1D.jl")
     include("TransportPlots/Static/NumberDensity1D.jl")
+    include("TransportPlots/Static/Hydro1D.jl")
 
     # 2D (space) plots 
     include("TransportPlots/Static/NumberDensity2D.jl")
-    include("TransportPlots/Static/BulkGamma2D.jl")
+    include("TransportPlots/Static/Hydro2D.jl")
 
 end

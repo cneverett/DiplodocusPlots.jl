@@ -1,8 +1,8 @@
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.12.1"
+julia_version = "1.12.0"
 manifest_format = "2.0"
-project_hash = "a0aaade172b7d3b464f72f4a55fe4e8294fac0af"
+project_hash = "89790619eae2d5e2d4b2aba8c2e97c2c03468af7"
 
 [[deps.AbstractFFTs]]
 deps = ["LinearAlgebra"]
@@ -355,21 +355,25 @@ version = "1.6.6"
 
 [[deps.DiplodocusCollisions]]
 deps = ["BenchmarkTools", "Bessels", "JLD2", "MultiFloats", "ProgressMeter", "Random", "Revise"]
-git-tree-sha1 = "5bdff1505d19e303f6512cfc1ae05e07bf42608c"
+git-tree-sha1 = "dffb889e1b1abf5003f2cd604bdd4e10b3f3cc3d"
+repo-rev = "dev"
+repo-url = "https://github.com/cneverett/DiplodocusCollisions.jl.git"
 uuid = "32d0d58a-4da0-4f8e-8b7e-c2816ac6e5cb"
-version = "0.2.0"
+version = "0.2.2"
 
 [[deps.DiplodocusPlots]]
 deps = ["CairoMakie", "DiplodocusCollisions", "DiplodocusTransport", "GLMakie", "Revise"]
 path = "."
 uuid = "e2feba3a-3769-4cd4-93ab-3db026c329dd"
-version = "0.2.0"
+version = "0.2.1"
 
 [[deps.DiplodocusTransport]]
 deps = ["BenchmarkTools", "Bessels", "CUDA", "DiplodocusCollisions", "JLD2", "LinearAlgebra", "MKL", "MKLSparse", "ProgressMeter", "Revise", "SparseArrays", "Statistics"]
-git-tree-sha1 = "fcb1d8b20374ca2db2c78777150aa5be6a9a0f20"
+git-tree-sha1 = "bcfbd4a5963b64bf32dabbe37aecdc034ab03f45"
+repo-rev = "dev"
+repo-url = "https://github.com/cneverett/DiplodocusTransport.jl.git"
 uuid = "f63b9913-7a9a-464d-82b9-3e1e536d6db0"
-version = "0.2.0"
+version = "0.2.1"
 
 [[deps.Distributed]]
 deps = ["Random", "Serialization", "Sockets"]
@@ -738,9 +742,9 @@ weakdeps = ["Unitful"]
 
 [[deps.IntervalArithmetic]]
 deps = ["CRlibm", "MacroTools", "OpenBLASConsistentFPCSR_jll", "Printf", "Random", "RoundingEmulator"]
-git-tree-sha1 = "02b61501dbe6da3b927cc25dacd7ce32390ee970"
+git-tree-sha1 = "2cce1fed119ca7b6cc230c4a3b85202478af7924"
 uuid = "d1acc4aa-44c8-5952-acd4-ba5d80a2a253"
-version = "1.0.2"
+version = "1.0.3"
 
     [deps.IntervalArithmetic.extensions]
     IntervalArithmeticArblibExt = "Arblib"
@@ -853,9 +857,9 @@ version = "3.1.4+0"
 
 [[deps.JuliaInterpreter]]
 deps = ["CodeTracking", "InteractiveUtils", "Random", "UUIDs"]
-git-tree-sha1 = "f5e59455236d8269b7868665c3665e8477af0e37"
+git-tree-sha1 = "3d3b79166e2a0afcf875df20db110af91ad3ab61"
 uuid = "aa1ae85d-cabe-5617-a682-6adf51b2e16a"
-version = "0.10.10"
+version = "0.10.11"
 
 [[deps.JuliaNVTXCallbacks_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -1463,9 +1467,9 @@ version = "1.3.1"
 
 [[deps.Revise]]
 deps = ["CodeTracking", "FileWatching", "InteractiveUtils", "JuliaInterpreter", "LibGit2", "LoweredCodeUtils", "OrderedCollections", "Preferences", "REPL", "UUIDs"]
-git-tree-sha1 = "14d1bfb0a30317edc77e11094607ace3c800f193"
+git-tree-sha1 = "d97d78d4fc5f858d8ce44f6b88bc972f2023f51d"
 uuid = "295af30f-e4ad-537b-8983-00126c2a3abe"
-version = "3.13.2"
+version = "3.14.0"
 weakdeps = ["Distributed"]
 
     [deps.Revise.extensions]
@@ -1657,16 +1661,18 @@ weakdeps = ["Adapt", "GPUArraysCore", "KernelAbstractions", "LinearAlgebra", "Sp
 
 [[deps.StructUtils]]
 deps = ["Dates", "UUIDs"]
-git-tree-sha1 = "28145feabf717c5d65c1d5e09747ee7b1ff3ed13"
+git-tree-sha1 = "fa95b3b097bcef5845c142ea2e085f1b2591e92c"
 uuid = "ec057cc2-7a8d-4b58-b3b3-92acb9f63b42"
-version = "2.6.3"
+version = "2.7.1"
 
     [deps.StructUtils.extensions]
     StructUtilsMeasurementsExt = ["Measurements"]
+    StructUtilsStaticArraysCoreExt = ["StaticArraysCore"]
     StructUtilsTablesExt = ["Tables"]
 
     [deps.StructUtils.weakdeps]
     Measurements = "eff96d63-e80a-5855-80a2-b1b0885c5ab7"
+    StaticArraysCore = "1e83bf80-4336-4d27-bf5d-d5a4f845583c"
     Tables = "bd369af6-aec1-5ad0-b16a-f7cc5008161c"
 
 [[deps.StyledStrings]]
@@ -1937,7 +1943,7 @@ version = "0.17.4+0"
 [[deps.libblastrampoline_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "8e850b90-86db-534c-a0d3-1478176c7d93"
-version = "5.15.0+0"
+version = "5.13.1+1"
 
 [[deps.libdecor_jll]]
 deps = ["Artifacts", "Dbus_jll", "JLLWrappers", "Libdl", "Libglvnd_jll", "Pango_jll", "Wayland_jll", "xkbcommon_jll"]

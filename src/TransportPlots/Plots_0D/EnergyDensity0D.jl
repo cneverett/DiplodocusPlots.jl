@@ -1,5 +1,5 @@
 """
-    EnergyDensityPlot(type,PhaseSpace,sol,species;...)
+    EnergyDensityPlot0D(type,PhaseSpace,sol,species;...)
 
 Returns a plot of the energy density of a `species`` as a function of time.
 

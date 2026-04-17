@@ -162,6 +162,9 @@ function InteractiveBinaryGainLossPlot(Output::Tuple)
   
     Legend(subgl2[1,1:2],ax1)
 
+    #set_close_to!(sg1.sliders[1],31)
+    #set_close_to!(sg2.sliders[1],257)
+
     return fig
 
 end

@@ -39,8 +39,10 @@ function MomentumDistributionPlot0D(type::Static,PhaseSpace::PhaseSpaceStruct,so
 
     with_theme(theme) do
 
+    CHAR_n = PhaseSpace.Characteristic.CHAR_number_density
+
     if wide
-        fig = Figure(size=(576,216)) # double column 8:3 aspect ratio
+        fig = Figure(size=(576,234)) # double column 8:3 aspect ratio
     else
         fig = Figure() # default single column 4:3 aspect ratio
     end
@@ -128,7 +130,7 @@ function MomentumDistributionPlot0D(type::Static,PhaseSpace::PhaseSpaceStruct,so
             # scale by order
             # f = dN/dpdudh * dpdudh therefore dN/dp = f / dp and p^order * dN/dp = f * mp^order / dp
             for px in 1:p_num, py in 1:u_num, pz in 1:h_num
-                f3D[px,py,pz] = f3D[px,py,pz] * (meanp[px]^(order)) / dp[px]
+                f3D[px,py,pz] = f3D[px,py,pz] * (meanp[px]^(order)) / dp[px] * CHAR_n
             end
 
             if paraperp == false
@@ -140,7 +142,10 @@ function MomentumDistributionPlot0D(type::Static,PhaseSpace::PhaseSpaceStruct,so
                 else
                     scatterlines!(ax,mp_plot,log10.(pdNdp),linewidth=2.0,color = color,markersize=0.0,linestyle=linestyles[species_idx])
                 end
-                max_f = maximum(x for x in pdNdp if !isnan(x))
+                max_f = try maximum(x for x in pdNdp if !isnan(x))
+                catch
+                    continue
+                end
                 max_total = max(max_f,max_total)
             elseif paraperp == true # assumes only a single particle species
                 pdNdp_para = dropdims(sum(f3D, dims=(3)),dims=(3))[:,end]
