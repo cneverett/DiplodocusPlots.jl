@@ -11,12 +11,11 @@ function VelocityZPlot1D(type::Static,sol::OutputStruct,PhaseSpace::PhaseSpaceSt
 
     name_list = PhaseSpace.name_list
     Momentum = PhaseSpace.Momentum
-    Space = PhaseSpace.Space
-    Time = PhaseSpace.Time
+    Spacetime = PhaseSpace.Spacetime
     Grids = PhaseSpace.Grids
-    x_num = Space.x_num
-    y_num = Space.y_num
-    z_num = Space.z_num
+    x_num = Spacetime.x_num
+    y_num = Spacetime.y_num
+    z_num = Spacetime.z_num
     dx = Grids.dx
     dy = Grids.dy
     dz = Grids.dz
@@ -34,7 +33,7 @@ function VelocityZPlot1D(type::Static,sol::OutputStruct,PhaseSpace::PhaseSpaceSt
     if direction == "x"
         xlab = L"$\left(x\,[\text{Code Units}]\right)$"
         n_dir = x_num
-        grid_type = Space.x_grid
+        grid_type = Spacetime.x_grid
         if grid_type == "u"
             mdir_plot = mx
         elseif grid_type == "l"
@@ -43,7 +42,7 @@ function VelocityZPlot1D(type::Static,sol::OutputStruct,PhaseSpace::PhaseSpaceSt
     elseif direction == "y"
         xlab = L"$\left(y\,[\text{Code Units}]\right)$"
         n_dir = y_num
-        grid_type = Space.y_grid
+        grid_type = Spacetime.y_grid
         if grid_type == "u"
             mdir_plot = my
         elseif grid_type == "l"
@@ -52,7 +51,7 @@ function VelocityZPlot1D(type::Static,sol::OutputStruct,PhaseSpace::PhaseSpaceSt
     elseif direction == "z"
         xlab = L"$\left(z\,[\text{Code Units}]\right)$"
         n_dir = z_num
-        grid_type = Space.z_grid
+        grid_type = Spacetime.z_grid
         if grid_type == "u"
             mdir_plot = mz
         elseif grid_type == "l"
@@ -109,8 +108,8 @@ function VelocityZPlot1D(type::Static,sol::OutputStruct,PhaseSpace::PhaseSpaceSt
 
                 for x in 1:x_num, y in 1:y_num, z in 1:z_num
 
-                    Nᵃ = DiplodocusTransport.FourFlow(sol.f[i],PhaseSpace,species_index;x_idx=x,y_idx=y,z_idx=z)
-                    HydroFourVelocity = DiplodocusTransport.HydroFourVelocity(Nᵃ)
+                    Nᵃ = FourFlow(sol.f[i],PhaseSpace,species_index;x_idx=x,y_idx=y,z_idx=z)
+                    HydroFourVelocity = HydroFourVelocity(Nᵃ)
 
                     Vz_local = HydroFourVelocity[4]/HydroFourVelocity[1]
 

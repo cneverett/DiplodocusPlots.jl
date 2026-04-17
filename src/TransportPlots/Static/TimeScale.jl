@@ -9,7 +9,7 @@ Optional arguments:
 - `logt`: default is `false`. If a uniform time grid is used for the solution, this can be toggled to `true` to display the solution in log10 time steps rather than uniform time steps.
 - `dt`: default is `false`. If `true` the time step `dt` corresponding to the current simulation time will also be plotted as a horizontal line.
 """
-function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,sol::DiplodocusTransport.OutputStruct,t_idxs::Vector{Int64},species::Vector{String};wide=false,paraperp::Bool=false,u_avg::Bool=true,logt::Bool=false,p_timescale=false,legend=true,plot_dt::Bool=false,plot_limits=(nothing,nothing),theme=DiplodocusDark(),TimeUnits::Function=CodeToCodeUnitsTime,direction::String="all")
+function TimeScalePlot(method::AbstractSteppingMethod,sol::OutputStruct,t_idxs::Vector{Int64},species::Vector{String};wide=false,paraperp::Bool=false,u_avg::Bool=true,logt::Bool=false,p_timescale=false,legend=true,plot_dt::Bool=false,plot_limits=(nothing,nothing),theme=DiplodocusDark(),TimeUnits::Function=CodeToCodeUnitsTime,direction::String="all")
 
     CairoMakie.activate!(inline=true) # plot in vs code window
     with_theme(theme) do
@@ -108,7 +108,7 @@ function TimeScalePlot(method::DiplodocusTransport.SteppingMethodType,sol::Diplo
             end
             mu = Grids.mpy_list[species_index]
 
-            timescale1D = copy(Location_Species_To_StateVector(timescale,PhaseSpace,species_index=species_index))
+            timescale1D = copy(LocationSpeciesToStateVector(timescale,PhaseSpace,species_index=species_index))
             timescale3D = reshape(timescale1D,(p_num,u_num,h_num))
             @. timescale3D = timescale3D*(timescale3D!=Inf)
             @. timescale3D = timescale3D*(timescale3D!=-Inf)

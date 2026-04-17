@@ -49,7 +49,7 @@ function ObserverFluxCylindrical(PhaseSpace::PhaseSpaceStruct,sol::OutputStruct,
     u_low = cospi(θ+β)
     u_up = cospi(θ-β)
 
-    f1D = copy(Location_Species_To_StateVector(sol.f[t_idx],PhaseSpace,species_index=photon_index,x_idx=x_idx,y_idx=y_idx,z_idx=z_idx))
+    f1D = copy(LocationSpeciesToStateVector(sol.f[t_idx],PhaseSpace,species_index=photon_index,x_idx=x_idx,y_idx=y_idx,z_idx=z_idx))
 
     photon_f = reshape(f1D,(
         Momentum.px_num_list[photon_index],
@@ -179,7 +179,7 @@ function ObserverFluxCylindrical2(PhaseSpace::PhaseSpaceStruct,sol::OutputStruct
     u_low = cospi(θ+β)
     u_up = cospi(θ-β)
 
-    f1D = copy(Location_Species_To_StateVector(sol.f[t_idx],PhaseSpace,species_index=photon_index,x_idx=x_idx,y_idx=y_idx,z_idx=z_idx))
+    f1D = copy(LocationSpeciesToStateVector(sol.f[t_idx],PhaseSpace,species_index=photon_index,x_idx=x_idx,y_idx=y_idx,z_idx=z_idx))
 
     photon_f = reshape(f1D,(
         Momentum.px_num_list[photon_index],
@@ -397,7 +397,7 @@ function ObserverFlux(PhaseSpace::PhaseSpaceStruct,sol::OutputStruct,ObserverAng
 
         for t in 1:length(sol.t)
 
-            f1D = copy(Location_Species_To_StateVector(sol.f[t],PhaseSpace,species_index=photon_index))
+            f1D = copy(LocationSpeciesToStateVector(sol.f[t],PhaseSpace,species_index=photon_index))
 
             photon_f = reshape(f1D,(
                 Momentum.px_num_list[photon_index],

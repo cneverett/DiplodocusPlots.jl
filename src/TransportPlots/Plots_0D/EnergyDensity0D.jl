@@ -46,7 +46,6 @@ function EnergyDensityPlot0D(type::Static,PhaseSpace::PhaseSpaceStruct,sol::Outp
 
     Momentum = PhaseSpace.Momentum
     Grids = PhaseSpace.Grids
-    Time = PhaseSpace.Time
 
     Characteristic = PhaseSpace.Characteristic
 
@@ -112,14 +111,14 @@ function EnergyDensityPlot0D(type::Static,PhaseSpace::PhaseSpaceStruct,sol::Outp
 
         for i in eachindex(sol.t)
 
-            Nᵃ = DiplodocusTransport.FourFlow(sol.f[i],PhaseSpace,j;x_idx=x_idx,y_idx=y_idx,z_idx=z_idx)
+            Nᵃ = FourFlow(sol.f[i],PhaseSpace,j;x_idx=x_idx,y_idx=y_idx,z_idx=z_idx)
             Uₐ = [-1.0,0.0,0.0,0.0] # static observer
-            num = DiplodocusTransport.ScalarNumberDensity(Nᵃ,Uₐ)
+            num = ScalarNumberDensity(Nᵃ,Uₐ)
 
-            Tᵃᵇ = DiplodocusTransport.StressEnergyTensor(sol.f[i],PhaseSpace,j;x_idx=x_idx,y_idx=y_idx,z_idx=z_idx) 
+            Tᵃᵇ = StressEnergyTensor(sol.f[i],PhaseSpace,j;x_idx=x_idx,y_idx=y_idx,z_idx=z_idx) 
 
             val_prev = val
-            val = DiplodocusTransport.ScalarEnergyDensity(Tᵃᵇ,Uₐ,num,perparticle=perparticle)
+            val = ScalarEnergyDensity(Tᵃᵇ,Uₐ,num,perparticle=perparticle)
             val *= perparticle ? 1.0 : CHAR_number_density
 
             if frac
@@ -266,7 +265,7 @@ function FracEnergyDensityPlot(sol::OutputStruct,PhaseSpace::PhaseSpaceStruct;sp
 
         for i in eachindex(sol.t)
 
-            f1D = copy(Location_Species_To_StateVector(sol.f[i],PhaseSpace,species_index=j))
+            f1D = copy(LocationSpeciesToStateVector(sol.f[i],PhaseSpace,species_index=j))
 
             Nᵃ = DiplodocusTransport.FourFlow(f1D,p_num_list[j],u_num_list[j],h_num_list[j],pr_list[j],ur_list[j],hr_list[j],mass_list[j])
             Uₐ = [-1.0,0.0,0.0,0.0] # static observer
@@ -391,7 +390,7 @@ function MulitSolEngDenPlot(sols::Vector{OutputStruct},species::Vector{String},P
 
             for t_idx in eachindex(sol.t)
 
-            f1D = copy(Location_Species_To_StateVector(sol.f[t_idx],PhaseSpace,species_index=name_idx))
+            f1D = copy(LocationSpeciesToStateVector(sol.f[t_idx],PhaseSpace,species_index=name_idx))
 
             Nᵃ = DiplodocusTransport.FourFlow(f1D,p_num_list[name_idx],u_num_list[name_idx],h_num_list[name_idx],pr_list[name_idx],ur_list[name_idx],hr_list[name_idx],mass_list[name_idx])
             Uₐ = [-1.0,0.0,0.0,0.0] # static observer

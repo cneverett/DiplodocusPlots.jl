@@ -151,7 +151,7 @@ function MomentumDistribution1DPlot(type::Static,sol,species::Vector{String},Pha
 
         for x_idx in 1:x_num, y_idx in 1:y_num, z_idx in 1:z_num
 
-            f1D .= copy(Location_Species_To_StateVector(sol.f[t_idx],PhaseSpace,species_index=species_index,x_idx=x_idx,y_idx=y_idx,z_idx=z_idx))
+            f1D .= copy(LocationSpeciesToStateVector(sol.f[t_idx],PhaseSpace,species_index=species_index,x_idx=x_idx,y_idx=y_idx,z_idx=z_idx))
 
             f3D .= reshape(f1D,(p_num,u_num,h_num))
 
@@ -373,7 +373,7 @@ function MomentumDistribution1DPlot(type::Animated,sol,species::Vector{String},P
             p_min = min(p_min,p_r[1])
             p_max = max(p_max,p_r[end])
             for x_idx in 1:x_num, y_idx in 1:y_num, z_idx in 1:z_num
-                f1D .= copy(Location_Species_To_StateVector(sol.f[$time_idx],PhaseSpace,species_index=species_index,x_idx=x_idx,y_idx=y_idx,z_idx=z_idx))
+                f1D .= copy(LocationSpeciesToStateVector(sol.f[$time_idx],PhaseSpace,species_index=species_index,x_idx=x_idx,y_idx=y_idx,z_idx=z_idx))
                 f3D .= reshape(f1D,(p_num,u_num,h_num))
                 @. f3D = f3D*(f3D!=Inf)
                 # scale by order
@@ -493,11 +493,11 @@ function MomentumAndPolarAngleDistribution1DPlot(type::Static,sol,PhaseSpace::Ph
     fig = Figure(size=(576,276)) # 8:3 aspect ratio
 
     (x_idx,y_idx,z_idx) = coordinates[1]
-    f1 = copy(Location_Species_To_StateVector(sol.f[time_idx],PhaseSpace,species_index=species_index,x_idx=x_idx,y_idx=y_idx,z_idx=z_idx))
+    f1 = copy(LocationSpeciesToStateVector(sol.f[time_idx],PhaseSpace,species_index=species_index,x_idx=x_idx,y_idx=y_idx,z_idx=z_idx))
     (x_idx,y_idx,z_idx) = coordinates[2]
-    f2 = copy(Location_Species_To_StateVector(sol.f[time_idx],PhaseSpace,species_index=species_index,x_idx=x_idx,y_idx=y_idx,z_idx=z_idx))
+    f2 = copy(LocationSpeciesToStateVector(sol.f[time_idx],PhaseSpace,species_index=species_index,x_idx=x_idx,y_idx=y_idx,z_idx=z_idx))
     (x_idx,y_idx,z_idx) = coordinates[3]
-    f3 = copy(Location_Species_To_StateVector(sol.f[time_idx],PhaseSpace,species_index=species_index,x_idx=x_idx,y_idx=y_idx,z_idx=z_idx))
+    f3 = copy(LocationSpeciesToStateVector(sol.f[time_idx],PhaseSpace,species_index=species_index,x_idx=x_idx,y_idx=y_idx,z_idx=z_idx))
 
     #dis1 = dropdims(sum(reshape(sol.f[t_idx[1]].x[species_index],(p_num,u_num,h_num)),dims=3),dims=3)
     #dis2 = dropdims(sum(reshape(sol.f[t_idx[2]].x[species_index],(p_num,u_num,h_num)),dims=3),dims=3)

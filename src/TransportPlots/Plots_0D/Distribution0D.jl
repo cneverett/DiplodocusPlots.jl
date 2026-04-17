@@ -64,7 +64,6 @@ function MomentumDistributionPlot0D(type::Static,PhaseSpace::PhaseSpaceStruct,so
     name_list = PhaseSpace.name_list
     Momentum = PhaseSpace.Momentum
     Grids = PhaseSpace.Grids
-    Time = PhaseSpace.Time
 
     linestyles = [:solid,(:dash,:dense),(:dot),(:dashdot),(:dashdotdot)]
     max_total = -Inf32
@@ -122,7 +121,7 @@ function MomentumDistributionPlot0D(type::Static,PhaseSpace::PhaseSpaceStruct,so
                 color = theme.colormap[][(t - t_min) / (t_max - t_min)]
             end
 
-            f1D .= copy(Location_Species_To_StateVector(sol.f[i],PhaseSpace,species_index=species_index,x_idx=x_idx,y_idx=y_idx,z_idx=z_idx))
+            f1D .= copy(LocationSpeciesToStateVector(sol.f[i],PhaseSpace,species_index=species_index,x_idx=x_idx,y_idx=y_idx,z_idx=z_idx))
 
             f3D .= reshape(f1D,(p_num,u_num,h_num))
 
@@ -292,7 +291,6 @@ function MomentumDistributionPlot0D(type::Animated,PhaseSpace::PhaseSpaceStruct,
     name_list = PhaseSpace.name_list
     Momentum = PhaseSpace.Momentum
     Grids = PhaseSpace.Grids
-    Time = PhaseSpace.Time
 
     for (species_idx, species_name) in enumerate(species) 
 
@@ -317,7 +315,7 @@ function MomentumDistributionPlot0D(type::Animated,PhaseSpace::PhaseSpaceStruct,
     if paraperp == false 
         pdNdp = @lift begin
         f1D = zeros(Float32,p_num*u_num*h_num)
-        f1D .= copy(Location_Species_To_StateVector(sol.f[$time_idx],PhaseSpace,species_index=species_index,x_idx=x_idx,y_idx=y_idx,z_idx=z_idx))
+        f1D .= copy(LocationSpeciesToStateVector(sol.f[$time_idx],PhaseSpace,species_index=species_index,x_idx=x_idx,y_idx=y_idx,z_idx=z_idx))
         f3D = zeros(Float32,p_num,u_num,h_num)
         f3D .= reshape(f1D,(p_num,u_num,h_num))
         @. f3D = f3D*(f3D!=Inf)
@@ -336,7 +334,7 @@ function MomentumDistributionPlot0D(type::Animated,PhaseSpace::PhaseSpaceStruct,
 
         pdNdp_para = @lift begin
         f1D = zeros(Float32,p_num*u_num*h_num)
-        f1D .= copy(Location_Species_To_StateVector(sol.f[$time_idx],PhaseSpace,species_index=species_index,x_idx=x_idx,y_idx=y_idx,z_idx=z_idx))
+        f1D .= copy(LocationSpeciesToStateVector(sol.f[$time_idx],PhaseSpace,species_index=species_index,x_idx=x_idx,y_idx=y_idx,z_idx=z_idx))
         f3D = zeros(Float32,p_num,u_num,h_num)
         f3D .= reshape(f1D,(p_num,u_num,h_num))
         @. f3D = f3D*(f3D!=Inf)
@@ -351,7 +349,7 @@ function MomentumDistributionPlot0D(type::Animated,PhaseSpace::PhaseSpaceStruct,
 
         pdNdp_perp = @lift begin
         f1D = zeros(Float32,p_num*u_num*h_num)
-        f1D .= copy(Location_Species_To_StateVector(sol.f[$time_idx],PhaseSpace,species_index=species_index,x_idx=x_idx,y_idx=y_idx,z_idx=z_idx))
+        f1D .= copy(LocationSpeciesToStateVector(sol.f[$time_idx],PhaseSpace,species_index=species_index,x_idx=x_idx,y_idx=y_idx,z_idx=z_idx))
         f3D = zeros(Float32,p_num,u_num,h_num)
         f3D .= reshape(f1D,(p_num,u_num,h_num))
         @. f3D = f3D*(f3D!=Inf)
@@ -373,7 +371,7 @@ function MomentumDistributionPlot0D(type::Animated,PhaseSpace::PhaseSpaceStruct,
 
         pdNdp_initial = begin
             f1D_initial = zeros(Float32,p_num*u_num*h_num)
-            f1D_initial .= copy(Location_Species_To_StateVector(sol.f[1],PhaseSpace,species_index=species_index,x_idx=x_idx,y_idx=y_idx,z_idx=z_idx))
+            f1D_initial .= copy(LocationSpeciesToStateVector(sol.f[1],PhaseSpace,species_index=species_index,x_idx=x_idx,y_idx=y_idx,z_idx=z_idx))
             f3D_initial = zeros(Float32,p_num,u_num,h_num)
             f3D_initial .= reshape(f1D_initial,(p_num,u_num,h_num))
             @. f3D_initial = f3D_initial*(f3D_initial!=Inf)
@@ -541,7 +539,7 @@ function AngleDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseSpac
 
     t = sol.t[time_idx]
 
-    f1D .= copy(Location_Species_To_StateVector(sol.f[time_idx],PhaseSpace,species_index=species_index))
+    f1D .= copy(LocationSpeciesToStateVector(sol.f[time_idx],PhaseSpace,species_index=species_index))
 
     f3D .= reshape(f1D,(p_num,u_num,h_num))
     @. f3D = f3D*(f3D!=Inf)
@@ -671,7 +669,7 @@ function AngleDistributionPlot(sol,species::Vector{String},PhaseSpace::PhaseSpac
 
         pdNdp = @lift begin
         f1D = zeros(Float32,p_num*u_num*h_num)
-        f1D .= copy(Location_Species_To_StateVector(sol.f[$time_idx],PhaseSpace,species_index=species_index))
+        f1D .= copy(LocationSpeciesToStateVector(sol.f[$time_idx],PhaseSpace,species_index=species_index))
         f3D = zeros(Float32,p_num,u_num,h_num)
         f3D .= reshape(f1D,(p_num,u_num,h_num))
         @. f3D = f3D*(f3D!=Inf)
@@ -823,7 +821,7 @@ function AzimuthalAngleDistributionPlot(sol,species::Vector{String},PhaseSpace::
                 color = theme.colormap[][(log10(t) - log10(sol.t[1])) / (log10(sol.t[end]) - log10(sol.t[1]))]
             end
 
-            f1D .= copy(Location_Species_To_StateVector(sol.f[i],PhaseSpace,species_index=species_index))
+            f1D .= copy(LocationSpeciesToStateVector(sol.f[i],PhaseSpace,species_index=species_index))
 
             f3D .= reshape(f1D,(p_num,u_num,h_num))
 
@@ -951,7 +949,7 @@ function AzimuthalAngleDistributionPlot(sol,species::Vector{String},PhaseSpace::
         dNdphi = @lift begin
             f3D = zeros(Float32,p_num,u_num,h_num)
             f1D = zeros(Float32,p_num*u_num*h_num)
-            f1D .= copy(Location_Species_To_StateVector(sol.f[$time_idx],PhaseSpace,species_index=species_index))
+            f1D .= copy(LocationSpeciesToStateVector(sol.f[$time_idx],PhaseSpace,species_index=species_index))
             f3D .= reshape(f1D,(p_num,u_num,h_num))
             @. f3D = f3D*(f3D!=Inf)
             # scale by order
@@ -1034,7 +1032,6 @@ function MomentumAndPolarAngleDistributionPlot0D(type::Static,PhaseSpace::PhaseS
     name_list = PhaseSpace.name_list
     Momentum = PhaseSpace.Momentum
     Grids = PhaseSpace.Grids
-    Time = PhaseSpace.Time
 
     if length(species) != 1
         error("For Static plot, only a single species is allowed")
@@ -1072,9 +1069,9 @@ function MomentumAndPolarAngleDistributionPlot0D(type::Static,PhaseSpace::PhaseS
 
     fig = Figure(size=(576,276)) # 8:3 aspect ratio
 
-    f1 = copy(Location_Species_To_StateVector(sol.f[t_idx[1]],PhaseSpace,species_index=species_index,x_idx=x_idx,y_idx=y_idx,z_idx=z_idx))
-    f2 = copy(Location_Species_To_StateVector(sol.f[t_idx[2]],PhaseSpace,species_index=species_index,x_idx=x_idx,y_idx=y_idx,z_idx=z_idx))
-    f3 = copy(Location_Species_To_StateVector(sol.f[t_idx[3]],PhaseSpace,species_index=species_index,x_idx=x_idx,y_idx=y_idx,z_idx=z_idx))
+    f1 = copy(LocationSpeciesToStateVector(sol.f[t_idx[1]],PhaseSpace,species_index=species_index,x_idx=x_idx,y_idx=y_idx,z_idx=z_idx))
+    f2 = copy(LocationSpeciesToStateVector(sol.f[t_idx[2]],PhaseSpace,species_index=species_index,x_idx=x_idx,y_idx=y_idx,z_idx=z_idx))
+    f3 = copy(LocationSpeciesToStateVector(sol.f[t_idx[3]],PhaseSpace,species_index=species_index,x_idx=x_idx,y_idx=y_idx,z_idx=z_idx))
 
     #dis1 = dropdims(sum(reshape(sol.f[t_idx[1]].x[species_index],(p_num,u_num,h_num)),dims=3),dims=3)
     #dis2 = dropdims(sum(reshape(sol.f[t_idx[2]].x[species_index],(p_num,u_num,h_num)),dims=3),dims=3)
@@ -1218,7 +1215,7 @@ function MomentumAndPolarAngleDistributionPlot0D(type::Animated,PhaseSpace::Phas
 
 
     dis = @lift begin
-        f1D = copy(Location_Species_To_StateVector(sol.f[$time_idx],PhaseSpace,species_index=species_index,x_idx=x_idx,y_idx=y_idx,z_idx=z_idx))
+        f1D = copy(LocationSpeciesToStateVector(sol.f[$time_idx],PhaseSpace,species_index=species_index,x_idx=x_idx,y_idx=y_idx,z_idx=z_idx))
         f2D = dropdims(sum(reshape(f1D,(p_num,u_num,h_num)),dims=3),dims=3)
         # scale by order
         # f = dN/dpdudh * dpdudh therefore dN/dpdu = f / dpdu and p^order * dN/dpdu = f * mp^order / dpdu
@@ -1362,9 +1359,9 @@ function MomentumAndAzimuthalAngleDistributionPlot(sol,species::String,PhaseSpac
 
     fig = Figure(size=(576,276)) # 8:3 aspect ratio
 
-    f1 = copy(Location_Species_To_StateVector(sol.f[t_idx[1]],PhaseSpace,species_index=species_index))
-    f2 = copy(Location_Species_To_StateVector(sol.f[t_idx[2]],PhaseSpace,species_index=species_index))
-    f3 = copy(Location_Species_To_StateVector(sol.f[t_idx[3]],PhaseSpace,species_index=species_index))
+    f1 = copy(LocationSpeciesToStateVector(sol.f[t_idx[1]],PhaseSpace,species_index=species_index))
+    f2 = copy(LocationSpeciesToStateVector(sol.f[t_idx[2]],PhaseSpace,species_index=species_index))
+    f3 = copy(LocationSpeciesToStateVector(sol.f[t_idx[3]],PhaseSpace,species_index=species_index))
 
     #dis1 = dropdims(sum(reshape(sol.f[t_idx[1]].x[species_index],(p_num,u_num,h_num)),dims=3),dims=3)
     #dis2 = dropdims(sum(reshape(sol.f[t_idx[2]].x[species_index],(p_num,u_num,h_num)),dims=3),dims=3)
@@ -1517,7 +1514,7 @@ function MomentumAndAzimuthalAngleDistributionPlot(sol,species::String,PhaseSpac
 
             colormap = Makie.ColorScheme(range(Makie.alphacolor(color,0.0),Makie.alphacolor(color,1.0),length=256))
 
-            f = copy(Location_Species_To_StateVector(sol.f[i],PhaseSpace,species_index=species_index))
+            f = copy(LocationSpeciesToStateVector(sol.f[i],PhaseSpace,species_index=species_index))
 
             # sum over u angle
             dis = dropdims(sum(reshape(f,(p_num,u_num,h_num)),dims=2),dims=2)
@@ -1615,7 +1612,7 @@ function MomentumAndAzimuthalAngleDistributionPlot(sol,species::Vector{String},P
 
 
     dis = @lift begin
-        f1D = copy(Location_Species_To_StateVector(sol.f[$time_idx],PhaseSpace,species_index=species_index))
+        f1D = copy(LocationSpeciesToStateVector(sol.f[$time_idx],PhaseSpace,species_index=species_index))
         # sum over u angles
         f2D = dropdims(sum(reshape(f1D,(p_num,u_num,h_num)),dims=2),dims=2)
         # scale by order
@@ -1989,7 +1986,7 @@ function AM3_DIP_Combo_MomentumDistributionPlot(filePath_AM3,sol_DIP,PhaseSpace_
                 t_idx = 1 # works for both log and uniform diplodocus time stepping
             end          
             println(t_idx)
-            f1D .= copy(Location_Species_To_StateVector(sol_DIP.f[t_idx],PhaseSpace_DIP,species_index=species_index))
+            f1D .= copy(LocationSpeciesToStateVector(sol_DIP.f[t_idx],PhaseSpace_DIP,species_index=species_index))
             f3D .= reshape(f1D,(p_num,u_num,h_num))
             @. f3D = f3D*(f3D!=Inf)
             # scale by order
@@ -2071,7 +2068,7 @@ function AM3_DIP_Combo_MomentumDistributionPlot(filePath_AM3,sol_DIP,PhaseSpace_
             if isnothing(t_idx)
                 t_idx = 1 # works for both log and uniform diplodocus time stepping
             end 
-            f1D .= copy(Location_Species_To_StateVector(sol_DIP.f[t_idx],PhaseSpace_DIP,species_index=species_index))
+            f1D .= copy(LocationSpeciesToStateVector(sol_DIP.f[t_idx],PhaseSpace_DIP,species_index=species_index))
             f3D .= reshape(f1D,(p_num,u_num,h_num))
             @. f3D = f3D*(f3D!=Inf)
             # scale by order
@@ -2156,7 +2153,7 @@ function AM3_DIP_Combo_MomentumDistributionPlot(filePath_AM3,sol_DIP,PhaseSpace_
                 if isnothing(t_idx)
                     t_idx = 1 # works for both log and uniform diplodocus time stepping
                 end 
-                f1D .= copy(Location_Species_To_StateVector(sol_DIP.f[t_idx],PhaseSpace_DIP,species_index=species_index))
+                f1D .= copy(LocationSpeciesToStateVector(sol_DIP.f[t_idx],PhaseSpace_DIP,species_index=species_index))
                 f3D .= reshape(f1D,(p_num,u_num,h_num))
                 @. f3D = f3D*(f3D!=Inf)
                 # scale by order
@@ -2301,7 +2298,7 @@ function TwoSolAngleDistributionPlot(twosol::Tuple{OutputStruct,OutputStruct},sp
 
             pdNdp = @lift begin
                 f1D = zeros(Float32,p_num*u_num*h_num)
-                f1D .= copy(Location_Species_To_StateVector(sol.f[$time_idx],PhaseSpace,species_index=species_index))
+                f1D .= copy(LocationSpeciesToStateVector(sol.f[$time_idx],PhaseSpace,species_index=species_index))
                 f3D = zeros(Float32,p_num,u_num,h_num)
                 f3D .= reshape(f1D,(p_num,u_num,h_num))
                 @. f3D = f3D*(f3D!=Inf)
